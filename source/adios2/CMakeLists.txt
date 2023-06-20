@@ -61,6 +61,9 @@ add_library(adios2_core
   engine/plugin/PluginEngine.cpp engine/plugin/PluginEngineInterface.cpp
   operator/plugin/PluginOperator.cpp operator/plugin/PluginOperatorInterface.cpp
 #toolkit
+  toolkit/expression/lexer.cpp
+  toolkit/expression/parser.cpp
+
   toolkit/format/buffer/Buffer.cpp
   toolkit/format/buffer/BufferV.cpp
   toolkit/format/buffer/malloc/MallocV.cpp

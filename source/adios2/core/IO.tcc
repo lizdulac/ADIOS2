@@ -24,6 +24,7 @@
 #include "adios2/helper/adiosType.h"
 #include <adios2-perfstubs-interface.h>
 #include <adios2/core/Engine.h>
+#include "adios2/toolkit/expression/parser.h"
 
 namespace adios2
 {
@@ -31,10 +32,19 @@ namespace core
 {
 
 template <class T>
+void IO::DefineDerivedVariable(char* expression)
+{
+    parse_expression(expression);
+}
+
+template <class T>
 Variable<T> &IO::DefineVariable(const std::string &name, const Dims &shape,
                                 const Dims &start, const Dims &count,
                                 const bool constantDims)
 {
+    std::cout << "DefineVariable calling parse_expression:" << std::endl;
+    char* expr = "(7*(10+2)/(-3))\n";
+    parse_expression(expr);
     PERFSTUBS_SCOPED_TIMER("IO::DefineVariable");
 
     {
