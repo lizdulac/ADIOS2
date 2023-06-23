@@ -152,6 +152,9 @@ public:
     DefineVariable(const std::string &name, const Dims &shape = Dims(),
                    const Dims &start = Dims(), const Dims &count = Dims(),
                    const bool constantDims = false);
+    template <class T>
+    Variable<T> DefineDerivedVariable(const std::string &name,
+                                      const std::string &expression);
 
     VariableNT DefineVariable(const DataType type, const std::string &name,
                               const Dims &shape = Dims(),

@@ -22,9 +22,9 @@
 #include "adios2/common/ADIOSMacros.h"
 #include "adios2/helper/adiosFunctions.h"
 #include "adios2/helper/adiosType.h"
+#include "adios2/toolkit/expression/parser.h"
 #include <adios2-perfstubs-interface.h>
 #include <adios2/core/Engine.h>
-#include "adios2/toolkit/expression/parser.h"
 
 namespace adios2
 {
@@ -32,9 +32,30 @@ namespace core
 {
 
 template <class T>
-void IO::DefineDerivedVariable(char* expression)
+Variable<T> &IO::DefineDerivedVariable(const std::string &name,
+                                       const std::string &expression)
 {
-    parse_expression(expression);
+    PERFSTUBS_SCOPED_TIMER("IO::DefineDerivedVariable");
+
+    {
+        auto itVariable = m_Variables.find(name);
+        if (itVariable != m_Variables.end())
+        {
+            helper::Throw<std::invalid_argument>(
+                "Core", "IO", "DefineDerivedVariable",
+                "variable " + name + " already defined in IO " + m_Name);
+        }
+    }
+    parse_expression(expression.data());
+    auto itVariablePair =
+        m_Variables.emplace(name, std::unique_ptr<VariableBase>(new Variable<T>(
+                                      name, {10}, {0}, {10}, true)));
+
+    Variable<T> &variable =
+        static_cast<Variable<T> &>(*itVariablePair.first->second);
+    DefineAttribute<std::string>("_derived/" + name, expression);
+    variable.addDerivedExpression(expression);
+    return variable;
 }
 
 template <class T>
@@ -42,9 +63,6 @@ Variable<T> &IO::DefineVariable(const std::string &name, const Dims &shape,
                                 const Dims &start, const Dims &count,
                                 const bool constantDims)
 {
-    std::cout << "DefineVariable calling parse_expression:" << std::endl;
-    char* expr = "(7*(10+2)/(-3))\n";
-    parse_expression(expr);
     PERFSTUBS_SCOPED_TIMER("IO::DefineVariable");
 
     {

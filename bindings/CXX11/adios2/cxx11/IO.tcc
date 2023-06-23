@@ -18,6 +18,17 @@ namespace adios2
 {
 
 template <class T>
+Variable<T> IO::DefineDerivedVariable(const std::string &name,
+                                      const std::string &expression)
+{
+    helper::CheckForNullptr(m_IO, "for variable name " + name +
+                                      ", in call to IO::DefineDerivedVariable");
+    return Variable<T>(
+        &m_IO->DefineDerivedVariable<typename TypeInfo<T>::IOType>(name,
+                                                                   expression));
+}
+
+template <class T>
 Variable<T> IO::DefineVariable(const std::string &name, const Dims &shape,
                                const Dims &start, const Dims &count,
                                const bool constantDims)
