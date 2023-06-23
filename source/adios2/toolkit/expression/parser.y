@@ -56,7 +56,7 @@ exp:		        NUMBER                { void* expr = malloc(sizeof(Number<double>)
 			;
 %%
 
-void parse_expression(char* input) {
+void parse_expression(const char* input) {
   /*
   if (argc > 1) {
       yyin = fopen(argv[1], "r");
