@@ -43,9 +43,9 @@ int main(int argc, char *argv[])
         "simVar1", {size * Nx}, {rank * Nx}, {Nx});
     auto bpVar2 = bpIO.DefineVariable<float>(
         "simVar2", {size * Nx}, {rank * Nx}, {Nx});
-    auto derVar = bpIO.DefineDerivedVariable<float>("derivedVar", "sqrt(x^2+y^2) \n"
-        "x:simVar1 \n"
-        "y:SimVar2");
+    auto derVar = bpIO.DefineDerivedVariable<float>("derivedVar", "x:simVar1 \n"
+        "y:simVar2 \n"
+        "sqrt(x^2+y^2)");
 
     std::string filename = "SimpleExpression.bp";
     adios2::Engine bpFileWriter = bpIO.Open(filename, adios2::Mode::Write);

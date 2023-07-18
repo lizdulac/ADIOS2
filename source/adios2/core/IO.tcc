@@ -46,7 +46,15 @@ Variable<T> &IO::DefineDerivedVariable(const std::string &name,
                 "variable " + name + " already defined in IO " + m_Name);
         }
     }
-    parse_expression(expression.data());
+    std::vector<std::string> variables = parse_expression(expression.data());
+
+    // DEBUGGING
+    for (std::string s: variables)
+    {
+    std::cout << "variable: " << s << std::endl;
+    }
+    // END DEBUGGING
+
     auto itVariablePair =
         m_Variables.emplace(name, std::unique_ptr<VariableBase>(new Variable<T>(
                                       name, {10}, {0}, {10}, true)));
