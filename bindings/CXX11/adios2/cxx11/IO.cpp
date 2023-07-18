@@ -247,6 +247,8 @@ IO::IO(core::IO *io) : m_IO(io) {}
     template Variable<T> IO::DefineVariable(const std::string &, const Dims &, \
                                             const Dims &, const Dims &,        \
                                             const bool);                       \
+    template Variable<T> IO::DefineDerivedVariable(const std::string &,        \
+                                                   const std::string &);       \
                                                                                \
     template Variable<T> IO::InquireVariable<T>(const std::string &);
 

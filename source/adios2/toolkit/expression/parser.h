@@ -109,4 +109,4 @@ typedef struct YYLTYPE
 
 extern YYLTYPE yylloc;
 
-void parse_expression(char* input);
+void parse_expression(const char* input);

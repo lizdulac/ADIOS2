@@ -3,6 +3,9 @@
 # accompanying file Copyright.txt for details.
 #------------------------------------------------------------------------------#
 
+add_executable(hello_bpExpression helloBPExpression.cpp)
+target_link_libraries(hello_bpExpression adios2::cxx11)
+
 add_executable(hello_bpWriter helloBPWriter.cpp)
 target_link_libraries(hello_bpWriter adios2::cxx11)
 

@@ -177,9 +177,9 @@ public:
      * defined
      */
     template <class T>
-    void
-    DefineDerivedVariable(char* expression);
-  
+    Variable<T> &DefineDerivedVariable(const std::string &name,
+                                       const std::string &expression);
+
     template <class T>
     Variable<T> &
     DefineVariable(const std::string &name, const Dims &shape = Dims(),

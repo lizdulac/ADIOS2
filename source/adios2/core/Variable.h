@@ -47,6 +47,9 @@ public:
     /** current value */
     T m_Value = T();
 
+    bool m_isDerived = false;
+    std::string m_DerivedExpression;
+
     struct BPInfo
     {
         /** Contains (seek) read information for available [step][blockID],
@@ -117,6 +120,12 @@ public:
 
     std::vector<std::vector<typename Variable<T>::BPInfo>>
     AllStepsBlocksInfo() const;
+
+    void addDerivedExpression(const std::string expression)
+    {
+        m_isDerived = true;
+        m_DerivedExpression = expression;
+    };
 
 private:
     Dims DoCount() const;
