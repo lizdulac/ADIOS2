@@ -22,7 +22,7 @@
 #include "adios2/common/ADIOSMacros.h"
 #include "adios2/helper/adiosFunctions.h"
 #include "adios2/helper/adiosType.h"
-#include "adios2/toolkit/expression/parser.h"
+#include "adios2/toolkit/expression/parser.hpp"
 #include <adios2-perfstubs-interface.h>
 #include <adios2/core/Engine.h>
 
