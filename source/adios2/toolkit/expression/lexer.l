@@ -1,5 +1,5 @@
 %{   
-#include "parser.h"
+#include "parser.hpp"
 #define YY_USER_ACTION yylloc.first_line = yylloc.last_line = yylineno;
 %}
 
@@ -7,16 +7,18 @@
 
 
 DIGIT    [0-9]
+CHAR     ([a-z]|[A-Z])
    
 %%
 
-"-"            {return MINUS;}
 "+"            {return PLUS;}
+"-"            {return MINUS;}
 "*"            {return MULT;}
 "/"            {return DIV;}
 "("            {return L_PAREN;}
 ")"            {return R_PAREN;}
 "sqrt"         {return SQRT;}
+"^"            {return POW;}
 "sin"          {return SIN;}
 "cos"          {return COS;}
 "tan"          {return TAN;}
@@ -24,11 +26,15 @@ DIGIT    [0-9]
 "curl"         {return CURL;}
 
 
-(\.{DIGIT}+)|({DIGIT}+(\.{DIGIT}*)?([eE][+-]?[0-9]+)?)   {return NUMBER;}
+(\.{DIGIT}+)|({DIGIT}+(\.{DIGIT}*)?([eE][+-]?[0-9]+)?)   {yylval.dval = atof(yytext); return NUMBER;}
 
 [ \t]+         {/* ignore spaces */}
 
-[\n<<EOF>>$end]           {return END;}
+(\n|\0|EOF|$end)           {return ENDL;}
+
+({CHAR}|{DIGIT}|_)+        {yylval.sval=strdup(yytext); return ALIAS;}
+
+:(\\|\/|_|{DIGIT})*{CHAR}+(\\|\/|-|_|{DIGIT}|{CHAR})*      {yylval.sval=strndup(yytext + 1,strlen(yytext)-1); return PATH;}
 
 .              {printf("Error at line %d: unrecognized symbol \"%s\"\n", yylloc.first_line, yytext); exit(0);}
 

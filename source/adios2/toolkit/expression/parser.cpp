@@ -66,39 +66,45 @@
    /* Put the tokens into the symbol table, so that GDB and other debuggers
       know about them.  */
    enum yytokentype {
-     MULT = 258,
-     DIV = 259,
-     PLUS = 260,
-     MINUS = 261,
-     L_PAREN = 262,
-     R_PAREN = 263,
-     END = 264,
-     SQRT = 265,
-     SIN = 266,
-     COS = 267,
-     TAN = 268,
-     MAGNITUDE = 269,
-     CURL = 270,
-     NUMBER = 271,
-     UMINUS = 272
+     SQRT = 258,
+     POW = 259,
+     SIN = 260,
+     COS = 261,
+     TAN = 262,
+     MAGNITUDE = 263,
+     CURL = 264,
+     MULT = 265,
+     DIV = 266,
+     PLUS = 267,
+     MINUS = 268,
+     L_PAREN = 269,
+     R_PAREN = 270,
+     ENDL = 271,
+     NUMBER = 272,
+     ALIAS = 273,
+     PATH = 274,
+     UMINUS = 275
    };
 #endif
 /* Tokens.  */
-#define MULT 258
-#define DIV 259
-#define PLUS 260
-#define MINUS 261
-#define L_PAREN 262
-#define R_PAREN 263
-#define END 264
-#define SQRT 265
-#define SIN 266
-#define COS 267
-#define TAN 268
-#define MAGNITUDE 269
-#define CURL 270
-#define NUMBER 271
-#define UMINUS 272
+#define SQRT 258
+#define POW 259
+#define SIN 260
+#define COS 261
+#define TAN 262
+#define MAGNITUDE 263
+#define CURL 264
+#define MULT 265
+#define DIV 266
+#define PLUS 267
+#define MINUS 268
+#define L_PAREN 269
+#define R_PAREN 270
+#define ENDL 271
+#define NUMBER 272
+#define ALIAS 273
+#define PATH 274
+#define UMINUS 275
 
 
 
@@ -109,6 +115,9 @@
  #include <stdio.h>
  #include <stdlib.h>
  #include <math.h>
+ #include <string>
+ #include <vector>
+ #include <iostream>
  #include "lexer.h"
  #include "expression.h"
 
@@ -145,14 +154,15 @@
 
 #if ! defined YYSTYPE && ! defined YYSTYPE_IS_DECLARED
 typedef union YYSTYPE
-#line 22 "parser.y"
+#line 25 "parser.y"
 {
   double dval;
   int ival;
+  char* sval;
   struct custom_data* expr;
 }
 /* Line 193 of yacc.c.  */
-#line 156 "parser.c"
+#line 166 "parser.cpp"
 	YYSTYPE;
 # define yystype YYSTYPE /* obsolescent; will be withdrawn */
 # define YYSTYPE_IS_DECLARED 1
@@ -177,7 +187,7 @@ typedef struct YYLTYPE
 
 
 /* Line 216 of yacc.c.  */
-#line 181 "parser.c"
+#line 191 "parser.cpp"
 
 #ifdef short
 # undef short
@@ -392,22 +402,22 @@ union yyalloc
 #endif
 
 /* YYFINAL -- State number of the termination state.  */
-#define YYFINAL  8
+#define YYFINAL  16
 /* YYLAST -- Last index in YYTABLE.  */
-#define YYLAST   25
+#define YYLAST   70
 
 /* YYNTOKENS -- Number of terminals.  */
-#define YYNTOKENS  18
+#define YYNTOKENS  21
 /* YYNNTS -- Number of nonterminals.  */
-#define YYNNTS  3
+#define YYNNTS  4
 /* YYNRULES -- Number of rules.  */
-#define YYNRULES  9
+#define YYNRULES  16
 /* YYNRULES -- Number of states.  */
-#define YYNSTATES  19
+#define YYNSTATES  34
 
 /* YYTRANSLATE(YYLEX) -- Bison symbol number corresponding to YYLEX.  */
 #define YYUNDEFTOK  2
-#define YYMAXUTOK   272
+#define YYMAXUTOK   275
 
 #define YYTRANSLATE(YYX)						\
   ((unsigned int) (YYX) <= YYMAXUTOK ? yytranslate[YYX] : YYUNDEFTOK)
@@ -442,7 +452,7 @@ static const yytype_uint8 yytranslate[] =
        2,     2,     2,     2,     2,     2,     2,     2,     2,     2,
        2,     2,     2,     2,     2,     2,     1,     2,     3,     4,
        5,     6,     7,     8,     9,    10,    11,    12,    13,    14,
-      15,    16,    17
+      15,    16,    17,    18,    19,    20
 };
 
 #if YYDEBUG
@@ -450,22 +460,26 @@ static const yytype_uint8 yytranslate[] =
    YYRHS.  */
 static const yytype_uint8 yyprhs[] =
 {
-       0,     0,     3,     6,     8,    12,    16,    20,    24,    27
+       0,     0,     3,     4,     7,    10,    13,    16,    18,    20,
+      24,    28,    32,    36,    40,    43,    48
 };
 
 /* YYRHS -- A `-1'-separated list of the rules' RHS.  */
 static const yytype_int8 yyrhs[] =
 {
-      19,     0,    -1,    20,     9,    -1,    16,    -1,    20,     5,
-      20,    -1,    20,     6,    20,    -1,    20,     3,    20,    -1,
-      20,     4,    20,    -1,     6,    20,    -1,     7,    20,     8,
-      -1
+      22,     0,    -1,    -1,    16,    22,    -1,    23,    22,    -1,
+      24,    22,    -1,    18,    19,    -1,    18,    -1,    17,    -1,
+      14,    24,    15,    -1,    24,    10,    24,    -1,    24,    11,
+      24,    -1,    24,    12,    24,    -1,    24,    13,    24,    -1,
+      13,    24,    -1,     3,    14,    24,    15,    -1,    24,     4,
+      24,    -1
 };
 
 /* YYRLINE[YYN] -- source line where rule number YYN was defined.  */
 static const yytype_uint8 yyrline[] =
 {
-       0,    46,    46,    49,    50,    51,    52,    53,    54,    55
+       0,    53,    53,    54,    55,    56,    59,    62,    63,    64,
+      65,    66,    67,    68,    69,    70,    71
 };
 #endif
 
@@ -474,9 +488,10 @@ static const yytype_uint8 yyrline[] =
    First, the terminals, then, starting at YYNTOKENS, nonterminals.  */
 static const char *const yytname[] =
 {
-  "$end", "error", "$undefined", "MULT", "DIV", "PLUS", "MINUS",
-  "L_PAREN", "R_PAREN", "END", "SQRT", "SIN", "COS", "TAN", "MAGNITUDE",
-  "CURL", "NUMBER", "UMINUS", "$accept", "input", "exp", 0
+  "$end", "error", "$undefined", "SQRT", "POW", "SIN", "COS", "TAN",
+  "MAGNITUDE", "CURL", "MULT", "DIV", "PLUS", "MINUS", "L_PAREN",
+  "R_PAREN", "ENDL", "NUMBER", "ALIAS", "PATH", "UMINUS", "$accept",
+  "input", "decl", "exp", 0
 };
 #endif
 
@@ -486,20 +501,23 @@ static const char *const yytname[] =
 static const yytype_uint16 yytoknum[] =
 {
        0,   256,   257,   258,   259,   260,   261,   262,   263,   264,
-     265,   266,   267,   268,   269,   270,   271,   272
+     265,   266,   267,   268,   269,   270,   271,   272,   273,   274,
+     275
 };
 # endif
 
 /* YYR1[YYN] -- Symbol number of symbol that rule YYN derives.  */
 static const yytype_uint8 yyr1[] =
 {
-       0,    18,    19,    20,    20,    20,    20,    20,    20,    20
+       0,    21,    22,    22,    22,    22,    23,    24,    24,    24,
+      24,    24,    24,    24,    24,    24,    24
 };
 
 /* YYR2[YYN] -- Number of symbols composing right hand side of rule YYN.  */
 static const yytype_uint8 yyr2[] =
 {
-       0,     2,     2,     1,     3,     3,     3,     3,     2,     3
+       0,     2,     0,     2,     2,     2,     2,     1,     1,     3,
+       3,     3,     3,     3,     2,     4,     3
 };
 
 /* YYDEFACT[STATE-NAME] -- Default rule to reduce with in state
@@ -507,56 +525,72 @@ static const yytype_uint8 yyr2[] =
    means the default is an error.  */
 static const yytype_uint8 yydefact[] =
 {
-       0,     0,     0,     3,     0,     0,     8,     0,     1,     0,
-       0,     0,     0,     2,     9,     6,     7,     4,     5
+       2,     0,     0,     0,     2,     8,     7,     0,     2,     2,
+       0,     7,    14,     0,     3,     6,     1,     4,     0,     0,
+       0,     0,     0,     5,     0,     0,     9,    16,    10,    11,
+      12,    13,    15,    13
 };
 
 /* YYDEFGOTO[NTERM-NUM].  */
 static const yytype_int8 yydefgoto[] =
 {
-      -1,     4,     5
+      -1,     7,     8,     9
 };
 
 /* YYPACT[STATE-NUM] -- Index in YYTABLE of the portion describing
    STATE-NUM.  */
-#define YYPACT_NINF -5
+#define YYPACT_NINF -16
 static const yytype_int8 yypact[] =
 {
-      -4,    -4,    -4,    -5,     6,    10,    -5,    17,    -5,    -4,
-      -4,    -4,    -4,    -5,    -5,    -5,    -5,     1,     1
+      24,   -12,    30,    30,    24,   -16,   -15,     5,    24,    18,
+      30,   -16,   -16,    -1,   -16,   -16,   -16,   -16,    30,    30,
+      30,    30,    30,   -16,    41,    30,   -16,     2,     2,     2,
+      51,    53,   -16,    51
 };
 
 /* YYPGOTO[NTERM-NUM].  */
 static const yytype_int8 yypgoto[] =
 {
-      -5,    -5,    -1
+     -16,    61,   -16,    -2
 };
 
 /* YYTABLE[YYPACT[STATE-NUM]].  What to do in state STATE-NUM.  If
    positive, shift that token.  If negative, reduce the rule which
    number is the opposite.  If zero, do what YYDEFACT says.
    If YYTABLE_NINF, syntax error.  */
-#define YYTABLE_NINF -1
-static const yytype_uint8 yytable[] =
+#define YYTABLE_NINF -15
+static const yytype_int8 yytable[] =
 {
-       6,     7,     1,     2,     9,    10,     8,     0,    15,    16,
-      17,    18,     3,     9,    10,    11,    12,     0,     0,    13,
-       9,    10,    11,    12,     0,    14
+      12,    13,    10,    18,    15,    16,    18,     0,    24,    19,
+      20,    21,    25,     0,    26,     0,    27,    28,    29,    30,
+      31,     1,    18,    33,     0,     0,     0,     1,    19,    20,
+      21,    22,     3,     1,     4,     5,     6,     2,     3,     0,
+       4,     5,     6,     2,     3,    18,     0,     5,    11,     0,
+       0,    19,    20,    21,    25,    18,    32,   -14,     0,     0,
+       0,    19,    20,   -14,   -14,    14,     0,     0,     0,    17,
+      23
 };
 
 static const yytype_int8 yycheck[] =
 {
-       1,     2,     6,     7,     3,     4,     0,    -1,     9,    10,
-      11,    12,    16,     3,     4,     5,     6,    -1,    -1,     9,
-       3,     4,     5,     6,    -1,     8
+       2,     3,    14,     4,    19,     0,     4,    -1,    10,    10,
+      11,    12,    13,    -1,    15,    -1,    18,    19,    20,    21,
+      22,     3,     4,    25,    -1,    -1,    -1,     3,    10,    11,
+      12,    13,    14,     3,    16,    17,    18,    13,    14,    -1,
+      16,    17,    18,    13,    14,     4,    -1,    17,    18,    -1,
+      -1,    10,    11,    12,    13,     4,    15,     4,    -1,    -1,
+      -1,    10,    11,    10,    11,     4,    -1,    -1,    -1,     8,
+       9
 };
 
 /* YYSTOS[STATE-NUM] -- The (internal number of the) accessing
    symbol of state STATE-NUM.  */
 static const yytype_uint8 yystos[] =
 {
-       0,     6,     7,    16,    19,    20,    20,    20,     0,     3,
-       4,     5,     6,     9,     8,    20,    20,    20,    20
+       0,     3,    13,    14,    16,    17,    18,    22,    23,    24,
+      14,    18,    24,    24,    22,    19,     0,    22,     4,    10,
+      11,    12,    13,    22,    24,    13,    15,    24,    24,    24,
+      24,    24,    15,    24
 };
 
 #define yyerrok		(yyerrstatus = 0)
@@ -1393,48 +1427,83 @@ yyreduce:
   switch (yyn)
     {
         case 2:
-#line 46 "parser.y"
-    { yyparse_value = (yyvsp[(1) - (2)].expr)->expression; ;}
+#line 53 "parser.y"
+    {;}
     break;
 
   case 3:
-#line 49 "parser.y"
-    { void* expr = malloc(sizeof(Number<double>)); struct custom_data* cd = new struct custom_data; Number<double>* num = new(expr) Number<double>((yyvsp[(1) - (1)].dval)); cd->expression = num; (yyval.expr) = cd;;}
+#line 54 "parser.y"
+    {;}
     break;
 
   case 4:
-#line 50 "parser.y"
-    { void* expr = malloc(sizeof(Addition<double>)); struct custom_data* cd = new struct custom_data; Addition<double>* add = new(expr) Addition<double>((yyvsp[(1) - (3)].expr)->expression, (yyvsp[(3) - (3)].expr)->expression); cd->expression = add; (yyval.expr) = cd; ;}
+#line 55 "parser.y"
+    {;}
     break;
 
   case 5:
-#line 51 "parser.y"
-    { void* expr = malloc(sizeof(Subtraction<double>)); struct custom_data* cd = new struct custom_data; Subtraction<double>* subtr = new(expr) Subtraction<double>((yyvsp[(1) - (3)].expr)->expression, (yyvsp[(3) - (3)].expr)->expression); cd->expression = subtr; (yyval.expr) = cd; ;}
+#line 56 "parser.y"
+    { yyparse_value = (yyvsp[(1) - (2)].expr)->expression; ;}
     break;
 
   case 6:
-#line 52 "parser.y"
-    { void* expr = malloc(sizeof(Multiplication<double>)); struct custom_data* cd = new struct custom_data; Multiplication<double>* mult = new(expr) Multiplication<double>((yyvsp[(1) - (3)].expr)->expression, (yyvsp[(3) - (3)].expr)->expression); cd->expression = mult; (yyval.expr) = cd; ;}
+#line 59 "parser.y"
+    { add_var((yyvsp[(1) - (2)].sval),(yyvsp[(2) - (2)].sval)); ;}
     break;
 
   case 7:
-#line 53 "parser.y"
-    { void* expr = malloc(sizeof(Division<double>)); struct custom_data* cd = new struct custom_data; Division<double>* div = new(expr) Division<double>((yyvsp[(1) - (3)].expr)->expression, (yyvsp[(3) - (3)].expr)->expression); cd->expression = div; (yyval.expr) = cd; ;}
+#line 62 "parser.y"
+    { void* expr = malloc(sizeof(Alias<double>)); struct custom_data* cd = new struct custom_data; Alias<double>* var = new(expr) Alias<double>((yyvsp[(1) - (1)].sval)); cd->expression = var; (yyval.expr) = cd; ;}
     break;
 
   case 8:
-#line 54 "parser.y"
-    { void* expr = malloc(sizeof(Negation<double>)); struct custom_data* cd = new struct custom_data; Negation<double>* negative = new(expr) Negation<double>((yyvsp[(2) - (2)].expr)->expression); cd->expression = negative; (yyval.expr) = cd; ;}
+#line 63 "parser.y"
+    { void* expr = malloc(sizeof(Number<double>)); struct custom_data* cd = new struct custom_data; Number<double>* num = new(expr) Number<double>((yyvsp[(1) - (1)].dval)); cd->expression = num; (yyval.expr) = cd;;}
     break;
 
   case 9:
-#line 55 "parser.y"
+#line 64 "parser.y"
     { (yyval.expr) = (yyvsp[(2) - (3)].expr); ;}
+    break;
+
+  case 10:
+#line 65 "parser.y"
+    { void* expr = malloc(sizeof(Multiplication<double>)); struct custom_data* cd = new struct custom_data; Multiplication<double>* mult = new(expr) Multiplication<double>((yyvsp[(1) - (3)].expr)->expression, (yyvsp[(3) - (3)].expr)->expression); cd->expression = mult; (yyval.expr) = cd; ;}
+    break;
+
+  case 11:
+#line 66 "parser.y"
+    { void* expr = malloc(sizeof(Division<double>)); struct custom_data* cd = new struct custom_data; Division<double>* div = new(expr) Division<double>((yyvsp[(1) - (3)].expr)->expression, (yyvsp[(3) - (3)].expr)->expression); cd->expression = div; (yyval.expr) = cd; ;}
+    break;
+
+  case 12:
+#line 67 "parser.y"
+    { void* expr = malloc(sizeof(Addition<double>)); struct custom_data* cd = new struct custom_data; Addition<double>* add = new(expr) Addition<double>((yyvsp[(1) - (3)].expr)->expression, (yyvsp[(3) - (3)].expr)->expression); cd->expression = add; (yyval.expr) = cd; ;}
+    break;
+
+  case 13:
+#line 68 "parser.y"
+    { void* expr = malloc(sizeof(Subtraction<double>)); struct custom_data* cd = new struct custom_data; Subtraction<double>* subtr = new(expr) Subtraction<double>((yyvsp[(1) - (3)].expr)->expression, (yyvsp[(3) - (3)].expr)->expression); cd->expression = subtr; (yyval.expr) = cd; ;}
+    break;
+
+  case 14:
+#line 69 "parser.y"
+    { void* expr = malloc(sizeof(Negation<double>)); struct custom_data* cd = new struct custom_data; Negation<double>* negative = new(expr) Negation<double>((yyvsp[(2) - (2)].expr)->expression); cd->expression = negative; (yyval.expr) = cd; ;}
+    break;
+
+  case 15:
+#line 70 "parser.y"
+    { void* expr = malloc(sizeof(Sqrt<double>)); struct custom_data* cd = new struct custom_data; Sqrt<double>* sqrt = new(expr) Sqrt<double>((yyvsp[(3) - (4)].expr)->expression); cd->expression = sqrt; (yyval.expr) = cd; ;}
+    break;
+
+  case 16:
+#line 71 "parser.y"
+    { void* expr = malloc(sizeof(Pow<double>)); struct custom_data* cd = new struct custom_data; Pow<double>* pow = new(expr) Pow<double>((yyvsp[(1) - (3)].expr)->expression, (yyvsp[(3) - (3)].expr)->expression); cd->expression = pow; (yyval.expr) = cd; ;}
     break;
 
 
 /* Line 1267 of yacc.c.  */
-#line 1438 "parser.c"
+#line 1507 "parser.cpp"
       default: break;
     }
   YY_SYMBOL_PRINT ("-> $$ =", yyr1[yyn], &yyval, &yyloc);
@@ -1654,27 +1723,25 @@ yyreturn:
 }
 
 
-#line 57 "parser.y"
+#line 73 "parser.y"
 
 
-void parse_expression(char* input) {
-  /*
-  if (argc > 1) {
-      yyin = fopen(argv[1], "r");
-      if (yyin == NULL){
-         printf("syntax: %s filename\n", argv[0]);
-      }//end if
-   }//end if
-  */
-  //yyinput = input;
+std::vector<std::string> parse_expression(const char* input) {
   yy_scan_string(input);
-   yyparse(); // Calls yylex() for tokens.
+   yyparse();
+
+   // DEBUGGING
    if (yyparse_value == nullptr)
      {
        printf("Parsed tree, but didn't return correctly\n");
      }else{
        printf("Parsed tree: %s\n", yyparse_value->printpretty("    ").c_str());
-   }
+       }
+   // END DEBUGGING
+
+   std::vector<std::string> ret;
+    yyparse_value->get_var(&ret);
+    return ret;
 }
 
 void yyerror(const char *msg) {

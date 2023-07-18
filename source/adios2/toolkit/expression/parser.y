@@ -3,6 +3,9 @@
  #include <stdio.h>
  #include <stdlib.h>
  #include <math.h>
+ #include <string>
+ #include <vector>
+ #include <iostream>
  #include "lexer.h"
  #include "expression.h"
 
@@ -22,6 +25,7 @@
 %union{
   double dval;
   int ival;
+  char* sval;
   struct custom_data* expr;
 }
 
@@ -29,51 +33,61 @@
 %locations
 
 %start input
-%token MULT DIV PLUS MINUS L_PAREN R_PAREN END
-%token SQRT
+%token SQRT POW
 %token SIN COS TAN
 %token MAGNITUDE CURL
+%token MULT DIV PLUS MINUS L_PAREN R_PAREN ENDL
 %token NUMBER
+%token ALIAS PATH
 %type <dval> NUMBER
+%type <sval> ALIAS PATH
 %type <expr> input exp
 %left PLUS MINUS
 %left MULT DIV
+%right POW
 %nonassoc UMINUS
 
 
 %% 
 
-input:		        exp END         { yyparse_value = $1->expression; }
+input:                  {}
+                        | ENDL input             {}
+                        | decl input             {}
+                        | exp input              { yyparse_value = $1->expression; }
 			;
 
-exp:		        NUMBER                { void* expr = malloc(sizeof(Number<double>)); struct custom_data* cd = new struct custom_data; Number<double>* num = new(expr) Number<double>($1); cd->expression = num; $$ = cd;}
-                        | exp PLUS exp        { void* expr = malloc(sizeof(Addition<double>)); struct custom_data* cd = new struct custom_data; Addition<double>* add = new(expr) Addition<double>($1->expression, $3->expression); cd->expression = add; $$ = cd; }
-                        | exp MINUS exp        { void* expr = malloc(sizeof(Subtraction<double>)); struct custom_data* cd = new struct custom_data; Subtraction<double>* subtr = new(expr) Subtraction<double>($1->expression, $3->expression); cd->expression = subtr; $$ = cd; }
+decl:                   ALIAS PATH      { add_var($1,$2); }
+                        ;
+
+exp:                    ALIAS                  { void* expr = malloc(sizeof(Alias<double>)); struct custom_data* cd = new struct custom_data; Alias<double>* var = new(expr) Alias<double>($1); cd->expression = var; $$ = cd; }
+                        | NUMBER                { void* expr = malloc(sizeof(Number<double>)); struct custom_data* cd = new struct custom_data; Number<double>* num = new(expr) Number<double>($1); cd->expression = num; $$ = cd;}
+			| L_PAREN exp R_PAREN { $$ = $2; }
                         | exp MULT exp        { void* expr = malloc(sizeof(Multiplication<double>)); struct custom_data* cd = new struct custom_data; Multiplication<double>* mult = new(expr) Multiplication<double>($1->expression, $3->expression); cd->expression = mult; $$ = cd; }
                         | exp DIV exp        { void* expr = malloc(sizeof(Division<double>)); struct custom_data* cd = new struct custom_data; Division<double>* div = new(expr) Division<double>($1->expression, $3->expression); cd->expression = div; $$ = cd; }
+                        | exp PLUS exp        { void* expr = malloc(sizeof(Addition<double>)); struct custom_data* cd = new struct custom_data; Addition<double>* add = new(expr) Addition<double>($1->expression, $3->expression); cd->expression = add; $$ = cd; }
+                        | exp MINUS exp        { void* expr = malloc(sizeof(Subtraction<double>)); struct custom_data* cd = new struct custom_data; Subtraction<double>* subtr = new(expr) Subtraction<double>($1->expression, $3->expression); cd->expression = subtr; $$ = cd; }
                         | MINUS exp %prec UMINUS        { void* expr = malloc(sizeof(Negation<double>)); struct custom_data* cd = new struct custom_data; Negation<double>* negative = new(expr) Negation<double>($2->expression); cd->expression = negative; $$ = cd; }
-			| L_PAREN exp R_PAREN { $$ = $2; }
+                        | SQRT L_PAREN exp R_PAREN        { void* expr = malloc(sizeof(Sqrt<double>)); struct custom_data* cd = new struct custom_data; Sqrt<double>* sqrt = new(expr) Sqrt<double>($3->expression); cd->expression = sqrt; $$ = cd; }
+                        | exp POW exp        { void* expr = malloc(sizeof(Pow<double>)); struct custom_data* cd = new struct custom_data; Pow<double>* pow = new(expr) Pow<double>($1->expression, $3->expression); cd->expression = pow; $$ = cd; }
 			;
 %%
 
-void parse_expression(char* input) {
-  /*
-  if (argc > 1) {
-      yyin = fopen(argv[1], "r");
-      if (yyin == NULL){
-         printf("syntax: %s filename\n", argv[0]);
-      }//end if
-   }//end if
-  */
-  //yyinput = input;
+std::vector<std::string> parse_expression(const char* input) {
   yy_scan_string(input);
-   yyparse(); // Calls yylex() for tokens.
+   yyparse();
+
+   // DEBUGGING
    if (yyparse_value == nullptr)
      {
        printf("Parsed tree, but didn't return correctly\n");
      }else{
        printf("Parsed tree: %s\n", yyparse_value->printpretty("    ").c_str());
-   }
+       }
+   // END DEBUGGING
+
+   std::vector<std::string> ret;
+    yyparse_value->get_var(&ret);
+    return ret;
 }
 
 void yyerror(const char *msg) {
