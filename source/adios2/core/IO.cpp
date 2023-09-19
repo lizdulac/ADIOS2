@@ -288,6 +288,9 @@ void IO::SetTransportParameter(const size_t transportIndex, const std::string ke
 }
 
 const VarMap &IO::GetVariables() const noexcept { return m_Variables; }
+#ifdef ADIOS2_HAVE_DERIVED
+const VarMap &IO::GetDerivedVariables() const noexcept { return m_VariablesDerived; }
+#endif
 
 const AttrMap &IO::GetAttributes() const noexcept { return m_Attributes; }
 
@@ -807,6 +810,44 @@ void IO::CheckTransportType(const std::string type) const
                 "call to IO AddTransport");
     }
 }
+
+#ifdef ADIOS2_HAVE_DERIVED
+VariableDerived &IO::DefineDerivedVariable(const std::string &name, const std::string &expression)
+{
+    PERFSTUBS_SCOPED_TIMER("IO::DefineDerivedVariable");
+
+    {
+        auto itVariable = m_VariablesDerived.find(name);
+        if (itVariable != m_VariablesDerived.end())
+        {
+            helper::Throw<std::invalid_argument>("Core", "IO", "DefineDerivedVariable",
+                                                 "derived variable " + name +
+                                                     " already defined in IO " + m_Name);
+        }
+    }
+
+    derived::Expression exp(expression);
+    auto itVariablePair =
+        m_VariablesDerived.emplace(name, std::unique_ptr<VariableBase>(new VariableDerived(
+                                  name, exp.GetType(), exp.GetElementSize(), exp.GetShape(), exp.GetStart(), exp.GetCount(), true)));
+    VariableDerived &variable =
+        static_cast<VariableDerived &>(*itVariablePair.first->second);
+
+    variable.AddDerivedExpression(exp);
+
+    // check IO placeholder for variable operations
+    auto itOperations = m_VarOpsPlaceholder.find(name);
+    if (itOperations != m_VarOpsPlaceholder.end())
+    {
+        variable.m_Operations.reserve(itOperations->second.size());
+        for (auto &operation : itOperations->second)
+        {
+            variable.AddOperation(operation.first, operation.second);
+        }
+    }
+    return variable;
+}
+#endif
 
 StructDefinition &IO::DefineStruct(const std::string &name, const size_t size)
 {

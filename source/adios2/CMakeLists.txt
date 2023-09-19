@@ -127,6 +127,13 @@ add_library(adios2_core
 set_property(TARGET adios2_core PROPERTY EXPORT_NAME core)
 set_property(TARGET adios2_core PROPERTY OUTPUT_NAME adios2${ADIOS2_LIBRARY_SUFFIX}_core)
 
+if (ADIOS2_HAVE_Derived)
+  target_sources(adios2_core PRIVATE
+      core/VariableDerived.cpp
+      toolkit/derived/Expression.cpp)
+#      toolkit/derived/Functions.cpp toolkit/derived/Functions.tcc)
+endif()
+
 set(maybe_adios2_core_cuda)
 if(ADIOS2_HAVE_CUDA)
   add_library(adios2_core_cuda helper/adiosCUDA.cu)

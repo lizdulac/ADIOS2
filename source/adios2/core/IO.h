@@ -28,6 +28,9 @@
 #include "adios2/core/CoreTypes.h"
 #include "adios2/core/Group.h"
 #include "adios2/core/Variable.h"
+#ifdef ADIOS2_HAVE_DERIVED
+#include "adios2/core/VariableDerived.h"
+#endif
 #include "adios2/core/VariableStruct.h"
 
 namespace adios2
@@ -179,7 +182,9 @@ public:
     Variable<T> &DefineVariable(const std::string &name, const Dims &shape = Dims(),
                                 const Dims &start = Dims(), const Dims &count = Dims(),
                                 const bool constantDims = false);
-
+#ifdef ADIOS2_HAVE_DERIVED
+    VariableDerived &DefineDerivedVariable(const std::string &name, const std::string &expression);
+#endif
     VariableStruct &DefineStructVariable(const std::string &name, StructDefinition &def,
                                          const Dims &shape = Dims(), const Dims &start = Dims(),
                                          const Dims &count = Dims(),
@@ -304,6 +309,9 @@ public:
      * </pre>
      */
     const VarMap &GetVariables() const noexcept;
+#ifdef ADIOS2_HAVE_DERIVED
+    const VarMap &GetDerivedVariables() const noexcept;
+#endif
 
     /**
      * Retrieves hash holding internal Attributes identifiers
@@ -500,6 +508,9 @@ private:
     adios2::IOMode m_IOMode = adios2::IOMode::Independent;
 
     VarMap m_Variables;
+#ifdef ADIOS2_HAVE_DERIVED
+    VarMap m_VariablesDerived;
+#endif
 
     AttrMap m_Attributes;
 

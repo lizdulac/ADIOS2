@@ -21,6 +21,11 @@ add_library(adios2_cxx11
   adios2/cxx11/Group.cpp
   adios2/cxx11/Group.tcc
 )
+if (ADIOS2_HAVE_Derived)
+  target_sources(adios2_cxx11 PRIVATE
+      adios2/cxx11/VariableDerived.cpp
+  )
+endif()
 
 set_property(TARGET adios2_cxx11 PROPERTY EXPORT_NAME cxx11)
 set_property(TARGET adios2_cxx11 PROPERTY OUTPUT_NAME adios2${ADIOS2_LIBRARY_SUFFIX}_cxx11)
