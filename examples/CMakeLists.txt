@@ -11,6 +11,10 @@ add_subdirectory(inlineMWE)
 add_subdirectory(plugins)
 add_subdirectory(fides)
 
+if(ADIOS2_HAVE_Derived)
+    add_subdirectory(derived)
+endif()
+
 if(ADIOS2_HAVE_MPI)
   add_subdirectory(heatTransfer)
 endif()
