@@ -10,8 +10,8 @@ public:
   enum expr_op  {
     OP_ALIAS, /* Parser-use only */
     OP_PATH, /* Parser-use only */
-    OP_INDEX, /* Parser-use only */
     OP_NUM, /* Parser-use only */
+    OP_INDEX,
     OP_ADD,
     OP_SQRT,
     OP_POW,

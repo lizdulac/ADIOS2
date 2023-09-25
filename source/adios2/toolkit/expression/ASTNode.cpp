@@ -179,12 +179,13 @@ void ASTNode::to_expr(Expression *parent)
       parent->add_child(alias);
     break;
   case ExprHelper::OP_NUM:
-      parent->add_child(value);
+      parent->set_base(value);
   default:
-      Expression *expr = parent->add_child(operation);
-      for (ASTNode* e: sub_expr)
-	{
-	  e->to_expr(expr);
-	}
+    Expression *expr = new Expression(operation);
+    parent->add_child(expr);
+    for (ASTNode* e: sub_expr)
+      {
+	e->to_expr(expr);
       }
+  }
 }

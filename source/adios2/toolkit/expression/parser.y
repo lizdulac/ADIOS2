@@ -33,10 +33,11 @@
 %locations
 
 %start input
+%token COMMA L_PAREN R_PAREN ENDL
 %token SQRT POW
 %token SIN COS TAN
 %token MAGNITUDE CURL
-%token MULT DIV PLUS MINUS L_PAREN R_PAREN INDICES ENDL
+%token MULT DIV PLUS MINUS INDICES
 %token NUMBER
 %token ALIAS PATH
 %type <dval> NUMBER
@@ -63,6 +64,10 @@ decl:                   ALIAS PATH               { ASTNode::add_lookup_entry($1,
 //index:                  NUMBER comma index { ASTNode::extend_current_lookup_indices($1); }
 //                        | NUMBER { ASTNode::extend_current_lookup_indices($1); }
 //                        ;
+
+list: exp COMMA list {}
+| exp {}
+;
 
 exp:                    ALIAS                  { $$ = createExpr(expr_stack, ExprHelper::OP_ALIAS, $1, 0, 0); }
 | ALIAS INDICES         { createExpr(expr_stack, ExprHelper::OP_ALIAS, $1, 0, 0); $$ = createExpr(expr_stack, ExprHelper::OP_INDEX, $2, 0, 1); }

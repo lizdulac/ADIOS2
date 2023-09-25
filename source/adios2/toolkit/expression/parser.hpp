@@ -39,47 +39,49 @@
    /* Put the tokens into the symbol table, so that GDB and other debuggers
       know about them.  */
    enum yytokentype {
-     SQRT = 258,
-     POW = 259,
-     SIN = 260,
-     COS = 261,
-     TAN = 262,
-     MAGNITUDE = 263,
-     CURL = 264,
-     MULT = 265,
-     DIV = 266,
-     PLUS = 267,
-     MINUS = 268,
-     L_PAREN = 269,
-     R_PAREN = 270,
-     INDICES = 271,
-     ENDL = 272,
-     NUMBER = 273,
-     ALIAS = 274,
-     PATH = 275,
-     UMINUS = 276
+     COMMA = 258,
+     L_PAREN = 259,
+     R_PAREN = 260,
+     ENDL = 261,
+     SQRT = 262,
+     POW = 263,
+     SIN = 264,
+     COS = 265,
+     TAN = 266,
+     MAGNITUDE = 267,
+     CURL = 268,
+     MULT = 269,
+     DIV = 270,
+     PLUS = 271,
+     MINUS = 272,
+     INDICES = 273,
+     NUMBER = 274,
+     ALIAS = 275,
+     PATH = 276,
+     UMINUS = 277
    };
 #endif
 /* Tokens.  */
-#define SQRT 258
-#define POW 259
-#define SIN 260
-#define COS 261
-#define TAN 262
-#define MAGNITUDE 263
-#define CURL 264
-#define MULT 265
-#define DIV 266
-#define PLUS 267
-#define MINUS 268
-#define L_PAREN 269
-#define R_PAREN 270
-#define INDICES 271
-#define ENDL 272
-#define NUMBER 273
-#define ALIAS 274
-#define PATH 275
-#define UMINUS 276
+#define COMMA 258
+#define L_PAREN 259
+#define R_PAREN 260
+#define ENDL 261
+#define SQRT 262
+#define POW 263
+#define SIN 264
+#define COS 265
+#define TAN 266
+#define MAGNITUDE 267
+#define CURL 268
+#define MULT 269
+#define DIV 270
+#define PLUS 271
+#define MINUS 272
+#define INDICES 273
+#define NUMBER 274
+#define ALIAS 275
+#define PATH 276
+#define UMINUS 277
 
 
 
@@ -94,7 +96,7 @@ typedef union YYSTYPE
   void* expr_ptr;
 }
 /* Line 1529 of yacc.c.  */
-#line 98 "parser.hpp"
+#line 100 "parser.hpp"
 	YYSTYPE;
 # define yystype YYSTYPE /* obsolescent; will be withdrawn */
 # define YYSTYPE_IS_DECLARED 1
