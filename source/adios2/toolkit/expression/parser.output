@@ -1,13 +1,18 @@
 Terminals which are not used
 
+   SQRT
+   POW
    SIN
    COS
    TAN
-   MAGNITUDE
    CURL
+   MULT
+   DIV
+   MINUS
+   UMINUS
 
 
-State 31 conflicts: 8 reduce/reduce
+State 5 conflicts: 1 shift/reduce
 
 
 Grammar
@@ -20,66 +25,64 @@ Grammar
     4      | exp input
 
     5 decl: ALIAS PATH
+    6     | ALIAS PATH INDICES
 
-    6 exp: ALIAS
-    7    | NUMBER
-    8    | L_PAREN exp R_PAREN
-    9    | exp MULT exp
-   10    | exp DIV exp
-   11    | exp PLUS exp
-   12    | exp MINUS exp
-   13    | MINUS exp
-   14    | SQRT L_PAREN exp R_PAREN
-   15    | exp POW exp
+    7 exp: ALIAS
+    8    | ALIAS INDICES
+    9    | PATH
+   10    | NUMBER
+   11    | L_PAREN exp R_PAREN
+   12    | exp PLUS exp
+   13    | MAGNITUDE L_PAREN exp R_PAREN
 
 
 Terminals, with rules where they appear
 
 $end (0) 0
 error (256)
-SQRT (258) 14
-POW (259) 15
+SQRT (258)
+POW (259)
 SIN (260)
 COS (261)
 TAN (262)
-MAGNITUDE (263)
+MAGNITUDE (263) 13
 CURL (264)
-MULT (265) 9
-DIV (266) 10
-PLUS (267) 11
-MINUS (268) 12 13
-L_PAREN (269) 8 14
-R_PAREN (270) 8 14
-ENDL (271) 2
-NUMBER (272) 7
-ALIAS (273) 5 6
-PATH (274) 5
-UMINUS (275)
+MULT (265)
+DIV (266)
+PLUS (267) 12
+MINUS (268)
+L_PAREN (269) 11 13
+R_PAREN (270) 11 13
+INDICES (271) 6 8
+ENDL (272) 2
+NUMBER (273) 10
+ALIAS (274) 5 6 7 8
+PATH (275) 5 6 9
+UMINUS (276)
 
 
 Nonterminals, with rules where they appear
 
-$accept (21)
+$accept (22)
     on left: 0
-input (22)
+input (23)
     on left: 1 2 3 4, on right: 0 2 3 4
-decl (23)
-    on left: 5, on right: 3
-exp (24)
-    on left: 6 7 8 9 10 11 12 13 14 15, on right: 4 8 9 10 11 12 13
-    14 15
+decl (24)
+    on left: 5 6, on right: 3
+exp (25)
+    on left: 7 8 9 10 11 12 13, on right: 4 11 12 13
 
 
 state 0
 
     0 $accept: . input $end
 
-    SQRT     shift, and go to state 1
-    MINUS    shift, and go to state 2
-    L_PAREN  shift, and go to state 3
-    ENDL     shift, and go to state 4
-    NUMBER   shift, and go to state 5
-    ALIAS    shift, and go to state 6
+    MAGNITUDE  shift, and go to state 1
+    L_PAREN    shift, and go to state 2
+    ENDL       shift, and go to state 3
+    NUMBER     shift, and go to state 4
+    ALIAS      shift, and go to state 5
+    PATH       shift, and go to state 6
 
     $default  reduce using rule 1 (input)
 
@@ -90,70 +93,68 @@ state 0
 
 state 1
 
-   14 exp: SQRT . L_PAREN exp R_PAREN
+   13 exp: MAGNITUDE . L_PAREN exp R_PAREN
 
     L_PAREN  shift, and go to state 10
 
 
 state 2
 
-   13 exp: MINUS . exp
+   11 exp: L_PAREN . exp R_PAREN
 
-    SQRT     shift, and go to state 1
-    MINUS    shift, and go to state 2
-    L_PAREN  shift, and go to state 3
-    NUMBER   shift, and go to state 5
-    ALIAS    shift, and go to state 11
+    MAGNITUDE  shift, and go to state 1
+    L_PAREN    shift, and go to state 2
+    NUMBER     shift, and go to state 4
+    ALIAS      shift, and go to state 11
+    PATH       shift, and go to state 6
 
     exp  go to state 12
 
 
 state 3
 
-    8 exp: L_PAREN . exp R_PAREN
-
-    SQRT     shift, and go to state 1
-    MINUS    shift, and go to state 2
-    L_PAREN  shift, and go to state 3
-    NUMBER   shift, and go to state 5
-    ALIAS    shift, and go to state 11
-
-    exp  go to state 13
-
-
-state 4
-
     2 input: ENDL . input
 
-    SQRT     shift, and go to state 1
-    MINUS    shift, and go to state 2
-    L_PAREN  shift, and go to state 3
-    ENDL     shift, and go to state 4
-    NUMBER   shift, and go to state 5
-    ALIAS    shift, and go to state 6
+    MAGNITUDE  shift, and go to state 1
+    L_PAREN    shift, and go to state 2
+    ENDL       shift, and go to state 3
+    NUMBER     shift, and go to state 4
+    ALIAS      shift, and go to state 5
+    PATH       shift, and go to state 6
 
     $default  reduce using rule 1 (input)
 
-    input  go to state 14
+    input  go to state 13
     decl   go to state 8
     exp    go to state 9
 
 
+state 4
+
+   10 exp: NUMBER .
+
+    $default  reduce using rule 10 (exp)
+
+
 state 5
 
-    7 exp: NUMBER .
+    5 decl: ALIAS . PATH
+    6     | ALIAS . PATH INDICES
+    7 exp: ALIAS .
+    8    | ALIAS . INDICES
 
+    INDICES  shift, and go to state 14
+    PATH     shift, and go to state 15
+
+    PATH      [reduce using rule 7 (exp)]
     $default  reduce using rule 7 (exp)
 
 
 state 6
 
-    5 decl: ALIAS . PATH
-    6 exp: ALIAS .
+    9 exp: PATH .
 
-    PATH  shift, and go to state 15
-
-    $default  reduce using rule 6 (exp)
+    $default  reduce using rule 9 (exp)
 
 
 state 7
@@ -167,12 +168,12 @@ state 8
 
     3 input: decl . input
 
-    SQRT     shift, and go to state 1
-    MINUS    shift, and go to state 2
-    L_PAREN  shift, and go to state 3
-    ENDL     shift, and go to state 4
-    NUMBER   shift, and go to state 5
-    ALIAS    shift, and go to state 6
+    MAGNITUDE  shift, and go to state 1
+    L_PAREN    shift, and go to state 2
+    ENDL       shift, and go to state 3
+    NUMBER     shift, and go to state 4
+    ALIAS      shift, and go to state 5
+    PATH       shift, and go to state 6
 
     $default  reduce using rule 1 (input)
 
@@ -184,89 +185,75 @@ state 8
 state 9
 
     4 input: exp . input
-    9 exp: exp . MULT exp
-   10    | exp . DIV exp
-   11    | exp . PLUS exp
-   12    | exp . MINUS exp
-   15    | exp . POW exp
+   12 exp: exp . PLUS exp
 
-    SQRT     shift, and go to state 1
-    POW      shift, and go to state 18
-    MULT     shift, and go to state 19
-    DIV      shift, and go to state 20
-    PLUS     shift, and go to state 21
-    MINUS    shift, and go to state 22
-    L_PAREN  shift, and go to state 3
-    ENDL     shift, and go to state 4
-    NUMBER   shift, and go to state 5
-    ALIAS    shift, and go to state 6
+    MAGNITUDE  shift, and go to state 1
+    PLUS       shift, and go to state 18
+    L_PAREN    shift, and go to state 2
+    ENDL       shift, and go to state 3
+    NUMBER     shift, and go to state 4
+    ALIAS      shift, and go to state 5
+    PATH       shift, and go to state 6
 
     $default  reduce using rule 1 (input)
 
-    input  go to state 23
+    input  go to state 19
     decl   go to state 8
     exp    go to state 9
 
 
 state 10
 
-   14 exp: SQRT L_PAREN . exp R_PAREN
+   13 exp: MAGNITUDE L_PAREN . exp R_PAREN
 
-    SQRT     shift, and go to state 1
-    MINUS    shift, and go to state 2
-    L_PAREN  shift, and go to state 3
-    NUMBER   shift, and go to state 5
-    ALIAS    shift, and go to state 11
+    MAGNITUDE  shift, and go to state 1
+    L_PAREN    shift, and go to state 2
+    NUMBER     shift, and go to state 4
+    ALIAS      shift, and go to state 11
+    PATH       shift, and go to state 6
 
-    exp  go to state 24
+    exp  go to state 20
 
 
 state 11
 
-    6 exp: ALIAS .
+    7 exp: ALIAS .
+    8    | ALIAS . INDICES
 
-    $default  reduce using rule 6 (exp)
+    INDICES  shift, and go to state 14
+
+    $default  reduce using rule 7 (exp)
 
 
 state 12
 
-    9 exp: exp . MULT exp
-   10    | exp . DIV exp
-   11    | exp . PLUS exp
-   12    | exp . MINUS exp
-   13    | MINUS exp .
-   15    | exp . POW exp
+   11 exp: L_PAREN exp . R_PAREN
+   12    | exp . PLUS exp
 
-    $default  reduce using rule 13 (exp)
+    PLUS     shift, and go to state 18
+    R_PAREN  shift, and go to state 21
 
 
 state 13
-
-    8 exp: L_PAREN exp . R_PAREN
-    9    | exp . MULT exp
-   10    | exp . DIV exp
-   11    | exp . PLUS exp
-   12    | exp . MINUS exp
-   15    | exp . POW exp
-
-    POW      shift, and go to state 18
-    MULT     shift, and go to state 19
-    DIV      shift, and go to state 20
-    PLUS     shift, and go to state 21
-    MINUS    shift, and go to state 25
-    R_PAREN  shift, and go to state 26
-
-
-state 14
 
     2 input: ENDL input .
 
     $default  reduce using rule 2 (input)
 
 
+state 14
+
+    8 exp: ALIAS INDICES .
+
+    $default  reduce using rule 8 (exp)
+
+
 state 15
 
     5 decl: ALIAS PATH .
+    6     | ALIAS PATH . INDICES
+
+    INDICES  shift, and go to state 22
 
     $default  reduce using rule 5 (decl)
 
@@ -287,222 +274,57 @@ state 17
 
 state 18
 
-   15 exp: exp POW . exp
+   12 exp: exp PLUS . exp
 
-    SQRT     shift, and go to state 1
-    MINUS    shift, and go to state 2
-    L_PAREN  shift, and go to state 3
-    NUMBER   shift, and go to state 5
-    ALIAS    shift, and go to state 11
+    MAGNITUDE  shift, and go to state 1
+    L_PAREN    shift, and go to state 2
+    NUMBER     shift, and go to state 4
+    ALIAS      shift, and go to state 11
+    PATH       shift, and go to state 6
 
-    exp  go to state 27
+    exp  go to state 23
 
 
 state 19
-
-    9 exp: exp MULT . exp
-
-    SQRT     shift, and go to state 1
-    MINUS    shift, and go to state 2
-    L_PAREN  shift, and go to state 3
-    NUMBER   shift, and go to state 5
-    ALIAS    shift, and go to state 11
-
-    exp  go to state 28
-
-
-state 20
-
-   10 exp: exp DIV . exp
-
-    SQRT     shift, and go to state 1
-    MINUS    shift, and go to state 2
-    L_PAREN  shift, and go to state 3
-    NUMBER   shift, and go to state 5
-    ALIAS    shift, and go to state 11
-
-    exp  go to state 29
-
-
-state 21
-
-   11 exp: exp PLUS . exp
-
-    SQRT     shift, and go to state 1
-    MINUS    shift, and go to state 2
-    L_PAREN  shift, and go to state 3
-    NUMBER   shift, and go to state 5
-    ALIAS    shift, and go to state 11
-
-    exp  go to state 30
-
-
-state 22
-
-   12 exp: exp MINUS . exp
-   13    | MINUS . exp
-
-    SQRT     shift, and go to state 1
-    MINUS    shift, and go to state 2
-    L_PAREN  shift, and go to state 3
-    NUMBER   shift, and go to state 5
-    ALIAS    shift, and go to state 11
-
-    exp  go to state 31
-
-
-state 23
 
     4 input: exp input .
 
     $default  reduce using rule 4 (input)
 
 
-state 24
+state 20
 
-    9 exp: exp . MULT exp
-   10    | exp . DIV exp
-   11    | exp . PLUS exp
-   12    | exp . MINUS exp
-   14    | SQRT L_PAREN exp . R_PAREN
-   15    | exp . POW exp
+   12 exp: exp . PLUS exp
+   13    | MAGNITUDE L_PAREN exp . R_PAREN
 
-    POW      shift, and go to state 18
-    MULT     shift, and go to state 19
-    DIV      shift, and go to state 20
-    PLUS     shift, and go to state 21
-    MINUS    shift, and go to state 25
-    R_PAREN  shift, and go to state 32
+    PLUS     shift, and go to state 18
+    R_PAREN  shift, and go to state 24
 
 
-state 25
+state 21
 
-   12 exp: exp MINUS . exp
-
-    SQRT     shift, and go to state 1
-    MINUS    shift, and go to state 2
-    L_PAREN  shift, and go to state 3
-    NUMBER   shift, and go to state 5
-    ALIAS    shift, and go to state 11
-
-    exp  go to state 33
-
-
-state 26
-
-    8 exp: L_PAREN exp R_PAREN .
-
-    $default  reduce using rule 8 (exp)
-
-
-state 27
-
-    9 exp: exp . MULT exp
-   10    | exp . DIV exp
-   11    | exp . PLUS exp
-   12    | exp . MINUS exp
-   15    | exp . POW exp
-   15    | exp POW exp .
-
-    POW  shift, and go to state 18
-
-    $default  reduce using rule 15 (exp)
-
-
-state 28
-
-    9 exp: exp . MULT exp
-    9    | exp MULT exp .
-   10    | exp . DIV exp
-   11    | exp . PLUS exp
-   12    | exp . MINUS exp
-   15    | exp . POW exp
-
-    POW  shift, and go to state 18
-
-    $default  reduce using rule 9 (exp)
-
-
-state 29
-
-    9 exp: exp . MULT exp
-   10    | exp . DIV exp
-   10    | exp DIV exp .
-   11    | exp . PLUS exp
-   12    | exp . MINUS exp
-   15    | exp . POW exp
-
-    POW  shift, and go to state 18
-
-    $default  reduce using rule 10 (exp)
-
-
-state 30
-
-    9 exp: exp . MULT exp
-   10    | exp . DIV exp
-   11    | exp . PLUS exp
-   11    | exp PLUS exp .
-   12    | exp . MINUS exp
-   15    | exp . POW exp
-
-    POW   shift, and go to state 18
-    MULT  shift, and go to state 19
-    DIV   shift, and go to state 20
+   11 exp: L_PAREN exp R_PAREN .
 
     $default  reduce using rule 11 (exp)
 
 
-state 31
+state 22
 
-    9 exp: exp . MULT exp
-   10    | exp . DIV exp
-   11    | exp . PLUS exp
-   12    | exp . MINUS exp
-   12    | exp MINUS exp .
-   13    | MINUS exp .
-   15    | exp . POW exp
+    6 decl: ALIAS PATH INDICES .
 
-    $end      reduce using rule 12 (exp)
-    $end      [reduce using rule 13 (exp)]
-    SQRT      reduce using rule 12 (exp)
-    SQRT      [reduce using rule 13 (exp)]
-    POW       reduce using rule 13 (exp)
-    MULT      reduce using rule 13 (exp)
-    DIV       reduce using rule 13 (exp)
-    PLUS      reduce using rule 12 (exp)
-    PLUS      [reduce using rule 13 (exp)]
-    MINUS     reduce using rule 12 (exp)
-    MINUS     [reduce using rule 13 (exp)]
-    L_PAREN   reduce using rule 12 (exp)
-    L_PAREN   [reduce using rule 13 (exp)]
-    ENDL      reduce using rule 12 (exp)
-    ENDL      [reduce using rule 13 (exp)]
-    NUMBER    reduce using rule 12 (exp)
-    NUMBER    [reduce using rule 13 (exp)]
-    ALIAS     reduce using rule 12 (exp)
-    ALIAS     [reduce using rule 13 (exp)]
-    $default  reduce using rule 12 (exp)
+    $default  reduce using rule 6 (decl)
 
 
-state 32
+state 23
 
-   14 exp: SQRT L_PAREN exp R_PAREN .
-
-    $default  reduce using rule 14 (exp)
-
-
-state 33
-
-    9 exp: exp . MULT exp
-   10    | exp . DIV exp
-   11    | exp . PLUS exp
-   12    | exp . MINUS exp
-   12    | exp MINUS exp .
-   15    | exp . POW exp
-
-    POW   shift, and go to state 18
-    MULT  shift, and go to state 19
-    DIV   shift, and go to state 20
+   12 exp: exp . PLUS exp
+   12    | exp PLUS exp .
 
     $default  reduce using rule 12 (exp)
+
+
+state 24
+
+   13 exp: MAGNITUDE L_PAREN exp R_PAREN .
+
+    $default  reduce using rule 13 (exp)

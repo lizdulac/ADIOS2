@@ -63,6 +63,8 @@ add_library(adios2_core
 #toolkit
   toolkit/expression/lexer.cpp
   toolkit/expression/parser.cpp
+  toolkit/expression/ASTNode.cpp
+  toolkit/expression/ExprHelper.cpp
 
   toolkit/format/buffer/Buffer.cpp
   toolkit/format/buffer/BufferV.cpp

@@ -52,11 +52,12 @@
      MINUS = 268,
      L_PAREN = 269,
      R_PAREN = 270,
-     ENDL = 271,
-     NUMBER = 272,
-     ALIAS = 273,
-     PATH = 274,
-     UMINUS = 275
+     INDICES = 271,
+     ENDL = 272,
+     NUMBER = 273,
+     ALIAS = 274,
+     PATH = 275,
+     UMINUS = 276
    };
 #endif
 /* Tokens.  */
@@ -73,11 +74,12 @@
 #define MINUS 268
 #define L_PAREN 269
 #define R_PAREN 270
-#define ENDL 271
-#define NUMBER 272
-#define ALIAS 273
-#define PATH 274
-#define UMINUS 275
+#define INDICES 271
+#define ENDL 272
+#define NUMBER 273
+#define ALIAS 274
+#define PATH 275
+#define UMINUS 276
 
 
 
@@ -89,10 +91,10 @@ typedef union YYSTYPE
   double dval;
   int ival;
   char* sval;
-  struct custom_data* expr;
+  void* expr_ptr;
 }
 /* Line 1529 of yacc.c.  */
-#line 96 "parser.hpp"
+#line 98 "parser.hpp"
 	YYSTYPE;
 # define yystype YYSTYPE /* obsolescent; will be withdrawn */
 # define YYSTYPE_IS_DECLARED 1
@@ -116,7 +118,6 @@ typedef struct YYLTYPE
 
 extern YYLTYPE yylloc;
 
-#include <vector>
-#include<string>
+#include "ASTNode.h"
 
-std::vector<std::string> parse_expression(const char* input);
+Expression* parse_expression(const char* input);

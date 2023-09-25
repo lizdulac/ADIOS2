@@ -79,11 +79,12 @@
      MINUS = 268,
      L_PAREN = 269,
      R_PAREN = 270,
-     ENDL = 271,
-     NUMBER = 272,
-     ALIAS = 273,
-     PATH = 274,
-     UMINUS = 275
+     INDICES = 271,
+     ENDL = 272,
+     NUMBER = 273,
+     ALIAS = 274,
+     PATH = 275,
+     UMINUS = 276
    };
 #endif
 /* Tokens.  */
@@ -100,11 +101,12 @@
 #define MINUS 268
 #define L_PAREN 269
 #define R_PAREN 270
-#define ENDL 271
-#define NUMBER 272
-#define ALIAS 273
-#define PATH 274
-#define UMINUS 275
+#define INDICES 271
+#define ENDL 272
+#define NUMBER 273
+#define ALIAS 274
+#define PATH 275
+#define UMINUS 276
 
 
 
@@ -115,22 +117,20 @@
  #include <stdio.h>
  #include <stdlib.h>
  #include <math.h>
+ #include <stack>
  #include <string>
  #include <vector>
  #include <iostream>
  #include "lexer.h"
- #include "expression.h"
-
-  extern int yyparse();
-
-  static Expression<double>* yyparse_value;
+ #include "ASTNode.h"
   
- // Here is an example how to create custom data structure
- typedef struct custom_data {
-   Expression<double>* expression;
- } custom_data;
+  extern int yyparse(std::stack<ASTNode*>* expr_stack);
 
-  void yyerror(const char *msg);
+  void* createExpr(std::stack<ASTNode*>*, ExprHelper::expr_op, const char*, double, size_t);
+  
+  static void* yyparse_value;  
+
+  void yyerror(std::stack<ASTNode*>* expr_stack, const char *msg);
 
 
 
@@ -159,7 +159,7 @@ typedef union YYSTYPE
   double dval;
   int ival;
   char* sval;
-  struct custom_data* expr;
+  void* expr_ptr;
 }
 /* Line 193 of yacc.c.  */
 #line 166 "parser.cpp"
@@ -404,20 +404,20 @@ union yyalloc
 /* YYFINAL -- State number of the termination state.  */
 #define YYFINAL  16
 /* YYLAST -- Last index in YYTABLE.  */
-#define YYLAST   70
+#define YYLAST   36
 
 /* YYNTOKENS -- Number of terminals.  */
-#define YYNTOKENS  21
+#define YYNTOKENS  22
 /* YYNNTS -- Number of nonterminals.  */
 #define YYNNTS  4
 /* YYNRULES -- Number of rules.  */
-#define YYNRULES  16
+#define YYNRULES  14
 /* YYNRULES -- Number of states.  */
-#define YYNSTATES  34
+#define YYNSTATES  25
 
 /* YYTRANSLATE(YYLEX) -- Bison symbol number corresponding to YYLEX.  */
 #define YYUNDEFTOK  2
-#define YYMAXUTOK   275
+#define YYMAXUTOK   276
 
 #define YYTRANSLATE(YYX)						\
   ((unsigned int) (YYX) <= YYMAXUTOK ? yytranslate[YYX] : YYUNDEFTOK)
@@ -452,7 +452,7 @@ static const yytype_uint8 yytranslate[] =
        2,     2,     2,     2,     2,     2,     2,     2,     2,     2,
        2,     2,     2,     2,     2,     2,     1,     2,     3,     4,
        5,     6,     7,     8,     9,    10,    11,    12,    13,    14,
-      15,    16,    17,    18,    19,    20
+      15,    16,    17,    18,    19,    20,    21
 };
 
 #if YYDEBUG
@@ -460,26 +460,25 @@ static const yytype_uint8 yytranslate[] =
    YYRHS.  */
 static const yytype_uint8 yyprhs[] =
 {
-       0,     0,     3,     4,     7,    10,    13,    16,    18,    20,
-      24,    28,    32,    36,    40,    43,    48
+       0,     0,     3,     4,     7,    10,    13,    16,    20,    22,
+      25,    27,    29,    33,    37
 };
 
 /* YYRHS -- A `-1'-separated list of the rules' RHS.  */
 static const yytype_int8 yyrhs[] =
 {
-      22,     0,    -1,    -1,    16,    22,    -1,    23,    22,    -1,
-      24,    22,    -1,    18,    19,    -1,    18,    -1,    17,    -1,
-      14,    24,    15,    -1,    24,    10,    24,    -1,    24,    11,
-      24,    -1,    24,    12,    24,    -1,    24,    13,    24,    -1,
-      13,    24,    -1,     3,    14,    24,    15,    -1,    24,     4,
-      24,    -1
+      23,     0,    -1,    -1,    17,    23,    -1,    24,    23,    -1,
+      25,    23,    -1,    19,    20,    -1,    19,    20,    16,    -1,
+      19,    -1,    19,    16,    -1,    20,    -1,    18,    -1,    14,
+      25,    15,    -1,    25,    12,    25,    -1,     8,    14,    25,
+      15,    -1
 };
 
 /* YYRLINE[YYN] -- source line where rule number YYN was defined.  */
 static const yytype_uint8 yyrline[] =
 {
-       0,    53,    53,    54,    55,    56,    59,    62,    63,    64,
-      65,    66,    67,    68,    69,    70,    71
+       0,    53,    53,    54,    55,    56,    59,    60,    67,    68,
+      69,    70,    71,    72,    73
 };
 #endif
 
@@ -490,8 +489,8 @@ static const char *const yytname[] =
 {
   "$end", "error", "$undefined", "SQRT", "POW", "SIN", "COS", "TAN",
   "MAGNITUDE", "CURL", "MULT", "DIV", "PLUS", "MINUS", "L_PAREN",
-  "R_PAREN", "ENDL", "NUMBER", "ALIAS", "PATH", "UMINUS", "$accept",
-  "input", "decl", "exp", 0
+  "R_PAREN", "INDICES", "ENDL", "NUMBER", "ALIAS", "PATH", "UMINUS",
+  "$accept", "input", "decl", "exp", 0
 };
 #endif
 
@@ -502,22 +501,22 @@ static const yytype_uint16 yytoknum[] =
 {
        0,   256,   257,   258,   259,   260,   261,   262,   263,   264,
      265,   266,   267,   268,   269,   270,   271,   272,   273,   274,
-     275
+     275,   276
 };
 # endif
 
 /* YYR1[YYN] -- Symbol number of symbol that rule YYN derives.  */
 static const yytype_uint8 yyr1[] =
 {
-       0,    21,    22,    22,    22,    22,    23,    24,    24,    24,
-      24,    24,    24,    24,    24,    24,    24
+       0,    22,    23,    23,    23,    23,    24,    24,    25,    25,
+      25,    25,    25,    25,    25
 };
 
 /* YYR2[YYN] -- Number of symbols composing right hand side of rule YYN.  */
 static const yytype_uint8 yyr2[] =
 {
-       0,     2,     0,     2,     2,     2,     2,     1,     1,     3,
-       3,     3,     3,     3,     2,     4,     3
+       0,     2,     0,     2,     2,     2,     2,     3,     1,     2,
+       1,     1,     3,     3,     4
 };
 
 /* YYDEFACT[STATE-NAME] -- Default rule to reduce with in state
@@ -525,10 +524,9 @@ static const yytype_uint8 yyr2[] =
    means the default is an error.  */
 static const yytype_uint8 yydefact[] =
 {
-       2,     0,     0,     0,     2,     8,     7,     0,     2,     2,
-       0,     7,    14,     0,     3,     6,     1,     4,     0,     0,
-       0,     0,     0,     5,     0,     0,     9,    16,    10,    11,
-      12,    13,    15,    13
+       2,     0,     0,     2,    11,     8,    10,     0,     2,     2,
+       0,     8,     0,     3,     9,     6,     1,     4,     0,     5,
+       0,    12,     7,    13,    14
 };
 
 /* YYDEFGOTO[NTERM-NUM].  */
@@ -539,58 +537,48 @@ static const yytype_int8 yydefgoto[] =
 
 /* YYPACT[STATE-NUM] -- Index in YYTABLE of the portion describing
    STATE-NUM.  */
-#define YYPACT_NINF -16
+#define YYPACT_NINF -15
 static const yytype_int8 yypact[] =
 {
-      24,   -12,    30,    30,    24,   -16,   -15,     5,    24,    18,
-      30,   -16,   -16,    -1,   -16,   -16,   -16,   -16,    30,    30,
-      30,    30,    30,   -16,    41,    30,   -16,     2,     2,     2,
-      51,    53,   -16,    51
+       1,   -11,     9,     1,   -15,   -14,   -15,     4,     1,    -7,
+       9,     6,    20,   -15,   -15,     8,   -15,   -15,     9,   -15,
+      21,   -15,   -15,   -15,   -15
 };
 
 /* YYPGOTO[NTERM-NUM].  */
 static const yytype_int8 yypgoto[] =
 {
-     -16,    61,   -16,    -2
+     -15,    22,   -15,    -2
 };
 
 /* YYTABLE[YYPACT[STATE-NUM]].  What to do in state STATE-NUM.  If
    positive, shift that token.  If negative, reduce the rule which
    number is the opposite.  If zero, do what YYDEFACT says.
    If YYTABLE_NINF, syntax error.  */
-#define YYTABLE_NINF -15
-static const yytype_int8 yytable[] =
+#define YYTABLE_NINF -1
+static const yytype_uint8 yytable[] =
 {
-      12,    13,    10,    18,    15,    16,    18,     0,    24,    19,
-      20,    21,    25,     0,    26,     0,    27,    28,    29,    30,
-      31,     1,    18,    33,     0,     0,     0,     1,    19,    20,
-      21,    22,     3,     1,     4,     5,     6,     2,     3,     0,
-       4,     5,     6,     2,     3,    18,     0,     5,    11,     0,
-       0,    19,    20,    21,    25,    18,    32,   -14,     0,     0,
-       0,    19,    20,   -14,   -14,    14,     0,     0,     0,    17,
-      23
+      12,     1,    14,    10,    16,    18,    15,     2,    20,     1,
+       3,     4,     5,     6,     0,     2,    23,     1,     3,     4,
+       5,     6,    14,     2,    22,    13,     0,     4,    11,     6,
+      17,    19,    18,    18,     0,    21,    24
 };
 
 static const yytype_int8 yycheck[] =
 {
-       2,     3,    14,     4,    19,     0,     4,    -1,    10,    10,
-      11,    12,    13,    -1,    15,    -1,    18,    19,    20,    21,
-      22,     3,     4,    25,    -1,    -1,    -1,     3,    10,    11,
-      12,    13,    14,     3,    16,    17,    18,    13,    14,    -1,
-      16,    17,    18,    13,    14,     4,    -1,    17,    18,    -1,
-      -1,    10,    11,    12,    13,     4,    15,     4,    -1,    -1,
-      -1,    10,    11,    10,    11,     4,    -1,    -1,    -1,     8,
-       9
+       2,     8,    16,    14,     0,    12,    20,    14,    10,     8,
+      17,    18,    19,    20,    -1,    14,    18,     8,    17,    18,
+      19,    20,    16,    14,    16,     3,    -1,    18,    19,    20,
+       8,     9,    12,    12,    -1,    15,    15
 };
 
 /* YYSTOS[STATE-NUM] -- The (internal number of the) accessing
    symbol of state STATE-NUM.  */
 static const yytype_uint8 yystos[] =
 {
-       0,     3,    13,    14,    16,    17,    18,    22,    23,    24,
-      14,    18,    24,    24,    22,    19,     0,    22,     4,    10,
-      11,    12,    13,    22,    24,    13,    15,    24,    24,    24,
-      24,    24,    15,    24
+       0,     8,    14,    17,    18,    19,    20,    23,    24,    25,
+      14,    19,    25,    23,    16,    20,     0,    23,    12,    23,
+      25,    15,    16,    25,    15
 };
 
 #define yyerrok		(yyerrstatus = 0)
@@ -623,7 +611,7 @@ do								\
     }								\
   else								\
     {								\
-      yyerror (YY_("syntax error: cannot back up")); \
+      yyerror (expr_stack, YY_("syntax error: cannot back up")); \
       YYERROR;							\
     }								\
 while (YYID (0))
@@ -703,7 +691,7 @@ do {									  \
     {									  \
       YYFPRINTF (stderr, "%s ", Title);					  \
       yy_symbol_print (stderr,						  \
-		  Type, Value, Location); \
+		  Type, Value, Location, expr_stack); \
       YYFPRINTF (stderr, "\n");						  \
     }									  \
 } while (YYID (0))
@@ -717,19 +705,21 @@ do {									  \
 #if (defined __STDC__ || defined __C99__FUNC__ \
      || defined __cplusplus || defined _MSC_VER)
 static void
-yy_symbol_value_print (FILE *yyoutput, int yytype, YYSTYPE const * const yyvaluep, YYLTYPE const * const yylocationp)
+yy_symbol_value_print (FILE *yyoutput, int yytype, YYSTYPE const * const yyvaluep, YYLTYPE const * const yylocationp, std::stack<ASTNode*>* expr_stack)
 #else
 static void
-yy_symbol_value_print (yyoutput, yytype, yyvaluep, yylocationp)
+yy_symbol_value_print (yyoutput, yytype, yyvaluep, yylocationp, expr_stack)
     FILE *yyoutput;
     int yytype;
     YYSTYPE const * const yyvaluep;
     YYLTYPE const * const yylocationp;
+    std::stack<ASTNode*>* expr_stack;
 #endif
 {
   if (!yyvaluep)
     return;
   YYUSE (yylocationp);
+  YYUSE (expr_stack);
 # ifdef YYPRINT
   if (yytype < YYNTOKENS)
     YYPRINT (yyoutput, yytoknum[yytype], *yyvaluep);
@@ -751,14 +741,15 @@ yy_symbol_value_print (yyoutput, yytype, yyvaluep, yylocationp)
 #if (defined __STDC__ || defined __C99__FUNC__ \
      || defined __cplusplus || defined _MSC_VER)
 static void
-yy_symbol_print (FILE *yyoutput, int yytype, YYSTYPE const * const yyvaluep, YYLTYPE const * const yylocationp)
+yy_symbol_print (FILE *yyoutput, int yytype, YYSTYPE const * const yyvaluep, YYLTYPE const * const yylocationp, std::stack<ASTNode*>* expr_stack)
 #else
 static void
-yy_symbol_print (yyoutput, yytype, yyvaluep, yylocationp)
+yy_symbol_print (yyoutput, yytype, yyvaluep, yylocationp, expr_stack)
     FILE *yyoutput;
     int yytype;
     YYSTYPE const * const yyvaluep;
     YYLTYPE const * const yylocationp;
+    std::stack<ASTNode*>* expr_stack;
 #endif
 {
   if (yytype < YYNTOKENS)
@@ -768,7 +759,7 @@ yy_symbol_print (yyoutput, yytype, yyvaluep, yylocationp)
 
   YY_LOCATION_PRINT (yyoutput, *yylocationp);
   YYFPRINTF (yyoutput, ": ");
-  yy_symbol_value_print (yyoutput, yytype, yyvaluep, yylocationp);
+  yy_symbol_value_print (yyoutput, yytype, yyvaluep, yylocationp, expr_stack);
   YYFPRINTF (yyoutput, ")");
 }
 
@@ -808,13 +799,14 @@ do {								\
 #if (defined __STDC__ || defined __C99__FUNC__ \
      || defined __cplusplus || defined _MSC_VER)
 static void
-yy_reduce_print (YYSTYPE *yyvsp, YYLTYPE *yylsp, int yyrule)
+yy_reduce_print (YYSTYPE *yyvsp, YYLTYPE *yylsp, int yyrule, std::stack<ASTNode*>* expr_stack)
 #else
 static void
-yy_reduce_print (yyvsp, yylsp, yyrule)
+yy_reduce_print (yyvsp, yylsp, yyrule, expr_stack)
     YYSTYPE *yyvsp;
     YYLTYPE *yylsp;
     int yyrule;
+    std::stack<ASTNode*>* expr_stack;
 #endif
 {
   int yynrhs = yyr2[yyrule];
@@ -828,7 +820,7 @@ yy_reduce_print (yyvsp, yylsp, yyrule)
       fprintf (stderr, "   $%d = ", yyi + 1);
       yy_symbol_print (stderr, yyrhs[yyprhs[yyrule] + yyi],
 		       &(yyvsp[(yyi + 1) - (yynrhs)])
-		       , &(yylsp[(yyi + 1) - (yynrhs)])		       );
+		       , &(yylsp[(yyi + 1) - (yynrhs)])		       , expr_stack);
       fprintf (stderr, "\n");
     }
 }
@@ -836,7 +828,7 @@ yy_reduce_print (yyvsp, yylsp, yyrule)
 # define YY_REDUCE_PRINT(Rule)		\
 do {					\
   if (yydebug)				\
-    yy_reduce_print (yyvsp, yylsp, Rule); \
+    yy_reduce_print (yyvsp, yylsp, Rule, expr_stack); \
 } while (YYID (0))
 
 /* Nonzero means print parse trace.  It is left uninitialized so that
@@ -1087,18 +1079,20 @@ yysyntax_error (char *yyresult, int yystate, int yychar)
 #if (defined __STDC__ || defined __C99__FUNC__ \
      || defined __cplusplus || defined _MSC_VER)
 static void
-yydestruct (const char *yymsg, int yytype, YYSTYPE *yyvaluep, YYLTYPE *yylocationp)
+yydestruct (const char *yymsg, int yytype, YYSTYPE *yyvaluep, YYLTYPE *yylocationp, std::stack<ASTNode*>* expr_stack)
 #else
 static void
-yydestruct (yymsg, yytype, yyvaluep, yylocationp)
+yydestruct (yymsg, yytype, yyvaluep, yylocationp, expr_stack)
     const char *yymsg;
     int yytype;
     YYSTYPE *yyvaluep;
     YYLTYPE *yylocationp;
+    std::stack<ASTNode*>* expr_stack;
 #endif
 {
   YYUSE (yyvaluep);
   YYUSE (yylocationp);
+  YYUSE (expr_stack);
 
   if (!yymsg)
     yymsg = "Deleting";
@@ -1123,7 +1117,7 @@ int yyparse ();
 #endif
 #else /* ! YYPARSE_PARAM */
 #if defined __STDC__ || defined __cplusplus
-int yyparse (void);
+int yyparse (std::stack<ASTNode*>* expr_stack);
 #else
 int yyparse ();
 #endif
@@ -1162,11 +1156,11 @@ yyparse (YYPARSE_PARAM)
 #if (defined __STDC__ || defined __C99__FUNC__ \
      || defined __cplusplus || defined _MSC_VER)
 int
-yyparse (void)
+yyparse (std::stack<ASTNode*>* expr_stack)
 #else
 int
-yyparse ()
-
+yyparse (expr_stack)
+    std::stack<ASTNode*>* expr_stack;
 #endif
 #endif
 {
@@ -1443,67 +1437,57 @@ yyreduce:
 
   case 5:
 #line 56 "parser.y"
-    { yyparse_value = (yyvsp[(1) - (2)].expr)->expression; ;}
+    { /*yyparse_value = $1->expression;*/ ;}
     break;
 
   case 6:
 #line 59 "parser.y"
-    { add_var((yyvsp[(1) - (2)].sval),(yyvsp[(2) - (2)].sval)); ;}
+    { ASTNode::add_lookup_entry((yyvsp[(1) - (2)].sval), (yyvsp[(2) - (2)].sval), ""); ;}
     break;
 
   case 7:
-#line 62 "parser.y"
-    { void* expr = malloc(sizeof(Alias<double>)); struct custom_data* cd = new struct custom_data; Alias<double>* var = new(expr) Alias<double>((yyvsp[(1) - (1)].sval)); cd->expression = var; (yyval.expr) = cd; ;}
+#line 60 "parser.y"
+    { ASTNode::add_lookup_entry((yyvsp[(1) - (3)].sval), (yyvsp[(2) - (3)].sval), (yyvsp[(3) - (3)].sval)); ;}
     break;
 
   case 8:
-#line 63 "parser.y"
-    { void* expr = malloc(sizeof(Number<double>)); struct custom_data* cd = new struct custom_data; Number<double>* num = new(expr) Number<double>((yyvsp[(1) - (1)].dval)); cd->expression = num; (yyval.expr) = cd;;}
+#line 67 "parser.y"
+    { (yyval.expr_ptr) = createExpr(expr_stack, ExprHelper::OP_ALIAS, (yyvsp[(1) - (1)].sval), 0, 0); ;}
     break;
 
   case 9:
-#line 64 "parser.y"
-    { (yyval.expr) = (yyvsp[(2) - (3)].expr); ;}
+#line 68 "parser.y"
+    { createExpr(expr_stack, ExprHelper::OP_ALIAS, (yyvsp[(1) - (2)].sval), 0, 0); (yyval.expr_ptr) = createExpr(expr_stack, ExprHelper::OP_INDEX, (yyvsp[(2) - (2)].sval), 0, 1); ;}
     break;
 
   case 10:
-#line 65 "parser.y"
-    { void* expr = malloc(sizeof(Multiplication<double>)); struct custom_data* cd = new struct custom_data; Multiplication<double>* mult = new(expr) Multiplication<double>((yyvsp[(1) - (3)].expr)->expression, (yyvsp[(3) - (3)].expr)->expression); cd->expression = mult; (yyval.expr) = cd; ;}
+#line 69 "parser.y"
+    { (yyval.expr_ptr) = createExpr(expr_stack, ExprHelper::OP_PATH, (yyvsp[(1) - (1)].sval), 0, 0); ;}
     break;
 
   case 11:
-#line 66 "parser.y"
-    { void* expr = malloc(sizeof(Division<double>)); struct custom_data* cd = new struct custom_data; Division<double>* div = new(expr) Division<double>((yyvsp[(1) - (3)].expr)->expression, (yyvsp[(3) - (3)].expr)->expression); cd->expression = div; (yyval.expr) = cd; ;}
+#line 70 "parser.y"
+    { (yyval.expr_ptr) = createExpr(expr_stack, ExprHelper::OP_NUM, "", (yyvsp[(1) - (1)].dval), 0); ;}
     break;
 
   case 12:
-#line 67 "parser.y"
-    { void* expr = malloc(sizeof(Addition<double>)); struct custom_data* cd = new struct custom_data; Addition<double>* add = new(expr) Addition<double>((yyvsp[(1) - (3)].expr)->expression, (yyvsp[(3) - (3)].expr)->expression); cd->expression = add; (yyval.expr) = cd; ;}
+#line 71 "parser.y"
+    { (yyval.expr_ptr) = (yyvsp[(2) - (3)].expr_ptr); ;}
     break;
 
   case 13:
-#line 68 "parser.y"
-    { void* expr = malloc(sizeof(Subtraction<double>)); struct custom_data* cd = new struct custom_data; Subtraction<double>* subtr = new(expr) Subtraction<double>((yyvsp[(1) - (3)].expr)->expression, (yyvsp[(3) - (3)].expr)->expression); cd->expression = subtr; (yyval.expr) = cd; ;}
+#line 72 "parser.y"
+    { (yyval.expr_ptr) = createExpr(expr_stack, ExprHelper::OP_ADD, "", 0, 2); ;}
     break;
 
   case 14:
-#line 69 "parser.y"
-    { void* expr = malloc(sizeof(Negation<double>)); struct custom_data* cd = new struct custom_data; Negation<double>* negative = new(expr) Negation<double>((yyvsp[(2) - (2)].expr)->expression); cd->expression = negative; (yyval.expr) = cd; ;}
-    break;
-
-  case 15:
-#line 70 "parser.y"
-    { void* expr = malloc(sizeof(Sqrt<double>)); struct custom_data* cd = new struct custom_data; Sqrt<double>* sqrt = new(expr) Sqrt<double>((yyvsp[(3) - (4)].expr)->expression); cd->expression = sqrt; (yyval.expr) = cd; ;}
-    break;
-
-  case 16:
-#line 71 "parser.y"
-    { void* expr = malloc(sizeof(Pow<double>)); struct custom_data* cd = new struct custom_data; Pow<double>* pow = new(expr) Pow<double>((yyvsp[(1) - (3)].expr)->expression, (yyvsp[(3) - (3)].expr)->expression); cd->expression = pow; (yyval.expr) = cd; ;}
+#line 73 "parser.y"
+    { (yyval.expr_ptr) = createExpr(expr_stack, ExprHelper::OP_MAGN, "", 0, 1);;}
     break;
 
 
 /* Line 1267 of yacc.c.  */
-#line 1507 "parser.cpp"
+#line 1491 "parser.cpp"
       default: break;
     }
   YY_SYMBOL_PRINT ("-> $$ =", yyr1[yyn], &yyval, &yyloc);
@@ -1539,7 +1523,7 @@ yyerrlab:
     {
       ++yynerrs;
 #if ! YYERROR_VERBOSE
-      yyerror (YY_("syntax error"));
+      yyerror (expr_stack, YY_("syntax error"));
 #else
       {
 	YYSIZE_T yysize = yysyntax_error (0, yystate, yychar);
@@ -1563,11 +1547,11 @@ yyerrlab:
 	if (0 < yysize && yysize <= yymsg_alloc)
 	  {
 	    (void) yysyntax_error (yymsg, yystate, yychar);
-	    yyerror (yymsg);
+	    yyerror (expr_stack, yymsg);
 	  }
 	else
 	  {
-	    yyerror (YY_("syntax error"));
+	    yyerror (expr_stack, YY_("syntax error"));
 	    if (yysize != 0)
 	      goto yyexhaustedlab;
 	  }
@@ -1591,7 +1575,7 @@ yyerrlab:
       else
 	{
 	  yydestruct ("Error: discarding",
-		      yytoken, &yylval, &yylloc);
+		      yytoken, &yylval, &yylloc, expr_stack);
 	  yychar = YYEMPTY;
 	}
     }
@@ -1648,7 +1632,7 @@ yyerrlab1:
 
       yyerror_range[0] = *yylsp;
       yydestruct ("Error: popping",
-		  yystos[yystate], yyvsp, yylsp);
+		  yystos[yystate], yyvsp, yylsp, expr_stack);
       YYPOPSTACK (1);
       yystate = *yyssp;
       YY_STACK_PRINT (yyss, yyssp);
@@ -1691,7 +1675,7 @@ yyabortlab:
 | yyexhaustedlab -- memory exhaustion comes here.  |
 `-------------------------------------------------*/
 yyexhaustedlab:
-  yyerror (YY_("memory exhausted"));
+  yyerror (expr_stack, YY_("memory exhausted"));
   yyresult = 2;
   /* Fall through.  */
 #endif
@@ -1699,7 +1683,7 @@ yyexhaustedlab:
 yyreturn:
   if (yychar != YYEOF && yychar != YYEMPTY)
      yydestruct ("Cleanup: discarding lookahead",
-		 yytoken, &yylval, &yylloc);
+		 yytoken, &yylval, &yylloc, expr_stack);
   /* Do not reclaim the symbols of the rule which action triggered
      this YYABORT or YYACCEPT.  */
   YYPOPSTACK (yylen);
@@ -1707,7 +1691,7 @@ yyreturn:
   while (yyssp != yyss)
     {
       yydestruct ("Cleanup: popping",
-		  yystos[*yyssp], yyvsp, yylsp);
+		  yystos[*yyssp], yyvsp, yylsp, expr_stack);
       YYPOPSTACK (1);
     }
 #ifndef yyoverflow
@@ -1723,28 +1707,68 @@ yyreturn:
 }
 
 
-#line 73 "parser.y"
+#line 75 "parser.y"
 
 
-std::vector<std::string> parse_expression(const char* input) {
-  yy_scan_string(input);
-   yyparse();
+void* createExpr(std::stack<ASTNode*>* expr_stack, ExprHelper::expr_op op, const char* name, double value, size_t numsubexprs) {
+  std::cout << "Creating ASTNode in function createExpr" << std::endl;
+  std::cout << "\tstack size: " << expr_stack->size() << "\n\top: " << op << "\n\tname: " << name << "\n\tvalue: " << value << "\n\tnumsubexprs: " << numsubexprs << std::endl;
 
-   // DEBUGGING
-   if (yyparse_value == nullptr)
-     {
-       printf("Parsed tree, but didn't return correctly\n");
-     }else{
-       printf("Parsed tree: %s\n", yyparse_value->printpretty("    ").c_str());
-       }
-   // END DEBUGGING
+  ASTNode *subexpr1, *subexpr2;
+  switch(numsubexprs) {
+  case 0:
+    if (op == ExprHelper::OP_ALIAS)
+      {
+	expr_stack->push(new ASTNode(op, name));
+      } else if (op == ExprHelper::OP_PATH)
+      {
+	expr_stack->push(new ASTNode(op, name));
+      } else if (op == ExprHelper::OP_NUM)
+      {
+	expr_stack->push(new ASTNode(op, value));
+      }
+    break;
+  case 1:
+    subexpr1 = expr_stack->top();
+    expr_stack->pop();
+    if (op == ExprHelper::OP_INDEX)
+      {
+	expr_stack->push(new ASTNode(op, subexpr1, name));
+	
+      } else {
+      expr_stack->push(new ASTNode(op, subexpr1));
+    }
+    break;
+  case 2:
+    std::cout << "Case 2:" << std::endl;
+    subexpr2 = expr_stack->top();
+    expr_stack->pop();
+    subexpr1 = expr_stack->top();
+    expr_stack->pop();
+    std::cout << "\tpush new ASTNode" << std::endl;
+    expr_stack->push(new ASTNode(op, subexpr1, subexpr2));
+    break;
+  }
 
-   std::vector<std::string> ret;
-    yyparse_value->get_var(&ret);
-    return ret;
+  return &expr_stack->top();
 }
 
-void yyerror(const char *msg) {
+Expression* parse_expression(const char* input) {
+  yy_scan_string(input);
+  std::stack<ASTNode*> expr_stack;
+  yyparse(&expr_stack);
+
+  // DEBUGGING
+  std::cout << "yyparse complete. Stack size: " << expr_stack.size() << std::endl;
+  std::cout << "parser prettyprint:" << std::endl;
+  expr_stack.top()->printpretty("");
+
+  Expression *root = new Expression();
+  expr_stack.top()->to_expr(root);
+  return root;
+}
+
+void yyerror(std::stack<ASTNode*>* expr_stack, const char *msg) {
    printf("** Line %d: %s\n", yylloc.first_line, msg);
 }
 

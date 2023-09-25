@@ -36,6 +36,10 @@ CHAR     ([a-z]|[A-Z])
 
 :(\\|\/|_|{DIGIT})*{CHAR}+(\\|\/|-|_|{DIGIT}|{CHAR})*      {yylval.sval=strndup(yytext + 1,strlen(yytext)-1); return PATH;}
 
+'(\\|\/|_|{DIGIT})*{CHAR}+(\\|\/|-|_|{DIGIT}|{CHAR})*'     {yylval.sval=strndup(yytext + 1,strlen(yytext)-2); return PATH;}
+
+"["({DIGIT}+|{DIGIT}*":"{DIGIT}*":"{DIGIT}*)(,({DIGIT}+|{DIGIT}*":"{DIGIT}*":"{DIGIT}*))*"]"                            {yylval.sval=strndup(yytext + 1,strlen(yytext)-2); return INDICES;}
+
 .              {printf("Error at line %d: unrecognized symbol \"%s\"\n", yylloc.first_line, yytext); exit(0);}
 
 %%

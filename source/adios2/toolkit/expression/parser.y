@@ -3,30 +3,30 @@
  #include <stdio.h>
  #include <stdlib.h>
  #include <math.h>
+ #include <stack>
  #include <string>
  #include <vector>
  #include <iostream>
  #include "lexer.h"
- #include "expression.h"
-
-  extern int yyparse();
-
-  static Expression<double>* yyparse_value;
+ #include "ASTNode.h"
   
- // Here is an example how to create custom data structure
- typedef struct custom_data {
-   Expression<double>* expression;
- } custom_data;
+  extern int yyparse(std::stack<ASTNode*>* expr_stack);
 
-  void yyerror(const char *msg);
+  void* createExpr(std::stack<ASTNode*>*, ExprHelper::expr_op, const char*, double, size_t);
+  
+  static void* yyparse_value;  
+
+  void yyerror(std::stack<ASTNode*>* expr_stack, const char *msg);
 
 %}
+
+%parse-param {std::stack<ASTNode*>* expr_stack}
 
 %union{
   double dval;
   int ival;
   char* sval;
-  struct custom_data* expr;
+  void* expr_ptr;
 }
 
 %error-verbose
@@ -36,12 +36,12 @@
 %token SQRT POW
 %token SIN COS TAN
 %token MAGNITUDE CURL
-%token MULT DIV PLUS MINUS L_PAREN R_PAREN ENDL
+%token MULT DIV PLUS MINUS L_PAREN R_PAREN INDICES ENDL
 %token NUMBER
 %token ALIAS PATH
 %type <dval> NUMBER
-%type <sval> ALIAS PATH
-%type <expr> input exp
+%type <sval> ALIAS PATH INDICES
+%type <expr_ptr> input exp
 %left PLUS MINUS
 %left MULT DIV
 %right POW
@@ -53,44 +53,86 @@
 input:                  {}
                         | ENDL input             {}
                         | decl input             {}
-                        | exp input              { yyparse_value = $1->expression; }
+| exp input              { /*yyparse_value = $1->expression;*/ }
 			;
 
-decl:                   ALIAS PATH      { add_var($1,$2); }
+decl:                   ALIAS PATH               { ASTNode::add_lookup_entry($1, $2, ""); }
+| ALIAS PATH INDICES     { ASTNode::add_lookup_entry($1, $2, $3); }
                         ;
 
-exp:                    ALIAS                  { void* expr = malloc(sizeof(Alias<double>)); struct custom_data* cd = new struct custom_data; Alias<double>* var = new(expr) Alias<double>($1); cd->expression = var; $$ = cd; }
-                        | NUMBER                { void* expr = malloc(sizeof(Number<double>)); struct custom_data* cd = new struct custom_data; Number<double>* num = new(expr) Number<double>($1); cd->expression = num; $$ = cd;}
-			| L_PAREN exp R_PAREN { $$ = $2; }
-                        | exp MULT exp        { void* expr = malloc(sizeof(Multiplication<double>)); struct custom_data* cd = new struct custom_data; Multiplication<double>* mult = new(expr) Multiplication<double>($1->expression, $3->expression); cd->expression = mult; $$ = cd; }
-                        | exp DIV exp        { void* expr = malloc(sizeof(Division<double>)); struct custom_data* cd = new struct custom_data; Division<double>* div = new(expr) Division<double>($1->expression, $3->expression); cd->expression = div; $$ = cd; }
-                        | exp PLUS exp        { void* expr = malloc(sizeof(Addition<double>)); struct custom_data* cd = new struct custom_data; Addition<double>* add = new(expr) Addition<double>($1->expression, $3->expression); cd->expression = add; $$ = cd; }
-                        | exp MINUS exp        { void* expr = malloc(sizeof(Subtraction<double>)); struct custom_data* cd = new struct custom_data; Subtraction<double>* subtr = new(expr) Subtraction<double>($1->expression, $3->expression); cd->expression = subtr; $$ = cd; }
-                        | MINUS exp %prec UMINUS        { void* expr = malloc(sizeof(Negation<double>)); struct custom_data* cd = new struct custom_data; Negation<double>* negative = new(expr) Negation<double>($2->expression); cd->expression = negative; $$ = cd; }
-                        | SQRT L_PAREN exp R_PAREN        { void* expr = malloc(sizeof(Sqrt<double>)); struct custom_data* cd = new struct custom_data; Sqrt<double>* sqrt = new(expr) Sqrt<double>($3->expression); cd->expression = sqrt; $$ = cd; }
-                        | exp POW exp        { void* expr = malloc(sizeof(Pow<double>)); struct custom_data* cd = new struct custom_data; Pow<double>* pow = new(expr) Pow<double>($1->expression, $3->expression); cd->expression = pow; $$ = cd; }
+//index:                  NUMBER comma index { ASTNode::extend_current_lookup_indices($1); }
+//                        | NUMBER { ASTNode::extend_current_lookup_indices($1); }
+//                        ;
+
+exp:                    ALIAS                  { $$ = createExpr(expr_stack, ExprHelper::OP_ALIAS, $1, 0, 0); }
+| ALIAS INDICES         { createExpr(expr_stack, ExprHelper::OP_ALIAS, $1, 0, 0); $$ = createExpr(expr_stack, ExprHelper::OP_INDEX, $2, 0, 1); }
+| PATH                  { $$ = createExpr(expr_stack, ExprHelper::OP_PATH, $1, 0, 0); }
+| NUMBER                { $$ = createExpr(expr_stack, ExprHelper::OP_NUM, "", $1, 0); }
+| L_PAREN exp R_PAREN { $$ = $2; }
+| exp PLUS exp { $$ = createExpr(expr_stack, ExprHelper::OP_ADD, "", 0, 2); }
+| MAGNITUDE L_PAREN exp R_PAREN { $$ = createExpr(expr_stack, ExprHelper::OP_MAGN, "", 0, 1);}
 			;
 %%
 
-std::vector<std::string> parse_expression(const char* input) {
-  yy_scan_string(input);
-   yyparse();
+void* createExpr(std::stack<ASTNode*>* expr_stack, ExprHelper::expr_op op, const char* name, double value, size_t numsubexprs) {
+  std::cout << "Creating ASTNode in function createExpr" << std::endl;
+  std::cout << "\tstack size: " << expr_stack->size() << "\n\top: " << op << "\n\tname: " << name << "\n\tvalue: " << value << "\n\tnumsubexprs: " << numsubexprs << std::endl;
 
-   // DEBUGGING
-   if (yyparse_value == nullptr)
-     {
-       printf("Parsed tree, but didn't return correctly\n");
-     }else{
-       printf("Parsed tree: %s\n", yyparse_value->printpretty("    ").c_str());
-       }
-   // END DEBUGGING
+  ASTNode *subexpr1, *subexpr2;
+  switch(numsubexprs) {
+  case 0:
+    if (op == ExprHelper::OP_ALIAS)
+      {
+	expr_stack->push(new ASTNode(op, name));
+      } else if (op == ExprHelper::OP_PATH)
+      {
+	expr_stack->push(new ASTNode(op, name));
+      } else if (op == ExprHelper::OP_NUM)
+      {
+	expr_stack->push(new ASTNode(op, value));
+      }
+    break;
+  case 1:
+    subexpr1 = expr_stack->top();
+    expr_stack->pop();
+    if (op == ExprHelper::OP_INDEX)
+      {
+	expr_stack->push(new ASTNode(op, subexpr1, name));
+	
+      } else {
+      expr_stack->push(new ASTNode(op, subexpr1));
+    }
+    break;
+  case 2:
+    std::cout << "Case 2:" << std::endl;
+    subexpr2 = expr_stack->top();
+    expr_stack->pop();
+    subexpr1 = expr_stack->top();
+    expr_stack->pop();
+    std::cout << "\tpush new ASTNode" << std::endl;
+    expr_stack->push(new ASTNode(op, subexpr1, subexpr2));
+    break;
+  }
 
-   std::vector<std::string> ret;
-    yyparse_value->get_var(&ret);
-    return ret;
+  return &expr_stack->top();
 }
 
-void yyerror(const char *msg) {
+Expression* parse_expression(const char* input) {
+  yy_scan_string(input);
+  std::stack<ASTNode*> expr_stack;
+  yyparse(&expr_stack);
+
+  // DEBUGGING
+  std::cout << "yyparse complete. Stack size: " << expr_stack.size() << std::endl;
+  std::cout << "parser prettyprint:" << std::endl;
+  expr_stack.top()->printpretty("");
+
+  Expression *root = new Expression();
+  expr_stack.top()->to_expr(root);
+  return root;
+}
+
+void yyerror(std::stack<ASTNode*>* expr_stack, const char *msg) {
    printf("** Line %d: %s\n", yylloc.first_line, msg);
 }
 
