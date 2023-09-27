@@ -36,13 +36,13 @@ ASTNode::ASTNode(ExprHelper::expr_op op, const char *str)
     indices = str;
     break;
   default:
-    // Error
+    // TODO: Make some error
     std::cout << "***That's a problem... ASTNode constructed with string should be alias type, path type,  or index type\n";
   }
   // DEBUGGING  
   ++num_expr;
   std::cout << "\tNum expressions: " << num_expr << std::endl;
-  }
+}
 
 ASTNode::ASTNode(ExprHelper::expr_op op, double val)
   :operation(op), value(val)
@@ -67,7 +67,6 @@ ASTNode::ASTNode(ExprHelper::expr_op op, ASTNode *e)
 ASTNode::ASTNode(ExprHelper::expr_op op, ASTNode *e, const char *str)
   :operation(op), indices(str)
 {
-   
   sub_expr.push_back(e);
   // DEBUGGING
   ++num_expr;
@@ -77,8 +76,7 @@ ASTNode::ASTNode(ExprHelper::expr_op op, ASTNode *e, const char *str)
 
 ASTNode::ASTNode(ExprHelper::expr_op op, ASTNode *e1, ASTNode *e2)
   :operation(op)
-{
-   
+{  
   sub_expr.push_back(e1);
   sub_expr.push_back(e2);
   // DEBUGGING
@@ -130,11 +128,10 @@ ASTNode::~ASTNode()
     var_lookup[alias] = std::make_pair(var_name, indices);
   }
   
-  void ASTNode::add_operand(const ASTNode* e){}
-
-//  void ASTNode::assign_type(enum types t){}
-  
-  void ASTNode::infer_type(){}
+  void ASTNode::add_subexpr(ASTNode* e)
+  {
+    sub_expr.push_back(e);
+  }
 
   void ASTNode::printpretty(std::string indent)
   {
@@ -170,7 +167,9 @@ void ASTNode::to_expr(Expression *parent)
     // TODO: populate index vector
     if (lookup_var_indices(alias) == "")
       {
-	parent->add_child(lookup_var_path(alias), {});
+	Expression *expr = new Expression(ExprHelper::OP_INDEX/*, lookup_var_indices(alias)*/);
+	expr->add_child(lookup_var_path(alias));
+	parent->add_child(expr);
       } else {
 	parent->add_child(lookup_var_path(alias));
       }
@@ -181,8 +180,16 @@ void ASTNode::to_expr(Expression *parent)
   case ExprHelper::OP_NUM:
       parent->set_base(value);
   default:
-    Expression *expr = new Expression(operation);
-    parent->add_child(expr);
+    Expression *expr;
+    if (parent->detail.operation != operation)
+      {
+	expr = new Expression(operation);
+	parent->add_child(expr);	
+      }
+    else
+      {
+	expr = parent;
+      }
     for (ASTNode* e: sub_expr)
       {
 	e->to_expr(expr);

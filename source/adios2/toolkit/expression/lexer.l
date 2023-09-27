@@ -11,19 +11,21 @@ CHAR     ([a-z]|[A-Z])
    
 %%
 
-"+"            {return PLUS;}
-"-"            {return MINUS;}
-"*"            {return MULT;}
-"/"            {return DIV;}
+"+"            {yylval.sval=strdup(yytext); return OPERATOR;}
+"-"            {yylval.sval=strdup(yytext); return OPERATOR;}
+"*"            {yylval.sval=strdup(yytext); return OPERATOR;}
+"/"            {yylval.sval=strdup(yytext); return OPERATOR;}
+"^"            {yylval.sval=strdup(yytext); return OPERATOR;}
 "("            {return L_PAREN;}
 ")"            {return R_PAREN;}
-"sqrt"         {return SQRT;}
-"^"            {return POW;}
-"sin"          {return SIN;}
-"cos"          {return COS;}
-"tan"          {return TAN;}
-"magnitude"    {return MAGNITUDE;}
-"curl"         {return CURL;}
+","            {return COMMA;}
+"add"          {yylval.sval=strdup(yytext); return FUNCTION;}
+"sqrt"         {yylval.sval=strdup(yytext); return FUNCTION;}
+"sin"          {yylval.sval=strdup(yytext); return FUNCTION;}
+"cos"          {yylval.sval=strdup(yytext); return FUNCTION;}
+"tan"          {yylval.sval=strdup(yytext); return FUNCTION;}
+"magnitude"    {yylval.sval=strdup(yytext); return FUNCTION;}
+"curl"         {yylval.sval=strdup(yytext); return FUNCTION;}
 
 
 (\.{DIGIT}+)|({DIGIT}+(\.{DIGIT}*)?([eE][+-]?[0-9]+)?)   {yylval.dval = atof(yytext); return NUMBER;}

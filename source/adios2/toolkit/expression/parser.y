@@ -12,7 +12,7 @@
   
   extern int yyparse(std::stack<ASTNode*>* expr_stack);
 
-  void* createExpr(std::stack<ASTNode*>*, ExprHelper::expr_op, const char*, double, size_t);
+  void* createExpr(std::stack<ASTNode*>*, std::string, const char*, double, size_t);
   
   static void* yyparse_value;  
 
@@ -34,19 +34,16 @@
 
 %start input
 %token COMMA L_PAREN R_PAREN ENDL
-%token SQRT POW
-%token SIN COS TAN
-%token MAGNITUDE CURL
-%token MULT DIV PLUS MINUS INDICES
+%token FUNCTION
+%token OPERATOR
+%token INDICES
 %token NUMBER
 %token ALIAS PATH
 %type <dval> NUMBER
 %type <sval> ALIAS PATH INDICES
+%type <sval> FUNCTION OPERATOR
 %type <expr_ptr> input exp
-%left PLUS MINUS
-%left MULT DIV
-%right POW
-%nonassoc UMINUS
+%type <ival> list
 
 
 %% 
@@ -54,70 +51,62 @@
 input:                  {}
                         | ENDL input             {}
                         | decl input             {}
-| exp input              { /*yyparse_value = $1->expression;*/ }
+                        | exp input              { /*yyparse_value = $1->expression;*/ }
 			;
 
 decl:                   ALIAS PATH               { ASTNode::add_lookup_entry($1, $2, ""); }
-| ALIAS PATH INDICES     { ASTNode::add_lookup_entry($1, $2, $3); }
+                        | ALIAS PATH INDICES     { ASTNode::add_lookup_entry($1, $2, $3); }
                         ;
 
 //index:                  NUMBER comma index { ASTNode::extend_current_lookup_indices($1); }
 //                        | NUMBER { ASTNode::extend_current_lookup_indices($1); }
 //                        ;
 
-list: exp COMMA list {}
-| exp {}
-;
+list:                   list COMMA exp { $$ = $1 +1; }
+                        | exp { $$ = 1;}
+                        ;
 
-exp:                    ALIAS                  { $$ = createExpr(expr_stack, ExprHelper::OP_ALIAS, $1, 0, 0); }
-| ALIAS INDICES         { createExpr(expr_stack, ExprHelper::OP_ALIAS, $1, 0, 0); $$ = createExpr(expr_stack, ExprHelper::OP_INDEX, $2, 0, 1); }
-| PATH                  { $$ = createExpr(expr_stack, ExprHelper::OP_PATH, $1, 0, 0); }
-| NUMBER                { $$ = createExpr(expr_stack, ExprHelper::OP_NUM, "", $1, 0); }
+exp:                    ALIAS                  { $$ = createExpr(expr_stack, "ALIAS", $1, 0, 0); }
+| ALIAS INDICES         { createExpr(expr_stack, "ALIAS", $1, 0, 0); $$ = createExpr(expr_stack, "INDEX", $2, 0, 1); }
+| PATH                  { $$ = createExpr(expr_stack, "PATH", $1, 0, 0); }
+| NUMBER                { $$ = createExpr(expr_stack, "NUM", "", $1, 0); }
 | L_PAREN exp R_PAREN { $$ = $2; }
-| exp PLUS exp { $$ = createExpr(expr_stack, ExprHelper::OP_ADD, "", 0, 2); }
-| MAGNITUDE L_PAREN exp R_PAREN { $$ = createExpr(expr_stack, ExprHelper::OP_MAGN, "", 0, 1);}
+| exp OPERATOR exp { $$ = createExpr(expr_stack, $2, "", 0, 2); }
+| FUNCTION L_PAREN list R_PAREN { $$ = createExpr(expr_stack, $1, "", 0, $3); }
 			;
 %%
 
-void* createExpr(std::stack<ASTNode*>* expr_stack, ExprHelper::expr_op op, const char* name, double value, size_t numsubexprs) {
+void* createExpr(std::stack<ASTNode*>* expr_stack, std::string str_op, const char* name, double value, size_t numsubexprs) {
   std::cout << "Creating ASTNode in function createExpr" << std::endl;
-  std::cout << "\tstack size: " << expr_stack->size() << "\n\top: " << op << "\n\tname: " << name << "\n\tvalue: " << value << "\n\tnumsubexprs: " << numsubexprs << std::endl;
+  std::cout << "\tstack size: " << expr_stack->size() << "\n\top: " << str_op << "\n\tname: " << name << "\n\tvalue: " << value << "\n\tnumsubexprs: " << numsubexprs << std::endl;
 
-  ASTNode *subexpr1, *subexpr2;
-  switch(numsubexprs) {
-  case 0:
-    if (op == ExprHelper::OP_ALIAS)
-      {
-	expr_stack->push(new ASTNode(op, name));
-      } else if (op == ExprHelper::OP_PATH)
-      {
-	expr_stack->push(new ASTNode(op, name));
-      } else if (op == ExprHelper::OP_NUM)
-      {
-	expr_stack->push(new ASTNode(op, value));
-      }
+  ExprHelper::expr_op op = ExprHelper::get_op(str_op);
+
+  ASTNode *node = new ASTNode(op);
+  switch(op) {
+  case ExprHelper::OP_ALIAS:
+    node = new ASTNode(op, name);
     break;
-  case 1:
-    subexpr1 = expr_stack->top();
-    expr_stack->pop();
-    if (op == ExprHelper::OP_INDEX)
-      {
-	expr_stack->push(new ASTNode(op, subexpr1, name));
-	
-      } else {
-      expr_stack->push(new ASTNode(op, subexpr1));
+  case ExprHelper::OP_PATH:
+    node = new ASTNode(op, name);
+    break;
+  case ExprHelper::OP_NUM:
+    node = new ASTNode(op, value);
+    break;
+  case ExprHelper::OP_INDEX:
+    // TODO: translate indices
+    node = new ASTNode(op, name);
+    break;
+  default:
+    node = new ASTNode(op);
+  };
+  for (size_t i = 0; i < numsubexprs; ++i)
+    {
+      ASTNode *subexpr = expr_stack->top();
+      node->add_subexpr(subexpr);
+      expr_stack->pop();
     }
-    break;
-  case 2:
-    std::cout << "Case 2:" << std::endl;
-    subexpr2 = expr_stack->top();
-    expr_stack->pop();
-    subexpr1 = expr_stack->top();
-    expr_stack->pop();
-    std::cout << "\tpush new ASTNode" << std::endl;
-    expr_stack->push(new ASTNode(op, subexpr1, subexpr2));
-    break;
-  }
+  expr_stack->push(node);
 
   return &expr_stack->top();
 }
@@ -132,9 +121,9 @@ Expression* parse_expression(const char* input) {
   std::cout << "parser prettyprint:" << std::endl;
   expr_stack.top()->printpretty("");
 
-  Expression *root = new Expression();
-  expr_stack.top()->to_expr(root);
-  return root;
+  Expression *dummy_root = new Expression();
+  expr_stack.top()->to_expr(dummy_root);
+  return std::get<0>(dummy_root->sub_exprs[0]);
 }
 
 void yyerror(std::stack<ASTNode*>* expr_stack, const char *msg) {

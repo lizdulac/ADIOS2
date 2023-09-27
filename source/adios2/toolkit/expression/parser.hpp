@@ -43,22 +43,12 @@
      L_PAREN = 259,
      R_PAREN = 260,
      ENDL = 261,
-     SQRT = 262,
-     POW = 263,
-     SIN = 264,
-     COS = 265,
-     TAN = 266,
-     MAGNITUDE = 267,
-     CURL = 268,
-     MULT = 269,
-     DIV = 270,
-     PLUS = 271,
-     MINUS = 272,
-     INDICES = 273,
-     NUMBER = 274,
-     ALIAS = 275,
-     PATH = 276,
-     UMINUS = 277
+     FUNCTION = 262,
+     OPERATOR = 263,
+     INDICES = 264,
+     NUMBER = 265,
+     ALIAS = 266,
+     PATH = 267
    };
 #endif
 /* Tokens.  */
@@ -66,22 +56,12 @@
 #define L_PAREN 259
 #define R_PAREN 260
 #define ENDL 261
-#define SQRT 262
-#define POW 263
-#define SIN 264
-#define COS 265
-#define TAN 266
-#define MAGNITUDE 267
-#define CURL 268
-#define MULT 269
-#define DIV 270
-#define PLUS 271
-#define MINUS 272
-#define INDICES 273
-#define NUMBER 274
-#define ALIAS 275
-#define PATH 276
-#define UMINUS 277
+#define FUNCTION 262
+#define OPERATOR 263
+#define INDICES 264
+#define NUMBER 265
+#define ALIAS 266
+#define PATH 267
 
 
 
@@ -96,7 +76,7 @@ typedef union YYSTYPE
   void* expr_ptr;
 }
 /* Line 1529 of yacc.c.  */
-#line 100 "parser.hpp"
+#line 80 "parser.hpp"
 	YYSTYPE;
 # define yystype YYSTYPE /* obsolescent; will be withdrawn */
 # define YYSTYPE_IS_DECLARED 1

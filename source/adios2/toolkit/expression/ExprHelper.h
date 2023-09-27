@@ -8,6 +8,7 @@ class ExprHelper
 public:
  
   enum expr_op  {
+    OP_NULL,
     OP_ALIAS, /* Parser-use only */
     OP_PATH, /* Parser-use only */
     OP_NUM, /* Parser-use only */
@@ -19,9 +20,9 @@ public:
   };
 
   static std::string get_op_name(expr_op op);
-  static expr_op get_op(const char *op);
+  static expr_op get_op(std::string str);
 
 private:
-  const static std::map<const char*, expr_op> string_to_op;
+  const static std::map<std::string, expr_op> string_to_op;
   const static std::map<expr_op, std::string> op_to_string;
 };

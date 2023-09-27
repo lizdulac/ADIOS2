@@ -29,31 +29,18 @@ public:
   static std::string lookup_var_indices(const std::string var_alias);
   static void add_lookup_entry(const std::string alias, const std::string var_name, const std::string indices);
   
-  void add_operand(const ASTNode* e);
-  //void assign_type(enum types t);
+  void add_subexpr(ASTNode* e);
   void infer_type();
   void printpretty(std::string indent = "");
   void to_expr(Expression*);
 
   //private:
   ExprHelper::expr_op operation;
-  std::string op_name;
   std::string alias;
   std::string indices;
   double value;
-  //enum ops operation;
-  //enum types type;
   std::vector<ASTNode*> sub_expr;
-  /*
-  struct var_lookup_entry
-  {
-    std::string path;
-    std::vector<std::pair<bool, size_t>> indices;
-    //adios2::Variable var;
-    
-  }
-  static std::map<std::string, struct var_lookup_entry> var_lookup;
-  */
+
   static std::map<std::string, std::pair<std::string, std::string> > var_lookup;
   // DEBUGGING
   static int num_expr;
