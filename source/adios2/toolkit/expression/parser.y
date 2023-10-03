@@ -100,10 +100,11 @@ void* createExpr(std::stack<ASTNode*>* expr_stack, std::string str_op, const cha
   default:
     node = new ASTNode(op);
   };
-  for (size_t i = 0; i < numsubexprs; ++i)
+  node->extend_subexprs(numsubexprs);
+  for (size_t i = 1; i <= numsubexprs; ++i)
     {
       ASTNode *subexpr = expr_stack->top();
-      node->add_subexpr(subexpr);
+      node->add_back_subexpr(subexpr,i);
       expr_stack->pop();
     }
   expr_stack->push(node);

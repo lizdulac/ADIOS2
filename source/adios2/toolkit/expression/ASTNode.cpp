@@ -133,11 +133,25 @@ ASTNode::~ASTNode()
     sub_expr.push_back(e);
   }
 
+void ASTNode::add_back_subexpr(ASTNode* e, size_t n)
+{
+  size_t index = sub_expr.size() - n;
+  std::cout << "ASTNode add_back_subexpr index: " << index << std::endl;
+  //if (index > 0 && sub_expr[index] == nullptr)
+  sub_expr[index] = e;
+}
+
+void ASTNode::extend_subexprs(size_t n)
+{
+  std::cout << "ASTNode extending subexprs from size " << sub_expr.size() << " to " << (sub_expr.size() + n) << std::endl;
+  sub_expr.resize(sub_expr.size() + n);
+}
+
   void ASTNode::printpretty(std::string indent)
   {
     std::cout << indent << ExprHelper::get_op_name(operation) << ":";
-    switch (operation) {
-    case ExprHelper::OP_ALIAS:
+    if (operation == ExprHelper::OP_ALIAS)
+      {
 	std::cout << " (alias " << alias << " maps to Variable '";
 	std::cout << lookup_var_path(alias) << "'";
 	if (lookup_var_indices(alias) != "")
@@ -145,18 +159,22 @@ ASTNode::~ASTNode()
 	    std::cout << " [" << lookup_var_indices(alias) << "]";
 	  }
 	std::cout << ")";
-      break;
-    case ExprHelper::OP_PATH:
+      }
+    else if (operation == ExprHelper::OP_PATH)
+      {
 	std::cout << " (" << alias << ")";
-      break;
-    case ExprHelper::OP_INDEX:
+      }
+    else if (operation == ExprHelper::OP_INDEX)
+      {
 	std::cout << " [" << indices << "]";
-      break;
-    }    
+      }  
     std::cout << std::endl;
     for (ASTNode* e: sub_expr)
       {
-	e->printpretty(indent + "    ");
+	if (e != nullptr)
+	  e->printpretty(indent + "    ");
+	else
+	  std::cout << "sub_expr is nullptr" << std::endl;
       }
   }
 
@@ -165,7 +183,7 @@ void ASTNode::to_expr(Expression *parent)
   switch (operation) {
   case ExprHelper::OP_ALIAS:
     // TODO: populate index vector
-    if (lookup_var_indices(alias) == "")
+    if (lookup_var_indices(alias) != "")
       {
 	Expression *expr = new Expression(ExprHelper::OP_INDEX/*, lookup_var_indices(alias)*/);
 	expr->add_child(lookup_var_path(alias));

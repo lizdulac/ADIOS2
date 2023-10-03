@@ -30,6 +30,8 @@ public:
   static void add_lookup_entry(const std::string alias, const std::string var_name, const std::string indices);
   
   void add_subexpr(ASTNode* e);
+  void add_back_subexpr(ASTNode* e, size_t i);
+  void extend_subexprs(size_t n);
   void infer_type();
   void printpretty(std::string indent = "");
   void to_expr(Expression*);
