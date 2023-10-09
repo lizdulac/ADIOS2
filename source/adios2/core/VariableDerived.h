@@ -19,12 +19,9 @@ class VariableDerived : public VariableBase
     derived::Expression expression;
 
 public:
-    VariableDerived(const std::string &name, const DataType type, const size_t elementSize,
-                 const Dims &shape, const Dims &start, const Dims &count, const bool constantShape);
+    VariableDerived(const std::string &name, derived::Expression exp);
 
     ~VariableDerived() = default;
-
-    void AddDerivedExpression(derived::Expression exp);
 
 };
 

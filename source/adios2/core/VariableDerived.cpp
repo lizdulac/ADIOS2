@@ -1,3 +1,4 @@
+#include "adios2/helper/adiosType.h"
 #include "VariableDerived.h"
 
 namespace adios2
@@ -5,12 +6,10 @@ namespace adios2
 namespace core
 {
 
-    VariableDerived::VariableDerived(const std::string &name, const DataType type, const size_t elementSize,
-                 const Dims &shape, const Dims &start, const Dims &count, const bool constantShape)
-    : VariableBase(name, type, elementSize, shape, start, count, constantShape)
-    { 
+    VariableDerived::VariableDerived(const std::string &name, derived::Expression exp)
+    : VariableBase(name, exp.m_Type, helper::GetDataTypeSize(exp.m_Type), exp.GetShape(), exp.GetStart(), exp.GetCount(), exp.m_ConstantShape), expression(exp)
+    {
     }
 
-    void VariableDerived::AddDerivedExpression(derived::Expression exp): expression(exp){}
 } // end namespace core
 } // end namespace adios2

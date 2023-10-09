@@ -812,7 +812,7 @@ void IO::CheckTransportType(const std::string type) const
 }
 
 #ifdef ADIOS2_HAVE_DERIVED
-VariableDerived &IO::DefineDerivedVariable(const std::string &name, const std::string &expression)
+VariableDerived &IO::DefineDerivedVariable(const std::string &name, const std::string &exp_string)
 {
     PERFSTUBS_SCOPED_TIMER("IO::DefineDerivedVariable");
 
@@ -826,14 +826,12 @@ VariableDerived &IO::DefineDerivedVariable(const std::string &name, const std::s
         }
     }
 
-    derived::Expression exp(expression);
+    derived::Expression exp(exp_string);
     auto itVariablePair =
         m_VariablesDerived.emplace(name, std::unique_ptr<VariableBase>(new VariableDerived(
-                                  name, exp.GetType(), exp.GetElementSize(), exp.GetShape(), exp.GetStart(), exp.GetCount(), true)));
+                                  name, exp)));
     VariableDerived &variable =
         static_cast<VariableDerived &>(*itVariablePair.first->second);
-
-    variable.AddDerivedExpression(exp);
 
     // check IO placeholder for variable operations
     auto itOperations = m_VarOpsPlaceholder.find(name);
