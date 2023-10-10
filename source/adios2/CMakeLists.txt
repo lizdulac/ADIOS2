@@ -131,7 +131,12 @@ if (ADIOS2_HAVE_Derived)
   target_sources(adios2_core PRIVATE
       core/VariableDerived.cpp
       toolkit/derived/Expression.cpp)
-#      toolkit/derived/Functions.cpp toolkit/derived/Functions.tcc)
+  add_library(adios2_core_derived
+      toolkit/derived/parser/lexer.cpp
+      toolkit/derived/parser/parser.cpp
+      toolkit/derived/parser/ExprHelper.h
+      toolkit/derived/parser/ASTNode.cpp)
+  target_link_libraries(adios2_core PRIVATE adios2_core_derived)
 endif()
 
 set(maybe_adios2_core_cuda)
@@ -400,10 +405,12 @@ if(ADIOS2_HAVE_MPI)
   set(maybe_adios2_c_mpi adios2_c_mpi)
   set(maybe_adios2_cxx11_mpi adios2_cxx11_mpi)
   set(maybe_adios2_core_mpi adios2_core_mpi)
+  set(maybe_adios2_core_derived adios2_core_derived)
 else()
   set(maybe_adios2_c_mpi)
   set(maybe_adios2_cxx11_mpi)
   set(maybe_adios2_core_mpi)
+  set(maybe_adios2_core_derived)
 endif()
 
 # The main "adios2" target provides all interfaces.
@@ -457,7 +464,7 @@ install(DIRECTORY toolkit/
 )
 
 # Library installation
-install(TARGETS adios2_core ${maybe_adios2_core_mpi} ${maybe_adios2_core_cuda} ${maybe_adios2_core_kokkos} ${maybe_adios2_blosc2} EXPORT adios2Exports
+install(TARGETS adios2_core ${maybe_adios2_core_mpi} ${maybe_adios2_core_cuda} ${maybe_adios2_core_kokkos} ${maybe_adios2_blosc2} ${maybe_adios2_core_derived} EXPORT adios2Exports
   RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR} COMPONENT adios2_core-runtime
   LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR} COMPONENT adios2_core-libraries NAMELINK_COMPONENT adios2_core-development
   ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR} COMPONENT adios2_core-development

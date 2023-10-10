@@ -824,9 +824,19 @@ VariableDerived &IO::DefineDerivedVariable(const std::string &name, const std::s
                                                  "derived variable " + name +
                                                      " already defined in IO " + m_Name);
         }
+        else
+        {
+            auto itVariable = m_Variables.find(name);
+            if (itVariable != m_Variables.end())
+            {
+                helper::Throw<std::invalid_argument>("Core", "IO", "DefineDerivedVariable",
+                                                    "derived variable " + name +
+                                                    " trying to use an already defined variable name in IO " + m_Name);
+            }
+        }
     }
 
-    derived::Expression exp(exp_string);
+    derived::Expression exp(exp_string);//, m_Variables);
     auto itVariablePair =
         m_VariablesDerived.emplace(name, std::unique_ptr<VariableBase>(new VariableDerived(
                                   name, exp)));

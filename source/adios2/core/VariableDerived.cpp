@@ -7,7 +7,8 @@ namespace core
 {
 
     VariableDerived::VariableDerived(const std::string &name, derived::Expression exp)
-    : VariableBase(name, exp.m_Type, helper::GetDataTypeSize(exp.m_Type), exp.GetShape(), exp.GetStart(), exp.GetCount(), exp.m_ConstantShape), expression(exp)
+    : VariableBase(name, exp.GetDataType(), helper::GetDataTypeSize(exp.GetDataType()), exp.GetShape(), exp.GetStart(), exp.GetCount(), exp.IsConstantShape()),
+    expression(exp)
     {
     }
 
