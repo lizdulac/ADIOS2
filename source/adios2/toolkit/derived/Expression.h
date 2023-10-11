@@ -3,7 +3,7 @@
 
 #include <string>
 #include "adios2/common/ADIOSTypes.h"
-#include "adios2/core/IO.h"
+//#include "adios2/core/IO.h"
 #include "parser/parser.hpp"
 #include "parser/ASTNode.h"
 
@@ -27,7 +27,7 @@ struct OpInfo
 class ExpressionTree
 {
 public:
-  std::vector<std::tuple<ExpressionTree*, std::string>> sub_exprs;
+  std::vector<std::tuple<ExpressionTree, std::string, bool>> sub_exprs;
   OpInfo detail;
 
   ExpressionTree() {};
@@ -41,22 +41,22 @@ public:
     detail.constant = c;
   }
   
-  void add_child(ExpressionTree *exp)
+  void add_child(ExpressionTree exp)
   {
-    sub_exprs.push_back({exp, ""});
+    sub_exprs.push_back({exp, "", true});
   }
 
   void add_child(std::string var)
   {
     std::cout << "add_child with string: " << var << std::endl;
 
-    sub_exprs.push_back({nullptr, var});
+    sub_exprs.push_back({ExpressionTree(), var, false});
   }
   void add_child(std::string var, std::vector<std::tuple<size_t, size_t, size_t> >)
   {
     std::cout << "add_child with string: " << var << std::endl;
     // TODO: include indices
-    sub_exprs.push_back({nullptr, var});
+    sub_exprs.push_back({ExpressionTree(), var, false});
   }
 
   void print()
@@ -66,11 +66,11 @@ public:
     std::cout << "\tconstant: " << detail.constant << std::endl;
     std::cout << "\tchildren: " << sub_exprs.size() << std::endl;
 
-    for (std::tuple<ExpressionTree*, std::string> t: sub_exprs)
+    for (std::tuple<ExpressionTree, std::string, bool> t: sub_exprs)
       {
-	if (std::get<0>(t) != nullptr)
+	if (std::get<2>(t) == true)
 	  {
-	    std::get<0>(t)->print();
+	    std::get<0>(t).print();
 	  }
 	else
 	  {
@@ -90,7 +90,7 @@ class Expression
     Dims m_Start;
     Dims m_Count;
 
-    void ASTNode_to_ExpressionTree(adios2::detail::ASTNode* ASTTree);//, adios2::core::VarMap m_Variables);
+    ExpressionTree ASTNode_to_ExpressionTree(adios2::detail::ASTNode* ASTTree);//, adios2::core::VarMap m_Variables);
 
 public:
     Expression() = default;

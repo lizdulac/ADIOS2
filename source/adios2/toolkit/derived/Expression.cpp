@@ -15,72 +15,55 @@ Expression::Expression(std::string string_exp)//, adios2::core::VarMap variables
     m_Type = DataType::Float;
     m_ConstantShape = true;
     adios2::detail::ASTNode *root_node = adios2::detail::parse_expression(string_exp);
-    //m_Exp = ASTNode_to_ExpressionTree(root_node, variables);
+    std::cout << "Converting the ASTNode to ExpressionTree" << std::endl;
+    m_Exp = ASTNode_to_ExpressionTree(root_node);//, variables);
+    m_Exp.print();
 }
 
-void Expression::ASTNode_to_ExpressionTree(adios2::detail::ASTNode* node)//, adios2::core::VarMap variables)
+ExpressionTree Expression::ASTNode_to_ExpressionTree(adios2::detail::ASTNode* node)//, adios2::core::VarMap variables)
 {
+    std::cout << "Adding node " << node->operation << " " << node->sub_expr.size() << std::endl;
     ExpressionTree exprTree_node(node->operation);
     for (adios2::detail::ASTNode* e: node->sub_expr)
     {
-        // if the children nodes are other expressions, convert them to expressions
-        if (e->operation != adios2::detail::ExpressionOperator::OP_ALIAS &&
-            e->operation != adios2::detail::ExpressionOperator::OP_PATH &&
-            e->operation != adios2::detail::ExpressionOperator::OP_NUM)
+        std::cout << "Look at sub-expression " << e->operation << std::endl;
+        switch (e->operation)
         {
-            ASTNode_to_ExpressionTree(e);
-            // add_child(what is returned by the previous function);
-        }
-        else{ // otherwise add parameters to the current expression node
-            switch (node->operation)
-            {
-                case adios2::detail::ExpressionOperator::OP_ALIAS:
-                    // add an index vector
-                    break;
-                case adios2::detail::ExpressionOperator::OP_PATH:
-                    exprTree_node.add_child(e->alias);
-                    break;
-                case adios2::detail::ExpressionOperator::OP_NUM:
-                    exprTree_node.set_base(e->value);
-                    break;
-                default:
-                    break;
-            }
+            case adios2::detail::ExpressionOperator::OP_ALIAS:
+                // add an index vector
+                exprTree_node.add_child(e->lookup_var_path(e->alias));
+                std::cout << "variable alias " << e->lookup_var_path(e->alias) << std::endl;
+                break;
+            case adios2::detail::ExpressionOperator::OP_PATH:
+                exprTree_node.add_child(e->alias);
+                std::cout << "variable path" << std::endl;
+                break;
+            case adios2::detail::ExpressionOperator::OP_NUM:
+                exprTree_node.set_base(e->value);
+                std::cout << "value" << std::endl;
+                break;
+            default: //if the children nodes are other expressions, convert them to expressions
+                auto temp_node = ASTNode_to_ExpressionTree(e);
+                std::cout << "recursive - child operation is " << e->operation << std::endl;
+                // move from a binary to a multinary tree if the child has the same operation
+                if (e->operation == node->operation) // TODO check if the base is the same
+                {
+                    // concatenate exprTree with temp_node
+                    for (std::tuple<ExpressionTree, std::string, bool> childTree: temp_node.sub_exprs)
+                    {
+                        if(std::get<2>(childTree) == true)
+                            exprTree_node.add_child(std::get<0>(childTree));
+                        else
+                            exprTree_node.add_child(std::get<1>(childTree));
+                    }
+                }
+                else
+                {
+                    exprTree_node.add_child(temp_node);
+                }
         }
     }
-    //return exprTree_node;
-
-  //switch (node->operation) {
-  /*case adios2::detail::ExpressionOperator::OP_ALIAS:
-    // TODO: populate index vector
-    if (node->lookup_var_indices(node->alias) != "")
-      {
-        ExpressionTree *expr = new ExpressionTree(adios2::detail::ExpressionOperator::OP_INDEX/*, lookup_var_indices(alias)*///);
-     /*   expr->add_child(node->lookup_var_path(node->alias));
-        //parent->add_child(expr);
-      } else {
-	    //parent->add_child(node->lookup_var_path(node->alias));
-      }
-    break;*/
-  // add a variable to the list of operands
-  //case adios2::detail::ExpressionOperator::OP_PATH:
-      //parent->add_child(alias);
-    //break;
-  //case adios2::detail::ExpressionOperator::OP_NUM:
-      //parent->set_base(value);
-  //default:
-  //  ExpressionTree expr;
-    /*if (parent->detail.operation != operation)
-      {
-	expr = new ExpressionTree(operation);
-	parent->add_child(expr);
-      }
-    else
-      {
-	expr = parent;
-      }*/
-
-  //}
+    return exprTree_node;
 }
 
 Dims Expression::GetShape()
