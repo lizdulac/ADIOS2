@@ -812,7 +812,7 @@ void IO::CheckTransportType(const std::string type) const
 }
 
 #ifdef ADIOS2_HAVE_DERIVED
-VariableDerived &IO::DefineDerivedVariable(const std::string &name, const std::string &exp_string)
+VariableDerived &IO::DefineDerivedVariable(const std::string &name, const std::string &exp_string, const DerivedVarType varType)
 {
     PERFSTUBS_SCOPED_TIMER("IO::DefineDerivedVariable");
 
@@ -862,7 +862,7 @@ VariableDerived &IO::DefineDerivedVariable(const std::string &name, const std::s
     // create derived variable with the expression
     auto itVariablePair =
         m_VariablesDerived.emplace(name, std::unique_ptr<VariableBase>(new VariableDerived(
-                                  name, derived_exp, expressionType, isConstant)));
+                                  name, derived_exp, expressionType, isConstant, varType)));
     VariableDerived &variable =
         static_cast<VariableDerived &>(*itVariablePair.first->second);
 
@@ -870,7 +870,11 @@ VariableDerived &IO::DefineDerivedVariable(const std::string &name, const std::s
     auto itOperations = m_VarOpsPlaceholder.find(name);
     if (itOperations != m_VarOpsPlaceholder.end())
     {
-        // TODO allow to apply an operation only for derived variables that save the data
+        // allow to apply an operation only for derived variables that save the data
+        if (varType != DerivedVarType::StoreData)
+            helper::Throw<std::invalid_argument>("Core", "IO", "DefineDerivedVariable",
+                                                 "Operators for derived variables can only be applied "
+                                                " for DerivedVarType::StoreData types.");
         variable.m_Operations.reserve(itOperations->second.size());
         for (auto &operation : itOperations->second)
         {

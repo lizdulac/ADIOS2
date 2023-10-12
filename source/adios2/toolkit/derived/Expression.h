@@ -45,7 +45,6 @@ public:
 
   std::vector<std::string> VariableNameList();
   void print();
-
 };
 
 class Expression
