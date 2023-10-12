@@ -7,17 +7,12 @@ namespace adios2{
 
 namespace derived{
 
-//Expression::Expression(std::string string_exp): m_Exp(string_exp), m_Type(m_Exp.type), m_ConstantShape(m_Exp.constantShape), m_Shape(m_Exp.shape), m_Start(m_Exp.start), m_Count(m_Exp.count) {}
-
-Expression::Expression(std::string string_exp)//, adios2::core::VarMap variables)
-: m_Shape({0}), m_Start({0}), m_Count({0})
+Expression::Expression(std::string string_exp)
+: ExprString(string_exp), m_Shape({0}), m_Start({0}), m_Count({0})
 {
-    m_Type = DataType::Float;
-    m_ConstantShape = true;
     adios2::detail::ASTNode *root_node = adios2::detail::parse_expression(string_exp);
     std::cout << "Converting the ASTNode to ExpressionTree" << std::endl;
-    m_Exp = ASTNode_to_ExpressionTree(root_node);//, variables);
-    m_Exp.print();
+    m_Expr = ASTNode_to_ExpressionTree(root_node);//, variables);
 }
 
 ExpressionTree Expression::ASTNode_to_ExpressionTree(adios2::detail::ASTNode* node)//, adios2::core::VarMap variables)
@@ -29,24 +24,27 @@ ExpressionTree Expression::ASTNode_to_ExpressionTree(adios2::detail::ASTNode* no
         std::cout << "Look at sub-expression " << e->operation << std::endl;
         switch (e->operation)
         {
-            case adios2::detail::ExpressionOperator::OP_ALIAS:
-                // add an index vector
+            case adios2::detail::ExpressionOperator::OP_ALIAS: // add variable given by alias
+                // add an index operation in the chain if the variable contains indeces
+                /*if (e->lookup_var_indices(e->alias) != "")
+                {
+                    ExpressionTree index_expr(adios2::detail::ExpressionOperator::OP_INDEX);
+                    index_expr.set_indeces(e->lookup_var_indices(e->alias));
+                    index_expr.add_child(e->lookup_var_path(e->alias));
+                    expTree_node->add_child(expr);
+                }*/
                 exprTree_node.add_child(e->lookup_var_path(e->alias));
-                std::cout << "variable alias " << e->lookup_var_path(e->alias) << std::endl;
                 break;
-            case adios2::detail::ExpressionOperator::OP_PATH:
+            case adios2::detail::ExpressionOperator::OP_PATH: // add variable name
                 exprTree_node.add_child(e->alias);
-                std::cout << "variable path" << std::endl;
                 break;
-            case adios2::detail::ExpressionOperator::OP_NUM:
+            case adios2::detail::ExpressionOperator::OP_NUM: // set the base value for the operation
                 exprTree_node.set_base(e->value);
-                std::cout << "value" << std::endl;
                 break;
             default: //if the children nodes are other expressions, convert them to expressions
                 auto temp_node = ASTNode_to_ExpressionTree(e);
-                std::cout << "recursive - child operation is " << e->operation << std::endl;
                 // move from a binary to a multinary tree if the child has the same operation
-                if (e->operation == node->operation) // TODO check if the base is the same
+                if (e->operation == node->operation && adios2::detail::op_property.at(e->operation).is_associative)
                 {
                     // concatenate exprTree with temp_node
                     for (std::tuple<ExpressionTree, std::string, bool> childTree: temp_node.sub_exprs)
@@ -66,6 +64,11 @@ ExpressionTree Expression::ASTNode_to_ExpressionTree(adios2::detail::ASTNode* no
     return exprTree_node;
 }
 
+std::vector<std::string> Expression::VariableNameList()
+{
+    return m_Expr.VariableNameList();
+}
+
 Dims Expression::GetShape()
 {
     return m_Shape;
@@ -81,25 +84,69 @@ Dims Expression::GetCount()
     return m_Count;
 }
 
-DataType Expression::GetDataType()
+void Expression::SetDims(std::map<std::string, std::tuple<Dims, Dims, Dims>> NameToDims)
 {
-    return m_Type;
+    // TODO set dimenstions based on operator functions
+    // check correctness as we set the dimenstions
 }
 
-bool Expression::IsConstantShape()
+  void ExpressionTree::set_base(double c)
+  {
+    detail.constant = c;
+  }
+  
+  void ExpressionTree::set_indeces(std::vector<std::tuple<size_t, size_t, size_t> > index_list)
+  {
+      detail.indices = index_list;
+  }
+  
+  void ExpressionTree::add_child(ExpressionTree exp)
+  {
+    sub_exprs.push_back({exp, "", true});
+  }
+
+  void ExpressionTree::add_child(std::string var)
+  {
+    sub_exprs.push_back({ExpressionTree(), var, false});
+  }
+
+std::vector<std::string> ExpressionTree::VariableNameList()
 {
-    return m_ConstantShape;
+    std::vector<std::string> var_list;
+    for (auto subexp: sub_exprs)
+    {
+        // if the sub_expression is a leaf
+        if (!std::get<2>(subexp))
+        {
+            var_list.push_back(std::get<1>(subexp));
+        }
+        else{
+            auto subexpr_list = std::get<0>(subexp).VariableNameList();
+            var_list.insert(var_list.end(), subexpr_list.begin(), subexpr_list.end());
+        }
+    }
+    return var_list;
 }
 
-bool Expression::CheckCorrectness()
+void ExpressionTree::print()
 {
-    return true;
-}
+    std::cout << "Print Expression:" << std::endl;
+    std::cout << "\toperation: " << get_op_name(detail.operation) << std::endl;
+    std::cout << "\tconstant: " << detail.constant << std::endl;
+    std::cout << "\tchildren: " << sub_exprs.size() << std::endl;
 
-void Expression::ApplyExpression()
-{
-    // recompute the shape in case the variables were updated
-}
+    for (std::tuple<ExpressionTree, std::string, bool> t: sub_exprs)
+      {
+	if (std::get<2>(t) == true)
+	  {
+	    std::get<0>(t).print();
+	  }
+	else
+	  {
+	    std::cout << "string: " << std::get<1>(t) << std::endl;
+	  }
+      }
+  }
 
 }
 }

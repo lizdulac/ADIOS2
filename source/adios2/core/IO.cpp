@@ -836,10 +836,33 @@ VariableDerived &IO::DefineDerivedVariable(const std::string &name, const std::s
         }
     }
 
-    derived::Expression exp(exp_string);//, m_Variables);
+    derived::Expression derived_exp(exp_string);
+    std::vector<std::string> var_list = derived_exp.VariableNameList();
+    DataType expressionType = DataType::None;
+    bool isConstant = true;
+    // check correctness for the variable names and types within the expression
+    for (auto var_name: var_list)
+    {
+        auto itVariable = m_Variables.find(var_name);
+        if (itVariable == m_Variables.end())
+            helper::Throw<std::invalid_argument>("Core", "IO", "DefineDerivedVariable",
+                                                 "using undefine variable " + var_name +
+                                                " in defining the derived variable " + name);
+        DataType var_type = InquireVariableType(var_name);
+        if (expressionType == DataType::None) expressionType = var_type;
+        if (expressionType != var_type)
+            helper::Throw<std::invalid_argument>("Core", "IO", "DefineDerivedVariable",
+                                                 "all variables within a derived variable "
+                                                " must have the same type ");
+        if((itVariable->second)->IsConstantDims()==false) isConstant = false;
+    }
+    // TODO set the initial shape of the expression and check correcness
+    // derived_exp.setDims(name_to_dims);
+
+    // create derived variable with the expression
     auto itVariablePair =
         m_VariablesDerived.emplace(name, std::unique_ptr<VariableBase>(new VariableDerived(
-                                  name, exp)));
+                                  name, derived_exp, expressionType, isConstant)));
     VariableDerived &variable =
         static_cast<VariableDerived &>(*itVariablePair.first->second);
 
@@ -847,6 +870,7 @@ VariableDerived &IO::DefineDerivedVariable(const std::string &name, const std::s
     auto itOperations = m_VarOpsPlaceholder.find(name);
     if (itOperations != m_VarOpsPlaceholder.end())
     {
+        // TODO allow to apply an operation only for derived variables that save the data
         variable.m_Operations.reserve(itOperations->second.size());
         for (auto &operation : itOperations->second)
         {

@@ -16,11 +16,10 @@ namespace core
  */
 class VariableDerived : public VariableBase
 {
-    adios2::derived::Expression expression;
+    adios2::derived::Expression m_Expr;
 
 public:
-    VariableDerived(const std::string &name, adios2::derived::Expression exp);
-
+    VariableDerived(const std::string &name, adios2::derived::Expression expr, DataType exprType, bool isConstant);
     ~VariableDerived() = default;
 
 };
