@@ -77,8 +77,8 @@ exp:                    ALIAS                  { $$ = createExpr(expr_stack, "AL
 %%
 
 void* createExpr(std::stack<ASTNode*>* expr_stack, std::string str_op, const char* name, double value, size_t numsubexprs) {
-  std::cout << "Creating ASTNode in function createExpr" << std::endl;
-  std::cout << "\tstack size: " << expr_stack->size() << "\n\top: " << str_op << "\n\tname: " << name << "\n\tvalue: " << value << "\n\tnumsubexprs: " << numsubexprs << std::endl;
+  //std::cout << "Creating ASTNode in function createExpr" << std::endl;
+  //std::cout << "\tstack size: " << expr_stack->size() << "\n\top: " << str_op << "\n\tname: " << name << "\n\tvalue: " << value << "\n\tnumsubexprs: " << numsubexprs << std::endl;
 
   ExprHelper::expr_op op = ExprHelper::get_op(str_op);
 
@@ -118,9 +118,9 @@ Expression* parse_expression(const char* input) {
   yyparse(&expr_stack);
 
   // DEBUGGING
-  std::cout << "yyparse complete. Stack size: " << expr_stack.size() << std::endl;
-  std::cout << "parser prettyprint:" << std::endl;
-  expr_stack.top()->printpretty("");
+  //std::cout << "yyparse complete. Stack size: " << expr_stack.size() << std::endl;
+  //std::cout << "parser prettyprint:" << std::endl;
+  //expr_stack.top()->printpretty("");
 
   Expression *dummy_root = new Expression();
   expr_stack.top()->to_expr(dummy_root);

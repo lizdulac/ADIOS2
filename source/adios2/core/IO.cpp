@@ -858,8 +858,10 @@ VariableDerived &IO::DefineDerivedVariable(const std::string &name, const std::s
         if((itVariable->second)->IsConstantDims()==false) isConstant = false;
         name_to_dims.insert({var_name, {(itVariable->second)->m_Start, (itVariable->second)->m_Count, (itVariable->second)->m_Shape}});
     }
+    std::cout << "Derived variable " << name << ": PASS : variables exist and have the same type" << std::endl;
     // set the initial shape of the expression and check correcness
     derived_exp.SetDims(name_to_dims);
+    std::cout << "Derived variable " << name << ": PASS : initial variable dimensions are valid" << std::endl;
 
     // create derived variable with the expression
     auto itVariablePair =

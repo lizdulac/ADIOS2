@@ -15,7 +15,7 @@ ASTNode::ASTNode()
 {
   // DEBUGGING
   ++num_expr;
-  std::cout << "\tNum expressions: " << num_expr << std::endl;
+  //std::cout << "\tNum expressions: " << num_expr << std::endl;
 }
 
 ASTNode::ASTNode(ExpressionOperator op)
@@ -23,14 +23,14 @@ ASTNode::ASTNode(ExpressionOperator op)
 {
   // DEBUGGING
   ++num_expr;
-  std::cout << "creating ASTNode object with op: " << get_op_name(operation) << ", operation: " << operation<< std::endl;
-  std::cout << "\tNum expressions: " << num_expr << std::endl;
+  //std::cout << "creating ASTNode object with op: " << get_op_name(operation) << ", operation: " << operation<< std::endl;
+  //std::cout << "\tNum expressions: " << num_expr << std::endl;
 }
 
 ASTNode::ASTNode(ExpressionOperator op, const char *str)
   :operation(op)
 {
-  std::cout << "creating ASTNode object with op: " << op << " translated to operation (string): " << get_op_name(op) << ", operation: " << operation << " and string: " << str << std::endl;
+  //std::cout << "creating ASTNode object with op: " << op << " translated to operation (string): " << get_op_name(op) << ", operation: " << operation << " and string: " << str << std::endl;
   switch(operation){
   case ExpressionOperator::OP_ALIAS:
     alias = str;
@@ -43,11 +43,12 @@ ASTNode::ASTNode(ExpressionOperator op, const char *str)
     break;
   default:
     // TODO: Make some error
-    std::cout << "***That's a problem... ASTNode constructed with string should be alias type, path type,  or index type\n";
+    //std::cout << "***That's a problem... ASTNode constructed with string should be alias type, path type,  or index type\n";
+    break;
   }
   // DEBUGGING  
   ++num_expr;
-  std::cout << "\tNum expressions: " << num_expr << std::endl;
+  //std::cout << "\tNum expressions: " << num_expr << std::endl;
 }
 
 ASTNode::ASTNode(ExpressionOperator op, double val)
@@ -55,8 +56,8 @@ ASTNode::ASTNode(ExpressionOperator op, double val)
 {
   // DEBUGGING
   ++num_expr;
-  std::cout << "creating ASTNode object with op: " << op << " translated to operation (string): " << get_op_name(operation) << ", operation: " << operation << " and value: " << value << std::endl;
-  std::cout << "\tNum expressions: " << num_expr << std::endl;
+  //std::cout << "creating ASTNode object with op: " << op << " translated to operation (string): " << get_op_name(operation) << ", operation: " << operation << " and value: " << value << std::endl;
+  //std::cout << "\tNum expressions: " << num_expr << std::endl;
 }
 
 ASTNode::ASTNode(ExpressionOperator op, ASTNode *e)
@@ -65,8 +66,8 @@ ASTNode::ASTNode(ExpressionOperator op, ASTNode *e)
   sub_expr.push_back(e);
   // DEBUGGING
   ++num_expr;
-  std::cout << "creating ASTNode object with op: " << op << " translated to operation (string): " << get_op_name(operation) << ", operation: " << operation << " and subexpression with op: " << op << " translated to operation (string): " << get_op_name(sub_expr[0]->operation) << std::endl;
-  std::cout << "\tNum expressions: " << num_expr << std::endl;
+  //std::cout << "creating ASTNode object with op: " << op << " translated to operation (string): " << get_op_name(operation) << ", operation: " << operation << " and subexpression with op: " << op << " translated to operation (string): " << get_op_name(sub_expr[0]->operation) << std::endl;
+  //std::cout << "\tNum expressions: " << num_expr << std::endl;
 }
 
 // for index
@@ -76,8 +77,8 @@ ASTNode::ASTNode(ExpressionOperator op, ASTNode *e, const char *str)
   sub_expr.push_back(e);
   // DEBUGGING
   ++num_expr;
-  std::cout << "creating ASTNode object with op: " << op << " translated to operation (string): " << get_op_name(operation) << ", operation: " << operation << ", subexpression with op: " << op << " translated to operation (string): " << get_op_name(sub_expr[0]->operation) << ", and indices " << indices << std::endl;
-  std::cout << "\tNum expressions: " << num_expr << std::endl;
+  //std::cout << "creating ASTNode object with op: " << op << " translated to operation (string): " << get_op_name(operation) << ", operation: " << operation << ", subexpression with op: " << op << " translated to operation (string): " << get_op_name(sub_expr[0]->operation) << ", and indices " << indices << std::endl;
+  //std::cout << "\tNum expressions: " << num_expr << std::endl;
 }
 
 ASTNode::ASTNode(ExpressionOperator op, ASTNode *e1, ASTNode *e2)
@@ -87,8 +88,8 @@ ASTNode::ASTNode(ExpressionOperator op, ASTNode *e1, ASTNode *e2)
   sub_expr.push_back(e2);
   // DEBUGGING
   ++num_expr;
-  std::cout << "creating ASTNode object with op: " << op << " translated to operation (string): " << get_op_name(operation) << ", operation: " << operation << " and subexpression1 with op: " << op << " translated to operation (string): " << get_op_name(sub_expr[0]->operation) << " and subexpression2 with op: " << op << " translated to operation (string): " << get_op_name(sub_expr[1]->operation) << std::endl;
-  std::cout << "\tNum expressions: " << num_expr << std::endl;
+  //std::cout << "creating ASTNode object with op: " << op << " translated to operation (string): " << get_op_name(operation) << ", operation: " << operation << " and subexpression1 with op: " << op << " translated to operation (string): " << get_op_name(sub_expr[0]->operation) << " and subexpression2 with op: " << op << " translated to operation (string): " << get_op_name(sub_expr[1]->operation) << std::endl;
+  //std::cout << "\tNum expressions: " << num_expr << std::endl;
 }
 
 // Copy constructor
@@ -97,8 +98,8 @@ ASTNode::ASTNode(const ASTNode &e)
 {
   // DEBUGGING
   ++num_expr;
-  std::cout << "ASTNode Copy Constructor for op: " << get_op_name(operation) << ", operation: " << operation << std::endl;
-  std::cout << "\tNum expressions: " << num_expr << std::endl;
+  //std::cout << "ASTNode Copy Constructor for op: " << get_op_name(operation) << ", operation: " << operation << std::endl;
+  //std::cout << "\tNum expressions: " << num_expr << std::endl;
 }
 
 ASTNode::~ASTNode()
@@ -109,8 +110,8 @@ ASTNode::~ASTNode()
     }
   // DEBUGGING
   --num_expr;
-  std::cout << "Destructor called for expression with op: " << get_op_name(operation) << ", operation: " << operation << std::endl;
-  std::cout << "\tNum expressions: " << num_expr << std::endl;
+  //std::cout << "Destructor called for expression with op: " << get_op_name(operation) << ", operation: " << operation << std::endl;
+  //std::cout << "\tNum expressions: " << num_expr << std::endl;
 }
 
   std::pair<std::string, std::string> ASTNode::lookup_var(const std::string var_alias)
@@ -130,7 +131,7 @@ ASTNode::~ASTNode()
 
   void ASTNode::add_lookup_entry(const std::string alias, const std::string var_name, const std::string indices)
   {
-    std::cout << "Adding alias to lookup table:\n\talias: " << alias << "\n\tvar_name: " << var_name << "\n\tindices: " << indices <<  std::endl;
+    //std::cout << "Adding alias to lookup table:\n\talias: " << alias << "\n\tvar_name: " << var_name << "\n\tindices: " << indices <<  std::endl;
     var_lookup[alias] = std::make_pair(var_name, indices);
   }
   
@@ -142,14 +143,14 @@ ASTNode::~ASTNode()
 void ASTNode::add_back_subexpr(ASTNode* e, size_t n)
 {
   size_t index = sub_expr.size() - n;
-  std::cout << "ASTNode add_back_subexpr index: " << index << std::endl;
+  //std::cout << "ASTNode add_back_subexpr index: " << index << std::endl;
   //if (index > 0 && sub_expr[index] == nullptr)
   sub_expr[index] = e;
 }
 
 void ASTNode::extend_subexprs(size_t n)
 {
-  std::cout << "ASTNode extending subexprs from size " << sub_expr.size() << " to " << (sub_expr.size() + n) << std::endl;
+  //std::cout << "ASTNode extending subexprs from size " << sub_expr.size() << " to " << (sub_expr.size() + n) << std::endl;
   sub_expr.resize(sub_expr.size() + n);
 }
 

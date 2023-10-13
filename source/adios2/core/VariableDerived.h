@@ -25,6 +25,8 @@ public:
                     const DerivedVarType varType);
     ~VariableDerived() = default;
 
+    void ApplyExpression(){};
+    void UpdateExprDim(){};
 };
 
 } // end namespace core

@@ -1700,8 +1700,8 @@ namespace adios2{
     namespace detail{
 
 void* createExpr(std::stack<ASTNode*>* expr_stack, std::string str_op, const char* name, double value, size_t numsubexprs) {
-  std::cout << "Creating ASTNode in function createExpr" << std::endl;
-  std::cout << "\tstack size: " << expr_stack->size() << "\n\top: " << str_op << "\n\tname: " << name << "\n\tvalue: " << value << "\n\tnumsubexprs: " << numsubexprs << std::endl;
+  //std::cout << "Creating ASTNode in function createExpr" << std::endl;
+  //std::cout << "\tstack size: " << expr_stack->size() << "\n\top: " << str_op << "\n\tname: " << name << "\n\tvalue: " << value << "\n\tnumsubexprs: " << numsubexprs << std::endl;
 
   ExpressionOperator op = get_op(str_op);
 
@@ -1741,9 +1741,9 @@ ASTNode* parse_expression(std::string input) {
   yyparse(&expr_stack);
 
   // DEBUGGING
-  std::cout << "yyparse complete. Stack size: " << expr_stack.size() << std::endl;
-  std::cout << "parser prettyprint:" << std::endl;
-  expr_stack.top()->printpretty("");
+  //std::cout << "yyparse complete. Stack size: " << expr_stack.size() << std::endl;
+  //std::cout << "parser prettyprint:" << std::endl;
+  //expr_stack.top()->printpretty("");
   return expr_stack.top();
 }
 

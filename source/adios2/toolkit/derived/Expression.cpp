@@ -12,17 +12,14 @@ Expression::Expression(std::string string_exp)
 : ExprString(string_exp), m_Shape({0}), m_Start({0}), m_Count({0})
 {
     adios2::detail::ASTNode *root_node = adios2::detail::parse_expression(string_exp);
-    std::cout << "Converting the ASTNode to ExpressionTree" << std::endl;
     m_Expr = ASTNode_to_ExpressionTree(root_node);//, variables);
 }
 
 ExpressionTree Expression::ASTNode_to_ExpressionTree(adios2::detail::ASTNode* node)//, adios2::core::VarMap variables)
 {
-    std::cout << "Adding node " << node->operation << " " << node->sub_expr.size() << std::endl;
     ExpressionTree exprTree_node(node->operation);
     for (adios2::detail::ASTNode* e: node->sub_expr)
     {
-        std::cout << "Look at sub-expression " << e->operation << std::endl;
         switch (e->operation)
         {
             case adios2::detail::ExpressionOperator::OP_ALIAS: // add variable given by alias
@@ -96,7 +93,6 @@ void Expression::SetDims(std::map<std::string, std::tuple<Dims, Dims, Dims>> Nam
     m_Count = m_Expr.GetDims(NameToCount);
     m_Start = m_Expr.GetDims(NameToStart);
     m_Shape = m_Expr.GetDims(NameToShape);
-    std::cout << "Dimensions set to start: " << m_Start << " count: " << m_Count << std::endl;
 }
 
   void ExpressionTree::set_base(double c)
