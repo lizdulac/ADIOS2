@@ -2,6 +2,7 @@
 #define ADIOS2_DERIVED_Expression_CPP_
 
 #include "Expression.h"
+#include "Function.h"
 
 namespace adios2{
 
@@ -86,8 +87,16 @@ Dims Expression::GetCount()
 
 void Expression::SetDims(std::map<std::string, std::tuple<Dims, Dims, Dims>> NameToDims)
 {
-    // TODO set dimenstions based on operator functions
-    // check correctness as we set the dimenstions
+    std::map<std::string, Dims> NameToCount, NameToStart, NameToShape;
+    for (const auto& it : NameToDims) {
+        NameToStart[it.first] = std::get<0>(it.second);
+        NameToCount[it.first] = std::get<1>(it.second);
+        NameToShape[it.first] = std::get<2>(it.second);
+    }
+    m_Count = m_Expr.GetDims(NameToCount);
+    m_Start = m_Expr.GetDims(NameToStart);
+    m_Shape = m_Expr.GetDims(NameToShape);
+    std::cout << "Dimensions set to start: " << m_Start << " count: " << m_Count << std::endl;
 }
 
   void ExpressionTree::set_base(double c)
@@ -147,6 +156,26 @@ void ExpressionTree::print()
 	  }
       }
   }
+
+    Dims ExpressionTree::GetDims(std::map<std::string, Dims> NameToDims)
+    {
+        std::vector<Dims> exprDims;
+        for (auto subexp: sub_exprs)
+        {
+            // if the sub_expression is a leaf, we get the shape from the input std::map
+            if (!std::get<2>(subexp))
+            {
+                exprDims.push_back(NameToDims[std::get<1>(subexp)]);
+            }
+            else{
+                exprDims.push_back(std::get<0>(subexp).GetDims(NameToDims));
+            }
+        }
+        // get the output dimensions after applying the operator
+        auto op_fct = OpFunctions.at(detail.operation);
+        Dims opDims = op_fct.DimsFct(exprDims);
+        return opDims;
+    }
 
 }
 }

@@ -130,7 +130,8 @@ set_property(TARGET adios2_core PROPERTY OUTPUT_NAME adios2${ADIOS2_LIBRARY_SUFF
 if (ADIOS2_HAVE_Derived)
   target_sources(adios2_core PRIVATE
       core/VariableDerived.cpp
-      toolkit/derived/Expression.cpp)
+      toolkit/derived/Expression.cpp
+      toolkit/derived/Function.cpp toolkit/derived/Function.tcc)
   add_library(adios2_core_derived
       toolkit/derived/parser/lexer.cpp
       toolkit/derived/parser/parser.cpp

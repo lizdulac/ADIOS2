@@ -62,7 +62,7 @@ int main(int argc, char *argv[])
         "y:sim/Uy \n"
         "z:sim/Uz \n"
         //"sqrt(x+y+z) + sqrt(y+z) + sqrt(x+z)");
-        "sqrt(sqrt(x+y+z))");
+        "x+y+z");
 /*    auto magU = bpIO.DefineDerivedVariable("derive/magU", "x:sim/Ux \n"
         "y:sim/Uy \n"
         "z:sim/Uz \n"

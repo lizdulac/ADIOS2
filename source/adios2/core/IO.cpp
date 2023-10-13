@@ -840,6 +840,7 @@ VariableDerived &IO::DefineDerivedVariable(const std::string &name, const std::s
     std::vector<std::string> var_list = derived_exp.VariableNameList();
     DataType expressionType = DataType::None;
     bool isConstant = true;
+    std::map<std::string, std::tuple<Dims, Dims, Dims>> name_to_dims;
     // check correctness for the variable names and types within the expression
     for (auto var_name: var_list)
     {
@@ -855,9 +856,10 @@ VariableDerived &IO::DefineDerivedVariable(const std::string &name, const std::s
                                                  "all variables within a derived variable "
                                                 " must have the same type ");
         if((itVariable->second)->IsConstantDims()==false) isConstant = false;
+        name_to_dims.insert({var_name, {(itVariable->second)->m_Start, (itVariable->second)->m_Count, (itVariable->second)->m_Shape}});
     }
-    // TODO set the initial shape of the expression and check correcness
-    // derived_exp.setDims(name_to_dims);
+    // set the initial shape of the expression and check correcness
+    derived_exp.SetDims(name_to_dims);
 
     // create derived variable with the expression
     auto itVariablePair =

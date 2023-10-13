@@ -5,7 +5,6 @@
 #include <tuple>
 #include <string>
 #include <vector>
-#include <functional> // function
 
 namespace adios2{
     namespace detail{
@@ -21,24 +20,24 @@ namespace adios2{
     OP_POW,
     OP_MAGN
   };
-    struct OperatorProperty
-    {
-      std::string name;
-      bool is_associative;
-      std::function<void(std::vector<int>)> funct;
-    };
 
-    const std::map<ExpressionOperator, OperatorProperty> op_property = {
-      {ExpressionOperator::OP_NULL, {"NULL", false, nullptr}},
-      {ExpressionOperator::OP_ALIAS, {"ALIAS", false, nullptr}}, /* Parser-use only */
-      {ExpressionOperator::OP_PATH, {"PATH", false, nullptr}}, /* Parser-use only */
-      {ExpressionOperator::OP_NUM, {"NUM", false, nullptr}}, /* Parser-use only */
-      {ExpressionOperator::OP_INDEX, {"INDEX", false, nullptr}},
-      {ExpressionOperator::OP_ADD, {"ADD", true, nullptr}},
-      {ExpressionOperator::OP_SQRT, {"SQRT", false, nullptr}},
-      {ExpressionOperator::OP_POW, {"POW", false, nullptr}},
-      {ExpressionOperator::OP_MAGN, {"MAGNITUDE", false, nullptr}}
-    };
+  struct OperatorProperty
+  {
+    std::string name;
+    bool is_associative;
+  };
+
+  const std::map<ExpressionOperator, OperatorProperty> op_property = {
+      {ExpressionOperator::OP_NULL, {"NULL", false}},
+      {ExpressionOperator::OP_ALIAS, {"ALIAS", false}}, /* Parser-use only */
+      {ExpressionOperator::OP_PATH, {"PATH", false}}, /* Parser-use only */
+      {ExpressionOperator::OP_NUM, {"NUM", false}}, /* Parser-use only */
+      {ExpressionOperator::OP_INDEX, {"INDEX", false}},
+      {ExpressionOperator::OP_ADD, {"ADD", true}},
+      {ExpressionOperator::OP_SQRT, {"SQRT", false}},
+      {ExpressionOperator::OP_POW, {"POW", false}},
+      {ExpressionOperator::OP_MAGN, {"MAGNITUDE", false}}
+  };
 
   const std::map<std::string, ExpressionOperator> string_to_op = {
       {"ALIAS", ExpressionOperator::OP_ALIAS}, /* Parser-use only */

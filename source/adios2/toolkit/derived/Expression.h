@@ -4,7 +4,6 @@
 #include <string>
 #include <unordered_map>
 #include "adios2/common/ADIOSTypes.h"
-//#include "adios2/core/VariableBase.h"
 #include "parser/parser.hpp"
 #include "parser/ASTNode.h"
 
@@ -15,9 +14,7 @@ namespace derived{
  A Note on Types:
  - Variables: detail is Variable Name (std::string). There should be no sub_exprs
  - Indexing/Slicing: detail is indices (std::vector<std::tuple<size_t start, size_t end, size_t stride>>
- - All other (normal) Operations: detail is ExprHelper::expr_op (operation)
  */
-
 struct OpInfo
 {
   adios2::detail::ExpressionOperator operation;
@@ -44,6 +41,7 @@ public:
   void add_child(std::string var);
 
   std::vector<std::string> VariableNameList();
+  Dims GetDims(std::map<std::string, Dims> NameToDims);
   void print();
 };
 
