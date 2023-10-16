@@ -1,48 +1,53 @@
 #ifndef ADIOS2_DERIVED_Expression_H_
 #define ADIOS2_DERIVED_Expression_H_
 
+#include "adios2/common/ADIOSTypes.h"
+#include "parser/ASTNode.h"
+#include "parser/parser.hpp"
 #include <string>
 #include <unordered_map>
-#include "adios2/common/ADIOSTypes.h"
-#include "parser/parser.hpp"
-#include "parser/ASTNode.h"
 
-namespace adios2{
+namespace adios2
+{
 
-namespace derived{
+namespace derived
+{
 /*
  A Note on Types:
  - Variables: detail is Variable Name (std::string). There should be no sub_exprs
- - Indexing/Slicing: detail is indices (std::vector<std::tuple<size_t start, size_t end, size_t stride>>
+ - Indexing/Slicing: detail is indices (std::vector<std::tuple<size_t start, size_t end, size_t
+ stride>>
  */
 struct OpInfo
 {
-  adios2::detail::ExpressionOperator operation;
-  std::vector<std::tuple<size_t, size_t, size_t> > indices;
-  double constant;
+    adios2::detail::ExpressionOperator operation;
+    std::vector<std::tuple<size_t, size_t, size_t>> indices;
+    double constant;
 };
 
 class ExpressionTree
 {
 public:
-  std::vector<std::tuple<ExpressionTree, std::string, bool>> sub_exprs;
-  OpInfo detail;
+    std::vector<std::tuple<ExpressionTree, std::string, bool>> sub_exprs;
+    OpInfo detail;
 
-  ExpressionTree() {};
-  ExpressionTree(adios2::detail::ExpressionOperator  o) : detail({o,{},0}) {}
-  ExpressionTree(adios2::detail::ExpressionOperator  o, double c) : detail({o,{},0}) {}
-  ExpressionTree(std::vector<std::tuple<size_t, size_t, size_t> > indices)
-    : detail({adios2::detail::ExpressionOperator ::OP_INDEX, indices, 0}) {}
+    ExpressionTree(){};
+    ExpressionTree(adios2::detail::ExpressionOperator o) : detail({o, {}, 0}) {}
+    ExpressionTree(adios2::detail::ExpressionOperator o, double c) : detail({o, {}, 0}) {}
+    ExpressionTree(std::vector<std::tuple<size_t, size_t, size_t>> indices)
+    : detail({adios2::detail::ExpressionOperator ::OP_INDEX, indices, 0})
+    {
+    }
 
-  void set_base(double c);
-  void set_indeces(std::vector<std::tuple<size_t, size_t, size_t> > index_list);
-  
-  void add_child(ExpressionTree exp);
-  void add_child(std::string var);
+    void set_base(double c);
+    void set_indeces(std::vector<std::tuple<size_t, size_t, size_t>> index_list);
 
-  std::vector<std::string> VariableNameList();
-  Dims GetDims(std::map<std::string, Dims> NameToDims);
-  void print();
+    void add_child(ExpressionTree exp);
+    void add_child(std::string var);
+
+    std::vector<std::string> VariableNameList();
+    Dims GetDims(std::map<std::string, Dims> NameToDims);
+    void print();
 };
 
 class Expression
@@ -53,7 +58,7 @@ class Expression
     Dims m_Start;
     Dims m_Count;
 
-    ExpressionTree ASTNode_to_ExpressionTree(adios2::detail::ASTNode* ASTTree);
+    ExpressionTree ASTNode_to_ExpressionTree(adios2::detail::ASTNode *ASTTree);
 
 public:
     Expression() = default;

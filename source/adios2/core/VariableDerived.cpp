@@ -17,5 +17,9 @@ namespace core
                  " start: " << m_Start << " count: " << m_Count << std::endl;
     }
 
+    std::vector<std::string> VariableDerived::VariableNameList(){ return m_Expr.VariableNameList(); }
+    void VariableDerived::UpdateExprDim(std::map<std::string, std::tuple<Dims, Dims, Dims>> NameToDims){ return m_Expr.SetDims(NameToDims); }
+
+
 } // end namespace core
 } // end namespace adios2

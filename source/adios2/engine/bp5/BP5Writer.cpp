@@ -497,6 +497,36 @@ void BP5Writer::MarshalAttributes()
 
 void BP5Writer::EndStep()
 {
+    /*
+#ifdef ADIOS2_HAVE_DERIVED
+    auto m_VariablesDerived = m_IO.GetDerivedVariables();
+    auto m_Variables = m_IO.GetVariables();
+    // compute all derived variables
+    for (auto it = m_VariablesDerived.begin(); it != m_VariablesDerived.end(); it++)
+    {
+        auto derived_var = static_cast<VariableDerived> ((*it).second);
+        // if the shape is not constant, re-check the dimensions
+        if (!(*it).second->IsConstantDims())
+        {
+            std::vector<std::string> var_list = (*it).second->VariableNameList();
+            std::map<std::string, std::tuple<Dims, Dims, Dims>> name_to_dims;
+            for (auto var_name: var_list)
+            {
+                auto itVariable = m_Variables.find(var_name);
+                if (itVariable == m_Variables.end())
+                    helper::Throw<std::invalid_argument>("Core", "IO", "DefineDerivedVariable",
+                                                        "using undefine variable " + var_name +
+                                                        " in defining the derived variable " + (*it).second->m_Name);
+                name_to_dims.insert({var_name, {(itVariable->second)->m_Start, (itVariable->second)->m_Count, (itVariable->second)->m_Shape}});
+            }
+            // set the initial shape of the expression and check correcness
+            (*it).second->UpdateExprDim(name_to_dims);
+            std::cout << "Derived variable " << (*it).second->m_Name << ": PASS : variable dimensions are valid" << std::endl;
+        }
+        //compute the values for the derived variable
+    }
+#endif
+*/
     m_BetweenStepPairs = false;
     PERFSTUBS_SCOPED_TIMER("BP5Writer::EndStep");
     m_Profiler.Start("ES");

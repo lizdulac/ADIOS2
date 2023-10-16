@@ -25,8 +25,10 @@ public:
                     const DerivedVarType varType);
     ~VariableDerived() = default;
 
+    std::vector<std::string> VariableNameList();
+    void UpdateExprDim(std::map<std::string, std::tuple<Dims, Dims, Dims>> NameToDims);
+
     void ApplyExpression(){};
-    void UpdateExprDim(){};
 };
 
 } // end namespace core
