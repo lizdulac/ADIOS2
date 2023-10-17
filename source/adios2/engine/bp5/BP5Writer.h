@@ -119,6 +119,11 @@ private:
     /** Inform about computation block through User->ADIOS->IO */
     void ExitComputationBlock() noexcept;
 
+#ifdef ADIOS2_HAVE_DERIVED
+    std::vector<void *> GetVariableData(VariableBase *varBase);
+    void ComputeDerivedVariables();
+#endif
+
 #define declare_type(T)                                                                            \
     void DoPut(Variable<T> &variable, typename Variable<T>::Span &span, const bool initialize,     \
                const T &value) final;

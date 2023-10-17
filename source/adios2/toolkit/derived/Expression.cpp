@@ -88,6 +88,12 @@ void Expression::SetDims(std::map<std::string, std::tuple<Dims, Dims, Dims>> Nam
     m_Shape = m_Expr.GetDims(NameToShape);
 }
 
+std::vector<void *> Expression::GetOutputData(std::map<std::string, std::vector<void *>> NameToData)
+{
+    std::vector<void *> BlockData;
+    return BlockData;
+}
+
 void ExpressionTree::set_base(double c) { detail.constant = c; }
 
 void ExpressionTree::set_indeces(std::vector<std::tuple<size_t, size_t, size_t>> index_list)

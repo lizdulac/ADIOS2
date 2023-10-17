@@ -71,6 +71,7 @@ public:
     Dims GetCount();
     void SetDims(std::map<std::string, std::tuple<Dims, Dims, Dims>> NameToDims);
     std::vector<std::string> VariableNameList();
+    std::vector<void *> GetOutputData(std::map<std::string, std::vector<void *>> NameToData);
 };
 
 }

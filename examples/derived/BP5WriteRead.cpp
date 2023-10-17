@@ -32,11 +32,13 @@ int main(int argc, char *argv[])
     std::vector<float> simArray1(Nx * Ny * Nz);
     std::vector<float> simArray2(Nx * Ny * Nz);
     std::vector<float> simArray3(Nx * Ny * Nz);
+    std::vector<float> simArray4(Nx * Ny * Nz);
     for (size_t i = 0; i < Nx * Ny * Nz; ++i)
     {
         simArray1[i] = distribution(generator);
         simArray2[i] = distribution(generator);
         simArray3[i] = distribution(generator);
+        simArray4[i] = distribution(generator);
     }
 
 #if ADIOS2_USE_MPI
@@ -46,7 +48,7 @@ int main(int argc, char *argv[])
 #endif
 
     adios2::IO bpIO = adios.DeclareIO("BPExpression");
-    bpIO.SetEngine("bp4");
+    bpIO.SetEngine("bp5");
     bpIO.DefineAttribute<int>("nsteps", steps);
     bpIO.DefineAttribute<int>("arraySize", Nx * Ny * Nz);
     bpIO.SetParameters("statslevel=1");
@@ -62,7 +64,7 @@ int main(int argc, char *argv[])
         "y:sim/Uy \n"
         "z:sim/Uz \n"
         //"sqrt(x+y+z) + sqrt(y+z) + sqrt(x+z)");
-        "x+y+z");
+        "x+y", adios2::DerivedVarType::StoreData);
 /*    auto magU = bpIO.DefineDerivedVariable("derive/magU", "x:sim/Ux \n"
         "y:sim/Uy \n"
         "z:sim/Uz \n"
@@ -78,9 +80,13 @@ int main(int argc, char *argv[])
     {
         std::cout << "Start step " << i << std::endl;
         bpFileWriter.BeginStep();
-        bpFileWriter.Put(Ux, simArray1.data());
-        bpFileWriter.Put(Uy, simArray2.data());
-        bpFileWriter.Put(Uz, simArray3.data());
+        if (i % 2 == 0)
+        {
+            bpFileWriter.Put(Ux, simArray1.data());
+            bpFileWriter.Put(Uy, simArray2.data());
+            bpFileWriter.Put(Ux, simArray3.data());
+            bpFileWriter.Put(Uy, simArray4.data());
+        }else bpFileWriter.Put(Uz, simArray3.data());
         bpFileWriter.EndStep();
     }
 
