@@ -26,7 +26,7 @@ namespace derived
     return (void *) nullptr;
 }*/
 
-void *AddFunc(std::vector<DerivedData> inputData, DataType type)
+DerivedData AddFunc(std::vector<DerivedData> inputData, DataType type)
 {
     size_t dataSize = std::accumulate(std::begin(inputData[0].Count), std::end(inputData[0].Count), 1, std::multiplies<size_t>());
 #define declare_type(T)                                                                            \
@@ -41,12 +41,12 @@ void *AddFunc(std::vector<DerivedData> inputData, DataType type)
                 addValues[i] += *(reinterpret_cast<T *>(variable.Data) + i);     \
             }                                                                                      \
         }                 \
-        return (void *) addValues;                                                                             \
+        return DerivedData({(void *) addValues, inputData[0].Start, inputData[0].Count});                                                                             \
     }
     ADIOS2_FOREACH_STDTYPE_1ARG(declare_type)
     helper::Throw<std::invalid_argument>("Derived", "Function", "AddFunc",
                                         "Invalid variable types used for ADD operation");
-    return (void *) nullptr;
+    return DerivedData();
 }
 
 Dims SameDimsFunc(std::vector<Dims> input)

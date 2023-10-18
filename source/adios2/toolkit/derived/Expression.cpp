@@ -2,7 +2,6 @@
 #define ADIOS2_DERIVED_Expression_CPP_
 
 #include "Expression.h"
-#include "Function.h"
 
 namespace adios2
 {
@@ -88,10 +87,9 @@ void Expression::SetDims(std::map<std::string, std::tuple<Dims, Dims, Dims>> Nam
     m_Shape = m_Expr.GetDims(NameToShape);
 }
 
-std::vector<void *> Expression::GetOutputData(std::map<std::string, std::vector<void *>> NameToData)
+std::vector<DerivedData> Expression::ApplyExpression(DataType type, size_t numBlocks, std::map<std::string, std::vector<DerivedData>> nameToData)
 {
-    std::vector<void *> BlockData;
-    return BlockData;
+    return m_Expr.ApplyExpression(type, numBlocks, nameToData);
 }
 
 void ExpressionTree::set_base(double c) { detail.constant = c; }
@@ -166,6 +164,39 @@ Dims ExpressionTree::GetDims(std::map<std::string, Dims> NameToDims)
     auto op_fct = OpFunctions.at(detail.operation);
     Dims opDims = op_fct.DimsFct(exprDims);
     return opDims;
+}
+
+std::vector<DerivedData> ExpressionTree::ApplyExpression(DataType type, size_t numBlocks, std::map<std::string, std::vector<DerivedData>> nameToData)
+{
+    // create operands for the computation function
+    // exprData[0] = list of void* data for block 0 for each variable
+    std::vector<std::vector<DerivedData>> exprData(numBlocks);
+    for (auto subexp : sub_exprs)
+    {
+        if (!std::get<2>(subexp))
+        {
+            for (size_t blk=0; blk<numBlocks; blk++)
+            {
+                exprData[blk].push_back(nameToData[std::get<1>(subexp)][blk]);
+            }
+        }
+        else
+        {
+            auto subexpData = std::get<0>(subexp).ApplyExpression(type, numBlocks, nameToData);
+            for (size_t blk=0; blk<numBlocks; blk++)
+            {
+                exprData[blk].push_back(subexpData[blk]);
+            }
+        }
+    }
+    // apply the computation operator on all blocks
+    std::vector<DerivedData> outputData(numBlocks);
+    auto op_fct = OpFunctions.at(detail.operation);
+    for (size_t blk=0; blk<numBlocks; blk++)
+    {
+        outputData[blk] = op_fct.ComputeFct(exprData[blk], type);
+    }
+    return outputData;
 }
 
 }

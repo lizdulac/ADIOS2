@@ -26,11 +26,11 @@ namespace derived
 */
     struct OperatorFunctions
     {
-        std::function<void *(std::vector<DerivedData>, DataType)> ComputeFct;
+        std::function<DerivedData(std::vector<DerivedData>, DataType)> ComputeFct;
         std::function<Dims(std::vector<Dims>)> DimsFct;
     };
 
-    void * AddFunc(std::vector<DerivedData> input, DataType type);
+    DerivedData AddFunc(std::vector<DerivedData> input, DataType type);
     Dims SameDimsFunc(std::vector<Dims> input);
 
     const std::map<adios2::detail::ExpressionOperator, OperatorFunctions> OpFunctions = {

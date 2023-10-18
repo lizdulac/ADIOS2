@@ -502,7 +502,7 @@ std::vector<void *> BP5Writer::GetVariableData(VariableBase *baseVar)
     auto mvi = WriterMinBlocksInfo(*baseVar);
     if (!mvi) return varData;
 
-    PrintMVI(std::cout, *mvi);
+    //PrintMVI(std::cout, *mvi);
     for (const auto &blk : mvi->BlocksInfo)
     {
         varData.push_back((void *)blk.BufferP);
@@ -539,14 +539,11 @@ void BP5Writer::ComputeDerivedVariables()
             {
                 computeDerived = false;
                 std::cout << "Variable " << itVariable->first << " not written in this step";
-                std::cout << " .. skip derived variable" << std::endl;
+                std::cout << " .. skip derived variable " << (*it).second->m_Name << std::endl;
                 break;
             }
-            // if the shape is not constant, re-check the dimensions
-            if (!(*it).second->IsConstantDims())
-            {
-                name_to_dims.insert({varName, {(itVariable->second)->m_Start, (itVariable->second)->m_Count, (itVariable->second)->m_Shape}});
-            }
+            name_to_dims.insert({varName, {(itVariable->second)->m_Start, (itVariable->second)->m_Count, (itVariable->second)->m_Shape}});
+            name_to_data.insert({varName, varData});
         }
         // skip computing derived variables if it contains variables that are not written this step
         if (!computeDerived) continue;
@@ -562,7 +559,7 @@ void BP5Writer::ComputeDerivedVariables()
         std::vector<void *> DerivedBlockData;
         if (derivedVar->GetDerivedType() != DerivedVarType::ExpressionString)
         {
-            DerivedBlockData =  derivedVar->ApplyExpression(name_to_data);
+            DerivedBlockData =  derivedVar->ApplyExpression(name_to_data, name_to_dims);
         }
         // send the derived variable to ADIOS2 internal logic
         switch (derivedVar->GetDerivedType())
@@ -572,7 +569,10 @@ void BP5Writer::ComputeDerivedVariables()
                 break;
             case DerivedVarType::StoreData:
                 std::cout << "Store data and metadata for derived variable " << (*it).second->m_Name << std::endl;
-                //PutCommon(*(*it).second.get(), DerivedBlockData, true /* sync */);
+                for (auto derivedBlock: DerivedBlockData)
+                {
+                    PutCommon(*(*it).second.get(), derivedBlock, true /* sync */);
+                }
                 break;
             default:
                 // we currently only support Metadata/StoreData modes, TODO ExpressionString

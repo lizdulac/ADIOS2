@@ -28,7 +28,9 @@ public:
     DerivedVarType GetDerivedType();
     std::vector<std::string> VariableNameList();
     void UpdateExprDim(std::map<std::string, std::tuple<Dims, Dims, Dims>> NameToDims);
-    std::vector<void *> ApplyExpression(std::map<std::string, std::vector<void *>> NameToData);
+    std::vector<void *> ApplyExpression(std::map<std::string, std::vector<void *>> NameToData,
+                                        std::map<std::string, std::tuple<Dims, Dims, Dims>> NameToDims);
+//    std::vector<void *> ApplyExpression(const VarMap & variableList)
 };
 
 } // end namespace core
