@@ -23,7 +23,7 @@ int main(int argc, char *argv[])
     size = 1;
 #endif
 
-    const size_t Nx = 10, Ny = 10, Nz = 10;
+    const size_t Nx = 2, Ny = 2, Nz = 10;
     const size_t steps = 2;
     /** Application variable */
     std::default_random_engine generator;
