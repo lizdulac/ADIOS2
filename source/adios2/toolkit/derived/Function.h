@@ -31,11 +31,13 @@ namespace derived
     };
 
     DerivedData AddFunc(std::vector<DerivedData> input, DataType type);
+    DerivedData MagnitudeFunc(std::vector<DerivedData> input, DataType type);
+
     Dims SameDimsFunc(std::vector<Dims> input);
 
     const std::map<adios2::detail::ExpressionOperator, OperatorFunctions> OpFunctions = {
-        {adios2::detail::ExpressionOperator::OP_ADD, {AddFunc, SameDimsFunc}}};
-
+        {adios2::detail::ExpressionOperator::OP_ADD, {AddFunc, SameDimsFunc}},
+        {adios2::detail::ExpressionOperator::OP_MAGN, {MagnitudeFunc, SameDimsFunc}}};
 }
 }
 #endif

@@ -63,8 +63,7 @@ int main(int argc, char *argv[])
     auto magU = bpIO.DefineDerivedVariable("derive/magU", "x:sim/Ux \n"
         "y:sim/Uy \n"
         "z:sim/Uz \n"
-        //"sqrt(x+y+z) + sqrt(y+z) + sqrt(x+z)");
-        "x+y", adios2::DerivedVarType::StoreData);
+        "magnitude(x,y)", adios2::DerivedVarType::StoreData);
 /*    auto magU = bpIO.DefineDerivedVariable("derive/magU", "x:sim/Ux \n"
         "y:sim/Uy \n"
         "z:sim/Uz \n"

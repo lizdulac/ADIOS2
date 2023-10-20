@@ -5,6 +5,7 @@
 #include "Function.tcc"
 #include "adios2/common/ADIOSMacros.h"
 #include "adios2/helper/adiosFunctions.h"
+#include <cmath>
 
 namespace adios2
 {
@@ -26,26 +27,59 @@ namespace derived
     return (void *) nullptr;
 }*/
 
+// TODO check if T is char and exit or throw an exception
+
 DerivedData AddFunc(std::vector<DerivedData> inputData, DataType type)
 {
-    size_t dataSize = std::accumulate(std::begin(inputData[0].Count), std::end(inputData[0].Count), 1, std::multiplies<size_t>());
-#define declare_type(T)                                                                            \
+    size_t dataSize = std::accumulate(std::begin(inputData[0].Count), std::end(inputData[0].Count),
+                                      1, std::multiplies<size_t>());
+#define declare_type_add(T)                                                                        \
     if (type == helper::GetDataType<T>())                                                          \
     {                                                                                              \
-        T * addValues = (T *) malloc(dataSize * sizeof(T));  \
-        memset(addValues, 0, sizeof(T));                                \
+        T *addValues = (T *)malloc(dataSize * sizeof(T));                                          \
+        memset(addValues, 0, sizeof(T));                                                           \
         for (auto &variable : inputData)                                                           \
         {                                                                                          \
-            for (size_t i=0; i<dataSize; i++)                \
+            for (size_t i = 0; i < dataSize; i++)                                                  \
             {                                                                                      \
-                addValues[i] += *(reinterpret_cast<T *>(variable.Data) + i);     \
+                addValues[i] += *(reinterpret_cast<T *>(variable.Data) + i);                       \
             }                                                                                      \
-        }                 \
-        return DerivedData({(void *) addValues, inputData[0].Start, inputData[0].Count});                                                                             \
+        }                                                                                          \
+        return DerivedData({(void *)addValues, inputData[0].Start, inputData[0].Count});           \
     }
-    ADIOS2_FOREACH_STDTYPE_1ARG(declare_type)
+    ADIOS2_FOREACH_PRIMITIVE_STDTYPE_1ARG(declare_type_add)
     helper::Throw<std::invalid_argument>("Derived", "Function", "AddFunc",
-                                        "Invalid variable types used for ADD operation");
+                                         "Invalid variable types");
+    return DerivedData();
+}
+
+DerivedData MagnitudeFunc(std::vector<DerivedData> inputData, DataType type)
+{
+    size_t dataSize = std::accumulate(std::begin(inputData[0].Count), std::end(inputData[0].Count),
+                                      1, std::multiplies<size_t>());
+    std::cout << "MAGN " << dataSize << std::endl;
+#define declare_type_mag(T)                                                                        \
+    if (type == helper::GetDataType<T>())                                                          \
+    {                                                                                              \
+        T *magValues = (T *)malloc(dataSize * sizeof(T));                                          \
+        memset(magValues, 0, sizeof(T));                                                           \
+        for (auto &variable : inputData)                                                           \
+        {                                                                                          \
+            for (size_t i = 0; i < dataSize; i++)                                                  \
+            {                                                                                      \
+                T data = *(reinterpret_cast<T *>(variable.Data) + i);                              \
+                magValues[i] += (data * data);                                                     \
+            }                                                                                      \
+        }                                                                                          \
+        for (size_t i = 0; i < dataSize; i++)                                                      \
+        {                                                                                          \
+            magValues[i] = std::sqrt(magValues[i]);                                                \
+        }                                                                                          \
+        return DerivedData({(void *)magValues, inputData[0].Start, inputData[0].Count});           \
+    }
+    ADIOS2_FOREACH_PRIMITIVE_STDTYPE_1ARG(declare_type_mag)
+    helper::Throw<std::invalid_argument>("Derived", "Function", "MagnitudeFunc",
+                                         "Invalid variable types");
     return DerivedData();
 }
 

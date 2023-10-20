@@ -14,6 +14,7 @@ Expression::Expression(std::string string_exp)
 {
     adios2::detail::ASTNode *root_node = adios2::detail::parse_expression(string_exp);
     m_Expr = ASTNode_to_ExpressionTree(root_node); //, variables);
+    m_Expr.print();
 }
 
 ExpressionTree Expression::ASTNode_to_ExpressionTree(

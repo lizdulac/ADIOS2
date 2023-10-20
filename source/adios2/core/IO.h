@@ -184,7 +184,7 @@ public:
                                 const bool constantDims = false);
 #ifdef ADIOS2_HAVE_DERIVED
     VariableDerived &DefineDerivedVariable(const std::string &name, const std::string &expression,
-                                           const DerivedVarType type = DerivedVarType::MetadataOnly);
+                                           const DerivedVarType varType = DerivedVarType::MetadataOnly);
 #endif
     VariableStruct &DefineStructVariable(const std::string &name, StructDefinition &def,
                                          const Dims &shape = Dims(), const Dims &start = Dims(),
