@@ -1,10 +1,10 @@
 #ifndef ADIOS2_DERIVED_Expression_H_
 #define ADIOS2_DERIVED_Expression_H_
 
+#include "Function.h"
 #include "adios2/common/ADIOSTypes.h"
 #include "parser/ASTNode.h"
 #include "parser/parser.hpp"
-#include "Function.h"
 #include <string>
 #include <unordered_map>
 
@@ -48,7 +48,9 @@ public:
 
     std::vector<std::string> VariableNameList();
     Dims GetDims(std::map<std::string, Dims> NameToDims);
-    std::vector<DerivedData> ApplyExpression(DataType type, size_t numBlocks, std::map<std::string, std::vector<DerivedData>> nameToData);
+    std::vector<DerivedData>
+    ApplyExpression(DataType type, size_t numBlocks,
+                    std::map<std::string, std::vector<DerivedData>> nameToData);
     void print();
 };
 
@@ -73,7 +75,9 @@ public:
     Dims GetCount();
     void SetDims(std::map<std::string, std::tuple<Dims, Dims, Dims>> NameToDims);
     std::vector<std::string> VariableNameList();
-    std::vector<DerivedData> ApplyExpression(DataType type, size_t numBlocks, std::map<std::string, std::vector<DerivedData>> nameToData);
+    std::vector<DerivedData>
+    ApplyExpression(DataType type, size_t numBlocks,
+                    std::map<std::string, std::vector<DerivedData>> nameToData);
 };
 
 }

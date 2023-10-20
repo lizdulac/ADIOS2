@@ -500,15 +500,16 @@ std::vector<void *> BP5Writer::GetVariableData(VariableBase *baseVar)
 {
     std::vector<void *> varData;
     auto mvi = WriterMinBlocksInfo(*baseVar);
-    if (!mvi) return varData;
+    if (!mvi)
+        return varData;
 
-    //PrintMVI(std::cout, *mvi);
+    // PrintMVI(std::cout, *mvi);
     for (const auto &blk : mvi->BlocksInfo)
     {
         varData.push_back((void *)blk.BufferP);
     }
-//  TODO delete mvi;
-    return varData;        
+    //  TODO delete mvi;
+    return varData;
 }
 
 void BP5Writer::ComputeDerivedVariables()
@@ -519,64 +520,71 @@ void BP5Writer::ComputeDerivedVariables()
     std::cout << " Parsing " << m_VariablesDerived.size() << " derived variables" << std::endl;
     for (auto it = m_VariablesDerived.begin(); it != m_VariablesDerived.end(); it++)
     {
-        auto derivedVar = dynamic_cast<core::VariableDerived *> ((*it).second.get());
+        auto derivedVar = dynamic_cast<core::VariableDerived *>((*it).second.get());
         std::vector<std::string> varList = derivedVar->VariableNameList();
 
         // get the data and dimensions for each involved variable
         std::map<std::string, std::vector<void *>> name_to_data;
         std::map<std::string, std::tuple<Dims, Dims, Dims>> name_to_dims;
         bool computeDerived = true;
-        for (auto varName: varList)
+        for (auto varName : varList)
         {
             auto itVariable = m_Variables.find(varName);
             if (itVariable == m_Variables.end())
-                    helper::Throw<std::invalid_argument>("Core", "IO", "DefineDerivedVariable",
-                                                        "using undefine variable " + varName +
-                                                        " in defining the derived variable " + (*it).second->m_Name);
+                helper::Throw<std::invalid_argument>("Core", "IO", "DefineDerivedVariable",
+                                                     "using undefine variable " + varName +
+                                                         " in defining the derived variable " +
+                                                         (*it).second->m_Name);
             // check if the variable was written in this step and get data
             std::vector<void *> varData = GetVariableData(itVariable->second.get());
-            if(varData.size() == 0)  // variable was not written at this step
+            if (varData.size() == 0) // variable was not written at this step
             {
                 computeDerived = false;
                 std::cout << "Variable " << itVariable->first << " not written in this step";
                 std::cout << " .. skip derived variable " << (*it).second->m_Name << std::endl;
                 break;
             }
-            name_to_dims.insert({varName, {(itVariable->second)->m_Start, (itVariable->second)->m_Count, (itVariable->second)->m_Shape}});
+            name_to_dims.insert({varName,
+                                 {(itVariable->second)->m_Start, (itVariable->second)->m_Count,
+                                  (itVariable->second)->m_Shape}});
             name_to_data.insert({varName, varData});
         }
         // skip computing derived variables if it contains variables that are not written this step
-        if (!computeDerived) continue;
+        if (!computeDerived)
+            continue;
 
         // set the initial shape of the expression and check correcness
         if (!(*it).second->IsConstantDims())
         {
             derivedVar->UpdateExprDim(name_to_dims);
-            std::cout << "Derived variable " << (*it).second->m_Name << ": PASS : variable dimensions are valid" << std::endl;
+            std::cout << "Derived variable " << (*it).second->m_Name
+                      << ": PASS : variable dimensions are valid" << std::endl;
         }
 
         // compute the values for the derived variables that are not type ExpressionString
         std::vector<void *> DerivedBlockData;
         if (derivedVar->GetDerivedType() != DerivedVarType::ExpressionString)
         {
-            DerivedBlockData =  derivedVar->ApplyExpression(name_to_data, name_to_dims);
+            DerivedBlockData = derivedVar->ApplyExpression(name_to_data, name_to_dims);
         }
         // send the derived variable to ADIOS2 internal logic
         switch (derivedVar->GetDerivedType())
         {
-            case DerivedVarType::MetadataOnly:
-                std::cout << "Store only metadata for derived variable " << (*it).second->m_Name << std::endl;
-                break;
-            case DerivedVarType::StoreData:
-                std::cout << "Store data and metadata for derived variable " << (*it).second->m_Name << std::endl;
-                for (auto derivedBlock: DerivedBlockData)
-                {
-                    PutCommon(*(*it).second.get(), derivedBlock, true /* sync */);
-                }
-                break;
-            default:
-                // we currently only support Metadata/StoreData modes, TODO ExpressionString
-                break;
+        case DerivedVarType::MetadataOnly:
+            std::cout << "Store only metadata for derived variable " << (*it).second->m_Name
+                      << std::endl;
+            break;
+        case DerivedVarType::StoreData:
+            std::cout << "Store data and metadata for derived variable " << (*it).second->m_Name
+                      << std::endl;
+            for (auto derivedBlock : DerivedBlockData)
+            {
+                PutCommon(*(*it).second.get(), derivedBlock, true /* sync */);
+            }
+            break;
+        default:
+            // we currently only support Metadata/StoreData modes, TODO ExpressionString
+            break;
         }
     }
 }
@@ -894,7 +902,8 @@ uint64_t BP5Writer::CountStepsInMetadataIndex(format::BufferSTL &bufferSTL)
 
         switch (recordID)
         {
-        case IndexRecord::WriterMapRecord: {
+        case IndexRecord::WriterMapRecord:
+        {
             m_AppendWriterCount =
                 (uint32_t)helper::ReadValue<uint64_t>(buffer, position, IsLittleEndian);
             m_AppendAggregatorCount =
@@ -909,7 +918,8 @@ uint64_t BP5Writer::CountStepsInMetadataIndex(format::BufferSTL &bufferSTL)
             position += m_AppendWriterCount * sizeof(uint64_t);
             break;
         }
-        case IndexRecord::StepRecord: {
+        case IndexRecord::StepRecord:
+        {
             position += 2 * sizeof(uint64_t); // MetadataPos, MetadataSize
             const uint64_t FlushCount =
                 helper::ReadValue<uint64_t>(buffer, position, IsLittleEndian);
@@ -978,7 +988,8 @@ uint64_t BP5Writer::CountStepsInMetadataIndex(format::BufferSTL &bufferSTL)
 
         switch (recordID)
         {
-        case IndexRecord::WriterMapRecord: {
+        case IndexRecord::WriterMapRecord:
+        {
             m_AppendWriterCount =
                 (uint32_t)helper::ReadValue<uint64_t>(buffer, position, IsLittleEndian);
             m_AppendAggregatorCount =
@@ -996,7 +1007,8 @@ uint64_t BP5Writer::CountStepsInMetadataIndex(format::BufferSTL &bufferSTL)
             }
             break;
         }
-        case IndexRecord::StepRecord: {
+        case IndexRecord::StepRecord:
+        {
             m_AppendMetadataIndexPos =
                 position - sizeof(unsigned char) - sizeof(uint64_t); // pos of RecordID
             const uint64_t MetadataPos =

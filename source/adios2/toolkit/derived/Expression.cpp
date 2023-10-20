@@ -14,7 +14,6 @@ Expression::Expression(std::string string_exp)
 {
     adios2::detail::ASTNode *root_node = adios2::detail::parse_expression(string_exp);
     m_Expr = ASTNode_to_ExpressionTree(root_node); //, variables);
-    m_Expr.print();
 }
 
 ExpressionTree Expression::ASTNode_to_ExpressionTree(
@@ -88,7 +87,9 @@ void Expression::SetDims(std::map<std::string, std::tuple<Dims, Dims, Dims>> Nam
     m_Shape = m_Expr.GetDims(NameToShape);
 }
 
-std::vector<DerivedData> Expression::ApplyExpression(DataType type, size_t numBlocks, std::map<std::string, std::vector<DerivedData>> nameToData)
+std::vector<DerivedData>
+Expression::ApplyExpression(DataType type, size_t numBlocks,
+                            std::map<std::string, std::vector<DerivedData>> nameToData)
 {
     return m_Expr.ApplyExpression(type, numBlocks, nameToData);
 }
@@ -167,7 +168,9 @@ Dims ExpressionTree::GetDims(std::map<std::string, Dims> NameToDims)
     return opDims;
 }
 
-std::vector<DerivedData> ExpressionTree::ApplyExpression(DataType type, size_t numBlocks, std::map<std::string, std::vector<DerivedData>> nameToData)
+std::vector<DerivedData>
+ExpressionTree::ApplyExpression(DataType type, size_t numBlocks,
+                                std::map<std::string, std::vector<DerivedData>> nameToData)
 {
     // create operands for the computation function
     // exprData[0] = list of void* data for block 0 for each variable
@@ -176,7 +179,7 @@ std::vector<DerivedData> ExpressionTree::ApplyExpression(DataType type, size_t n
     {
         if (!std::get<2>(subexp))
         {
-            for (size_t blk=0; blk<numBlocks; blk++)
+            for (size_t blk = 0; blk < numBlocks; blk++)
             {
                 exprData[blk].push_back(nameToData[std::get<1>(subexp)][blk]);
             }
@@ -184,7 +187,7 @@ std::vector<DerivedData> ExpressionTree::ApplyExpression(DataType type, size_t n
         else
         {
             auto subexpData = std::get<0>(subexp).ApplyExpression(type, numBlocks, nameToData);
-            for (size_t blk=0; blk<numBlocks; blk++)
+            for (size_t blk = 0; blk < numBlocks; blk++)
             {
                 exprData[blk].push_back(subexpData[blk]);
             }
@@ -193,7 +196,7 @@ std::vector<DerivedData> ExpressionTree::ApplyExpression(DataType type, size_t n
     // apply the computation operator on all blocks
     std::vector<DerivedData> outputData(numBlocks);
     auto op_fct = OpFunctions.at(detail.operation);
-    for (size_t blk=0; blk<numBlocks; blk++)
+    for (size_t blk = 0; blk < numBlocks; blk++)
     {
         outputData[blk] = op_fct.ComputeFct(exprData[blk], type);
     }

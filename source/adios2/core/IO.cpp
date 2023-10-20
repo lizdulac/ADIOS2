@@ -812,7 +812,8 @@ void IO::CheckTransportType(const std::string type) const
 }
 
 #ifdef ADIOS2_HAVE_DERIVED
-VariableDerived &IO::DefineDerivedVariable(const std::string &name, const std::string &exp_string, const DerivedVarType varType)
+VariableDerived &IO::DefineDerivedVariable(const std::string &name, const std::string &exp_string,
+                                           const DerivedVarType varType)
 {
     PERFSTUBS_SCOPED_TIMER("IO::DefineDerivedVariable");
 
@@ -829,9 +830,10 @@ VariableDerived &IO::DefineDerivedVariable(const std::string &name, const std::s
             auto itVariable = m_Variables.find(name);
             if (itVariable != m_Variables.end())
             {
-                helper::Throw<std::invalid_argument>("Core", "IO", "DefineDerivedVariable",
-                                                    "derived variable " + name +
-                                                    " trying to use an already defined variable name in IO " + m_Name);
+                helper::Throw<std::invalid_argument>(
+                    "Core", "IO", "DefineDerivedVariable",
+                    "derived variable " + name +
+                        " trying to use an already defined variable name in IO " + m_Name);
             }
         }
     }
@@ -842,33 +844,38 @@ VariableDerived &IO::DefineDerivedVariable(const std::string &name, const std::s
     bool isConstant = true;
     std::map<std::string, std::tuple<Dims, Dims, Dims>> name_to_dims;
     // check correctness for the variable names and types within the expression
-    for (auto var_name: var_list)
+    for (auto var_name : var_list)
     {
         auto itVariable = m_Variables.find(var_name);
         if (itVariable == m_Variables.end())
             helper::Throw<std::invalid_argument>("Core", "IO", "DefineDerivedVariable",
                                                  "using undefine variable " + var_name +
-                                                " in defining the derived variable " + name);
+                                                     " in defining the derived variable " + name);
         DataType var_type = InquireVariableType(var_name);
-        if (expressionType == DataType::None) expressionType = var_type;
+        if (expressionType == DataType::None)
+            expressionType = var_type;
         if (expressionType != var_type)
             helper::Throw<std::invalid_argument>("Core", "IO", "DefineDerivedVariable",
                                                  "all variables within a derived variable "
-                                                " must have the same type ");
-        if((itVariable->second)->IsConstantDims()==false) isConstant = false;
-        name_to_dims.insert({var_name, {(itVariable->second)->m_Start, (itVariable->second)->m_Count, (itVariable->second)->m_Shape}});
+                                                 " must have the same type ");
+        if ((itVariable->second)->IsConstantDims() == false)
+            isConstant = false;
+        name_to_dims.insert({var_name,
+                             {(itVariable->second)->m_Start, (itVariable->second)->m_Count,
+                              (itVariable->second)->m_Shape}});
     }
-    std::cout << "Derived variable " << name << ": PASS : variables exist and have the same type" << std::endl;
+    std::cout << "Derived variable " << name << ": PASS : variables exist and have the same type"
+              << std::endl;
     // set the initial shape of the expression and check correcness
     derived_exp.SetDims(name_to_dims);
-    std::cout << "Derived variable " << name << ": PASS : initial variable dimensions are valid" << std::endl;
+    std::cout << "Derived variable " << name << ": PASS : initial variable dimensions are valid"
+              << std::endl;
 
     // create derived variable with the expression
-    auto itVariablePair =
-        m_VariablesDerived.emplace(name, std::unique_ptr<VariableBase>(new VariableDerived(
-                                  name, derived_exp, expressionType, isConstant, varType)));
-    VariableDerived &variable =
-        static_cast<VariableDerived &>(*itVariablePair.first->second);
+    auto itVariablePair = m_VariablesDerived.emplace(
+        name, std::unique_ptr<VariableBase>(
+                  new VariableDerived(name, derived_exp, expressionType, isConstant, varType)));
+    VariableDerived &variable = static_cast<VariableDerived &>(*itVariablePair.first->second);
 
     // check IO placeholder for variable operations
     auto itOperations = m_VarOpsPlaceholder.find(name);
@@ -876,9 +883,10 @@ VariableDerived &IO::DefineDerivedVariable(const std::string &name, const std::s
     {
         // allow to apply an operation only for derived variables that save the data
         if (varType != DerivedVarType::StoreData)
-            helper::Throw<std::invalid_argument>("Core", "IO", "DefineDerivedVariable",
-                                                 "Operators for derived variables can only be applied "
-                                                " for DerivedVarType::StoreData types.");
+            helper::Throw<std::invalid_argument>(
+                "Core", "IO", "DefineDerivedVariable",
+                "Operators for derived variables can only be applied "
+                " for DerivedVarType::StoreData types.");
         variable.m_Operations.reserve(itOperations->second.size());
         for (auto &operation : itOperations->second)
         {

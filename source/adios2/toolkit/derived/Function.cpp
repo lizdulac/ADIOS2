@@ -11,23 +11,6 @@ namespace adios2
 {
 namespace derived
 {
-/*void *AddFunc(std::vector<DerivedData> input, DataType type)
-{
-#define declare_type(T)                                                                            \
-    if (type == helper::GetDataType<T>())                                                          \
-    {                                                                                              \
-        std::vector<std::vector<T>> templatedInput;                                                \
-        ConvertInputData<T>(input, templatedInput);                                                \
-        return DerivedAddFunction<T>(templatedInput);                                              \
-    }
-    ADIOS2_FOREACH_STDTYPE_1ARG(declare_type)
-#undef declare_type
-    helper::Throw<std::invalid_argument>("Derived", "Function", "AddFunc",
-                                        "Invalid variable types used for ADD operation");
-    return (void *) nullptr;
-}*/
-
-// TODO check if T is char and exit or throw an exception
 
 DerivedData AddFunc(std::vector<DerivedData> inputData, DataType type)
 {
@@ -36,15 +19,7 @@ DerivedData AddFunc(std::vector<DerivedData> inputData, DataType type)
 #define declare_type_add(T)                                                                        \
     if (type == helper::GetDataType<T>())                                                          \
     {                                                                                              \
-        T *addValues = (T *)malloc(dataSize * sizeof(T));                                          \
-        memset(addValues, 0, sizeof(T));                                                           \
-        for (auto &variable : inputData)                                                           \
-        {                                                                                          \
-            for (size_t i = 0; i < dataSize; i++)                                                  \
-            {                                                                                      \
-                addValues[i] += *(reinterpret_cast<T *>(variable.Data) + i);                       \
-            }                                                                                      \
-        }                                                                                          \
+        T *addValues = ApplyOneToOne<T>(inputData, dataSize, [](T a, T b) { return a + b; });      \
         return DerivedData({(void *)addValues, inputData[0].Start, inputData[0].Count});           \
     }
     ADIOS2_FOREACH_PRIMITIVE_STDTYPE_1ARG(declare_type_add)
@@ -57,20 +32,10 @@ DerivedData MagnitudeFunc(std::vector<DerivedData> inputData, DataType type)
 {
     size_t dataSize = std::accumulate(std::begin(inputData[0].Count), std::end(inputData[0].Count),
                                       1, std::multiplies<size_t>());
-    std::cout << "MAGN " << dataSize << std::endl;
 #define declare_type_mag(T)                                                                        \
     if (type == helper::GetDataType<T>())                                                          \
     {                                                                                              \
-        T *magValues = (T *)malloc(dataSize * sizeof(T));                                          \
-        memset(magValues, 0, sizeof(T));                                                           \
-        for (auto &variable : inputData)                                                           \
-        {                                                                                          \
-            for (size_t i = 0; i < dataSize; i++)                                                  \
-            {                                                                                      \
-                T data = *(reinterpret_cast<T *>(variable.Data) + i);                              \
-                magValues[i] += (data * data);                                                     \
-            }                                                                                      \
-        }                                                                                          \
+        T *magValues = ApplyOneToOne<T>(inputData, dataSize, [](T a, T b) { return a + b * b; });  \
         for (size_t i = 0; i < dataSize; i++)                                                      \
         {                                                                                          \
             magValues[i] = std::sqrt(magValues[i]);                                                \
@@ -97,14 +62,11 @@ Dims SameDimsFunc(std::vector<Dims> input)
     return input[0];
 }
 
-/*
 #define declare_template_instantiation(T)                                                          \
-    void ConvertInputData(std::vector<DerivedData>, std::vector<std::vector<T>> &);                \
-    void *DerivedAddFunction(std::vector<std::vector<T>>);
+    T *ApplyOneToOne(std::vector<DerivedData>, size_t, std::function<T(T, T)>);
 
-ADIOS2_FOREACH_STDTYPE_1ARG(declare_template_instantiation)
+ADIOS2_FOREACH_PRIMITIVE_STDTYPE_1ARG(declare_template_instantiation)
 #undef declare_template_instantiation
-*/
 
 }
 } // namespace adios2

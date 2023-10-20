@@ -36,9 +36,9 @@ namespace adios2
 /** Type of derived variables */
 enum class DerivedVarType
 {
-    MetadataOnly,  ///< Store only the metadata (default)
+    MetadataOnly,     ///< Store only the metadata (default)
     ExpressionString, ///< Store only the expression string
-    StoreData ///< Store data and metadata
+    StoreData         ///< Store data and metadata
 };
 #endif
 

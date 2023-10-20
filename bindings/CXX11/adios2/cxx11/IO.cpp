@@ -173,18 +173,15 @@ VariableNT IO::DefineVariable(const DataType type, const std::string &name, cons
     }
     ADIOS2_FOREACH_STDTYPE_1ARG(declare_type)
 #undef declare_type
-    else
-    {
-        return nullptr;
-    }
+    else { return nullptr; }
 }
 
 #ifdef ADIOS2_HAVE_DERIVED
-VariableDerived IO::DefineDerivedVariable(const std::string &name,
-                               const std::string &expression, const DerivedVarType varType)
+VariableDerived IO::DefineDerivedVariable(const std::string &name, const std::string &expression,
+                                          const DerivedVarType varType)
 {
-    helper::CheckForNullptr(m_IO, "for variable name " + name +
-                                      ", in call to IO::DefineDerivedVariable");
+    helper::CheckForNullptr(m_IO,
+                            "for variable name " + name + ", in call to IO::DefineDerivedVariable");
 
     return VariableDerived(&m_IO->DefineDerivedVariable(name, expression, varType));
 }
@@ -216,14 +213,8 @@ VariableNT IO::InquireVariable(const std::string &name)
     }
     ADIOS2_FOREACH_STDTYPE_1ARG(declare_type)
 #undef declare_type
-    else if (type == DataType::Struct)
-    {
-        return VariableNT(m_IO->InquireStructVariable(name));
-    }
-    else
-    {
-        return nullptr;
-    }
+    else if (type == DataType::Struct) { return VariableNT(m_IO->InquireStructVariable(name)); }
+    else { return nullptr; }
 }
 
 VariableNT IO::InquireStructVariable(const std::string &name)
