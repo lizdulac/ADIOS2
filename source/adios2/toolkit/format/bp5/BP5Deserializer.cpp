@@ -1,3 +1,4 @@
+
 /*
  * Distributed under the OSI-approved Apache License, Version 2.0.  See
  * accompanying file Copyright.txt for details.
@@ -1501,6 +1502,8 @@ BP5Deserializer::GenerateReadRequests(const bool doAllocTempBuffers, size_t *max
                     RR.Timestep = Req->Step;
                     RR.WriterRank = WriterRank;
                     RR.StartOffset = writer_meta_base->DataBlockLocation[NeededBlock];
+                    if (RR.StartOffset == (size_t)-1)
+                        throw std::runtime_error("No data exists for this variable");
                     if (Req->MemSpace != MemorySpace::Host)
                         RR.DirectToAppMemory = false;
                     else
@@ -1574,6 +1577,8 @@ BP5Deserializer::GenerateReadRequests(const bool doAllocTempBuffers, size_t *max
                             RR.StartOffset = writer_meta_base->DataBlockLocation[Block];
                             RR.ReadLength = writer_meta_base->DataBlockSize[Block];
                             RR.DestinationAddr = nullptr;
+                            if (RR.StartOffset == (size_t)-1)
+                                throw std::runtime_error("No data exists for this variable");
                             if (doAllocTempBuffers)
                             {
                                 RR.DestinationAddr = (char *)malloc(RR.ReadLength);
@@ -1611,6 +1616,8 @@ BP5Deserializer::GenerateReadRequests(const bool doAllocTempBuffers, size_t *max
                             RR.WriterRank = WriterRank;
                             RR.StartOffset =
                                 writer_meta_base->DataBlockLocation[Block] + StartOffsetInBlock;
+                            if (writer_meta_base->DataBlockLocation[Block] == (size_t)-1)
+                                throw std::runtime_error("No data exists for this variable");
                             RR.ReadLength = EndOffsetInBlock - StartOffsetInBlock;
                             if (Req->MemSpace != MemorySpace::Host)
                                 RR.DirectToAppMemory = false;

@@ -10,6 +10,7 @@
 #include "adios2/core/Engine.h"
 #include "adios2/core/IO.h"
 #include "adios2/core/VariableBase.h"
+#include "adios2/core/VariableDerived.h"
 #include "adios2/helper/adiosFunctions.h"
 #include "adios2/toolkit/format/buffer/ffs/BufferFFS.h"
 
@@ -239,7 +240,7 @@ char *BP5Serializer::BuildVarName(const char *base_name, const ShapeID Shape, co
 }
 
 static char *BuildLongName(const char *base_name, const ShapeID Shape, const int type,
-                           const size_t element_size, const char *StructID)
+                           const size_t element_size, const char *StructID, const char *Expression)
 {
     const char *Prefix = NamePrefix(Shape);
     size_t StructIDLen = 0;
@@ -424,6 +425,7 @@ BP5Serializer::BP5WriterRec BP5Serializer::CreateWriterRec(void *Variable, const
                                                            size_t DimCount)
 {
     core::VariableBase *VB = static_cast<core::VariableBase *>(Variable);
+    core::VariableDerived *VD = dynamic_cast<core::VariableDerived *>(VB);
     Info.RecList =
         (BP5WriterRec)realloc(Info.RecList, (Info.RecCount + 1) * sizeof(Info.RecList[0]));
     BP5WriterRec Rec = &Info.RecList[Info.RecCount];
@@ -502,7 +504,11 @@ BP5Serializer::BP5WriterRec BP5Serializer::CreateWriterRec(void *Variable, const
         }
         // Array field.  To Metadata, add FMFields for DimCount, Shape, Count
         // and Offsets matching _MetaArrayRec
-        char *LongName = BuildLongName(Name, VB->m_ShapeID, (int)Type, ElemSize, TextStructID);
+
+        const char *ExprString = VD ? VD->m_Expr.ExprString.c_str() : NULL;
+
+        char *LongName =
+            BuildLongName(Name, VB->m_ShapeID, (int)Type, ElemSize, TextStructID, ExprString);
 
         const char *ArrayTypeName = "MetaArray";
         int FieldSize = sizeof(MetaArrayRec);
@@ -648,7 +654,14 @@ void BP5Serializer::Marshal(void *Variable, const char *Name, const DataType Typ
     };
 
     core::VariableBase *VB = static_cast<core::VariableBase *>(Variable);
+    core::VariableDerived *VD = dynamic_cast<core::VariableDerived *>(VB);
 
+    bool WriteData = true;
+    if (VD)
+    {
+        // All other types of Derived types we don't write data
+        WriteData = (VD->GetDerivedType() == DerivedVarType::StoreData);
+    }
     BP5MetadataInfoStruct *MBase;
 
     BP5WriterRec Rec = LookupWriterRec(Variable);
@@ -719,7 +732,9 @@ void BP5Serializer::Marshal(void *Variable, const char *Name, const DataType Typ
 
         MinMaxStruct MinMax;
         MinMax.Init(Type);
-        if ((m_StatsLevel > 0) && !Span)
+        bool DerivedWithoutStats = VD && (VD->GetDerivedType() == DerivedVarType::ExpressionString);
+        bool DoMinMax = (m_StatsLevel > 0) && !Span && !DerivedWithoutStats;
+        if (DoMinMax)
         {
             GetMinMax(Data, ElemCount, (DataType)Rec->Type, MinMax, MemSpace);
         }
@@ -747,6 +762,11 @@ void BP5Serializer::Marshal(void *Variable, const char *Name, const DataType Typ
                     (const char *)Data, tmpCount, (DataType)Rec->Type, CompressedData,
                     VB->m_Operations[0]->GetHeaderSize(), MemSpace);
             CurDataBuffer->DownsizeLastAlloc(AllocSize, CompressedSize);
+        }
+        else if (!WriteData)
+        {
+            DataOffset = (size_t)-1;
+            DeferAddToVec = false;
         }
         else if (Span == nullptr)
         {
@@ -785,7 +805,7 @@ void BP5Serializer::Marshal(void *Variable, const char *Name, const DataType Typ
                 MetaEntry->Offsets = CopyDims(DimCount, Offsets);
             else
                 MetaEntry->Offsets = NULL;
-            if (m_StatsLevel > 0)
+            if (DoMinMax)
             {
                 void **MMPtrLoc = (void **)(((char *)MetaEntry) + Rec->MinMaxOffset);
                 *MMPtrLoc = (void *)malloc(ElemSize * 2);
