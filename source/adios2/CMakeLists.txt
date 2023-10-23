@@ -127,6 +127,8 @@ add_library(adios2_core
 set_property(TARGET adios2_core PROPERTY EXPORT_NAME core)
 set_property(TARGET adios2_core PROPERTY OUTPUT_NAME adios2${ADIOS2_LIBRARY_SUFFIX}_core)
 
+set(maybe_adios2_core_derived)
+
 if (ADIOS2_HAVE_Derived)
   target_sources(adios2_core PRIVATE
       core/VariableDerived.cpp
@@ -138,6 +140,7 @@ if (ADIOS2_HAVE_Derived)
       toolkit/derived/parser/ExprHelper.h
       toolkit/derived/parser/ASTNode.cpp)
   target_link_libraries(adios2_core PRIVATE adios2_core_derived)
+  set(maybe_adios2_core_derived adios2_core_derived)
 endif()
 
 set(maybe_adios2_core_cuda)
@@ -406,12 +409,10 @@ if(ADIOS2_HAVE_MPI)
   set(maybe_adios2_c_mpi adios2_c_mpi)
   set(maybe_adios2_cxx11_mpi adios2_cxx11_mpi)
   set(maybe_adios2_core_mpi adios2_core_mpi)
-  set(maybe_adios2_core_derived adios2_core_derived)
 else()
   set(maybe_adios2_c_mpi)
   set(maybe_adios2_cxx11_mpi)
   set(maybe_adios2_core_mpi)
-  set(maybe_adios2_core_derived)
 endif()
 
 # The main "adios2" target provides all interfaces.
