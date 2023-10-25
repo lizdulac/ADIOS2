@@ -16,6 +16,7 @@ DerivedData AddFunc(std::vector<DerivedData> inputData, DataType type)
 {
     size_t dataSize = std::accumulate(std::begin(inputData[0].Count), std::end(inputData[0].Count),
                                       1, std::multiplies<size_t>());
+
 #define declare_type_add(T)                                                                        \
     if (type == helper::GetDataType<T>())                                                          \
     {                                                                                              \

@@ -496,23 +496,6 @@ void BP5Writer::MarshalAttributes()
 }
 
 #ifdef ADIOS2_HAVE_DERIVED
-/*
-std::vector<void *> BP5Writer::GetVariableData(VariableBase *baseVar)
-{
-    std::vector<void *> varData;
-    auto mvi = WriterMinBlocksInfo(*baseVar);
-    if (!mvi)
-        return varData;
-
-    // PrintMVI(std::cout, *mvi);
-    for (const auto &blk : mvi->BlocksInfo)
-    {
-        varData.push_back((void *)blk.BufferP);
-    }
-    //  TODO delete mvi;
-    return varData;
-}*/
-
 void BP5Writer::ComputeDerivedVariables()
 {
     auto const &m_VariablesDerived = m_IO.GetDerivedVariables();
@@ -545,33 +528,6 @@ void BP5Writer::ComputeDerivedVariables()
             }
             nameToVarInfo.insert({varName, mvi});
         }
-
-        /*/ get the data and dimensions for each involved variable
-        std::map<std::string, std::vector<void *>> name_to_data;
-        std::map<std::string, std::tuple<Dims, Dims, Dims>> name_to_dims;
-        bool computeDerived = true;
-        for (auto varName : varList)
-        {
-            auto itVariable = m_Variables.find(varName);
-            if (itVariable == m_Variables.end())
-                helper::Throw<std::invalid_argument>("Core", "IO", "DefineDerivedVariable",
-                                                     "using undefine variable " + varName +
-                                                         " in defining the derived variable " +
-                                                         (*it).second->m_Name);
-            // check if the variable was written in this step and get data
-            std::vector<void *> varData = GetVariableData(itVariable->second.get());
-            if (varData.size() == 0) // variable was not written at this step
-            {
-                computeDerived = false;
-                std::cout << "Variable " << itVariable->first << " not written in this step";
-                std::cout << " .. skip derived variable " << (*it).second->m_Name << std::endl;
-                break;
-            }
-            name_to_dims.insert({varName,
-                                 {(itVariable->second)->m_Start, (itVariable->second)->m_Count,
-                                  (itVariable->second)->m_Shape}});
-            name_to_data.insert({varName, varData});
-        }*/
         // skip computing derived variables if it contains variables that are not written this step
         if (!computeDerived)
             continue;

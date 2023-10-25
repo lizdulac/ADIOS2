@@ -120,7 +120,6 @@ private:
     void ExitComputationBlock() noexcept;
 
 #ifdef ADIOS2_HAVE_DERIVED
-    //std::vector<void *> GetVariableData(VariableBase *varBase);
     void ComputeDerivedVariables();
 #endif
 

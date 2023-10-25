@@ -10,7 +10,9 @@
 #include "adios2/core/Engine.h"
 #include "adios2/core/IO.h"
 #include "adios2/core/VariableBase.h"
+#ifdef ADIOS2_HAVE_DERIVED
 #include "adios2/core/VariableDerived.h"
+#endif
 #include "adios2/helper/adiosFunctions.h"
 #include "adios2/toolkit/format/buffer/ffs/BufferFFS.h"
 
@@ -504,7 +506,9 @@ BP5Serializer::BP5WriterRec BP5Serializer::CreateWriterRec(void *Variable, const
                                                            size_t DimCount)
 {
     core::VariableBase *VB = static_cast<core::VariableBase *>(Variable);
+#ifdef ADIOS2_HAVE_DERIVED
     core::VariableDerived *VD = dynamic_cast<core::VariableDerived *>(VB);
+#endif
     Info.RecList =
         (BP5WriterRec)realloc(Info.RecList, (Info.RecCount + 1) * sizeof(Info.RecList[0]));
     BP5WriterRec Rec = &Info.RecList[Info.RecCount];
@@ -583,9 +587,10 @@ BP5Serializer::BP5WriterRec BP5Serializer::CreateWriterRec(void *Variable, const
         }
         // Array field.  To Metadata, add FMFields for DimCount, Shape, Count
         // and Offsets matching _MetaArrayRec
-
-        const char *ExprString = VD ? VD->m_Expr.ExprString.c_str() : NULL;
-
+        const char *ExprString = NULL;
+#ifdef ADIOS2_HAVE_DERIVED
+        ExprString = VD ? VD->m_Expr.ExprString.c_str() : NULL;
+#endif
         char *LongName =
             BuildLongName(Name, VB->m_ShapeID, (int)Type, ElemSize, TextStructID, ExprString);
 
@@ -733,14 +738,18 @@ void BP5Serializer::Marshal(void *Variable, const char *Name, const DataType Typ
     };
 
     core::VariableBase *VB = static_cast<core::VariableBase *>(Variable);
+#ifdef ADIOS2_HAVE_DERIVED
     core::VariableDerived *VD = dynamic_cast<core::VariableDerived *>(VB);
+#endif
 
     bool WriteData = true;
+#ifdef ADIOS2_HAVE_DERIVED
     if (VD)
     {
         // All other types of Derived types we don't write data
         WriteData = (VD->GetDerivedType() == DerivedVarType::StoreData);
     }
+#endif
     BP5MetadataInfoStruct *MBase;
 
     BP5WriterRec Rec = LookupWriterRec(Variable);
@@ -811,7 +820,10 @@ void BP5Serializer::Marshal(void *Variable, const char *Name, const DataType Typ
 
         MinMaxStruct MinMax;
         MinMax.Init(Type);
-        bool DerivedWithoutStats = VD && (VD->GetDerivedType() == DerivedVarType::ExpressionString);
+        bool DerivedWithoutStats = false;
+#ifdef ADIOS2_HAVE_DERIVED
+        DerivedWithoutStats = VD && (VD->GetDerivedType() == DerivedVarType::ExpressionString);
+#endif
         bool DoMinMax = ((m_StatsLevel > 0) && !DerivedWithoutStats);
         if (DoMinMax && !Span)
         {
