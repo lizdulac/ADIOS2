@@ -29,12 +29,79 @@ void VariableDerived::UpdateExprDim(std::map<std::string, std::tuple<Dims, Dims,
     m_Count = m_Expr.GetCount();
 }
 
+std::vector<std::tuple<void *, Dims, Dims>> VariableDerived::ApplyExpression(std::map<std::string, MinVarInfo *> NameToMVI)
+{
+    size_t numBlocks = 0;
+    // check that all variables have the same number of blocks
+    for (auto variable : NameToMVI)
+    {
+        if (numBlocks == 0)
+            numBlocks = variable.second->BlocksInfo.size();
+        if (numBlocks != variable.second->BlocksInfo.size())
+            helper::Throw<std::invalid_argument>("Core", "VariableDerived", "ApplyExpression",
+                                                 " variables do not have the same number of blocks "
+                                                 " in computing the derived variable " +
+                                                 m_Name);
+    }
+    std::cout << "Derived variable " << m_Name
+              << ": PASS : variables have written the same num of blocks" << std::endl;
+
+    std::map<std::string, std::vector<adios2::derived::DerivedData>> inputData;
+    // create the map between variable name and DerivedData object
+    for (auto variable : NameToMVI)
+    {
+        // add the dimensions of all blocks into a vector
+        std::vector<adios2::derived::DerivedData> varData;
+        for (size_t i = 0; i < numBlocks; i++)
+        {
+            Dims start;
+            Dims count;
+            for(size_t d=0; d< variable.second->Dims; d++)
+            {
+                start.push_back(variable.second->BlocksInfo[i].Start[d]);
+                count.push_back(variable.second->BlocksInfo[i].Count[d]);
+            }
+            varData.push_back(adios2::derived::DerivedData(
+                {variable.second->BlocksInfo[i].BufferP, start, count}));
+        }
+        inputData.insert({variable.first, varData});
+    }
+    //TODO check that the dimensions are still corrects
+    std::vector<adios2::derived::DerivedData> outputData =
+        m_Expr.ApplyExpression(m_Type, numBlocks, inputData);
+
+    std::vector<std::tuple<void *, Dims, Dims>> blockData;
+    for (size_t i = 0; i < numBlocks; i++)
+    {
+        blockData.push_back({outputData[i].Data, outputData[i].Start, outputData[i].Count});
+    }
+
+    // DEBUG - TODO remove the switch
+    switch (m_DerivedType)
+    {
+    case DerivedVarType::MetadataOnly:
+        std::cout << "Store only metadata for derived variable " << m_Name
+                  << std::endl;
+        break;
+    case DerivedVarType::StoreData:
+        std::cout << "Store data and metadata for derived variable " << m_Name
+                  << std::endl;
+        break;
+    default:
+        // we currently only support Metadata/StoreData modes, TODO ExpressionString
+        break;
+    }
+
+    return blockData;
+}
+
 std::vector<void *>
 VariableDerived::ApplyExpression(std::map<std::string, std::vector<void *>> NameToData,
                                  std::map<std::string, std::tuple<Dims, Dims, Dims>> NameToDims)
 {
     size_t numBlocks = 0;
     std::map<std::string, std::vector<adios2::derived::DerivedData>> inputData;
+    // check that all variables have the same number of blocks
     for (auto variable : NameToData)
     {
         if (numBlocks == 0)
@@ -47,8 +114,10 @@ VariableDerived::ApplyExpression(std::map<std::string, std::vector<void *>> Name
     }
     std::cout << "Derived variable " << m_Name
               << ": PASS : variables have written the same num of blocks" << std::endl;
+    // create the map between variable name and DerivedData object
     for (auto variable : NameToData)
     {
+        // add the dimensions of all blocks into a vector
         std::vector<adios2::derived::DerivedData> varData;
         for (size_t i = 0; i < numBlocks; i++)
         {

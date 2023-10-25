@@ -27,10 +27,11 @@ public:
     DerivedVarType GetDerivedType();
     std::vector<std::string> VariableNameList();
     void UpdateExprDim(std::map<std::string, std::tuple<Dims, Dims, Dims>> NameToDims);
+
     std::vector<void *>
     ApplyExpression(std::map<std::string, std::vector<void *>> NameToData,
                     std::map<std::string, std::tuple<Dims, Dims, Dims>> NameToDims);
-    //    std::vector<void *> ApplyExpression(const VarMap & variableList)
+    std::vector<std::tuple<void *, Dims, Dims>> ApplyExpression(std::map<std::string, MinVarInfo *> mvi);
 };
 
 } // end namespace core

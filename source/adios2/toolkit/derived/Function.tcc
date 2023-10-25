@@ -5,6 +5,7 @@
 #include <algorithm>
 #include <iostream>
 #include <numeric>
+#include <cstring>
 
 namespace adios2
 {
@@ -16,7 +17,12 @@ T *ApplyOneToOne(std::vector<DerivedData> inputData, size_t dataSize,
                  std::function<T(T, T)> compFct)
 {
     T *outValues = (T *)malloc(dataSize * sizeof(T));
-    memset(outValues, 0, sizeof(T));
+    if (outValues == nullptr)
+    {
+        std::cout<< "Allocation failed for the derived data" << std::endl;
+        // TODO - throw an exception
+    }
+    memset(outValues, 0, dataSize * sizeof(T));
     for (auto &variable : inputData)
     {
         for (size_t i = 0; i < dataSize; i++)

@@ -13,7 +13,7 @@ Expression::Expression(std::string string_exp)
 : ExprString(string_exp), m_Shape({0}), m_Start({0}), m_Count({0})
 {
     adios2::detail::ASTNode *root_node = adios2::detail::parse_expression(string_exp);
-    m_Expr = ASTNode_to_ExpressionTree(root_node); //, variables);
+    m_Expr = ASTNode_to_ExpressionTree(root_node);
 }
 
 ExpressionTree Expression::ASTNode_to_ExpressionTree(

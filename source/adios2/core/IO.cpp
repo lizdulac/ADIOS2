@@ -833,7 +833,7 @@ VariableDerived &IO::DefineDerivedVariable(const std::string &name, const std::s
                 helper::Throw<std::invalid_argument>(
                     "Core", "IO", "DefineDerivedVariable",
                     "derived variable " + name +
-                        " trying to use an already defined variable name in IO " + m_Name);
+                    " trying to use an already defined variable name in IO " + m_Name);
             }
         }
     }

@@ -496,6 +496,7 @@ void BP5Writer::MarshalAttributes()
 }
 
 #ifdef ADIOS2_HAVE_DERIVED
+/*
 std::vector<void *> BP5Writer::GetVariableData(VariableBase *baseVar)
 {
     std::vector<void *> varData;
@@ -510,7 +511,7 @@ std::vector<void *> BP5Writer::GetVariableData(VariableBase *baseVar)
     }
     //  TODO delete mvi;
     return varData;
-}
+}*/
 
 void BP5Writer::ComputeDerivedVariables()
 {
@@ -522,8 +523,30 @@ void BP5Writer::ComputeDerivedVariables()
     {
         auto derivedVar = dynamic_cast<core::VariableDerived *>((*it).second.get());
         std::vector<std::string> varList = derivedVar->VariableNameList();
+        std::map<std::string, MinVarInfo *> nameToVarInfo;
+        bool computeDerived = true;
+        for (auto varName : varList)
+        {
+            auto itVariable = m_Variables.find(varName);
+            if (itVariable == m_Variables.end())
+                helper::Throw<std::invalid_argument>("Core", "IO", "DefineDerivedVariable",
+                                                     "using undefine variable " + varName +
+                                                         " in defining the derived variable " +
+                                                         (*it).second->m_Name);
+            // extract the dimensions and data for each variable
+            VariableBase *varBase = itVariable->second.get();
+            auto mvi = WriterMinBlocksInfo(*varBase);
+            if (mvi->BlocksInfo.size() == 0)
+            {
+                computeDerived = false;
+                std::cout << "Variable " << itVariable->first << " not written in this step";
+                std::cout << " .. skip derived variable " << (*it).second->m_Name << std::endl;
+                break;
+            }
+            nameToVarInfo.insert({varName, mvi});
+        }
 
-        // get the data and dimensions for each involved variable
+        /*/ get the data and dimensions for each involved variable
         std::map<std::string, std::vector<void *>> name_to_data;
         std::map<std::string, std::tuple<Dims, Dims, Dims>> name_to_dims;
         bool computeDerived = true;
@@ -548,43 +571,28 @@ void BP5Writer::ComputeDerivedVariables()
                                  {(itVariable->second)->m_Start, (itVariable->second)->m_Count,
                                   (itVariable->second)->m_Shape}});
             name_to_data.insert({varName, varData});
-        }
+        }*/
         // skip computing derived variables if it contains variables that are not written this step
         if (!computeDerived)
             continue;
 
-        // set the initial shape of the expression and check correcness
-        if (!(*it).second->IsConstantDims())
-        {
-            derivedVar->UpdateExprDim(name_to_dims);
-            std::cout << "Derived variable " << (*it).second->m_Name
-                      << ": PASS : variable dimensions are valid" << std::endl;
-        }
-
         // compute the values for the derived variables that are not type ExpressionString
-        std::vector<void *> DerivedBlockData;
+        std::vector<std::tuple<void *, Dims, Dims>> DerivedBlockData;
         if (derivedVar->GetDerivedType() != DerivedVarType::ExpressionString)
         {
-            DerivedBlockData = derivedVar->ApplyExpression(name_to_data, name_to_dims);
+            DerivedBlockData = derivedVar->ApplyExpression(nameToVarInfo);
         }
-        // send the derived variable to ADIOS2 internal logic
-        switch (derivedVar->GetDerivedType())
+
+        // Send the derived variable to ADIOS2 internal logic
+        for (auto derivedBlock : DerivedBlockData)
         {
-        case DerivedVarType::MetadataOnly:
-            std::cout << "Store only metadata for derived variable " << (*it).second->m_Name
-                      << std::endl;
-            break;
-        case DerivedVarType::StoreData:
-            std::cout << "Store data and metadata for derived variable " << (*it).second->m_Name
-                      << std::endl;
-            for (auto derivedBlock : DerivedBlockData)
+            // set the shape of the variable for each block
+            if (!(*it).second->IsConstantDims())
             {
-                PutCommon(*(*it).second.get(), derivedBlock, true /* sync */);
+                (*it).second->m_Start = std::get<1>(derivedBlock);
+                (*it).second->m_Count = std::get<2>(derivedBlock);
             }
-            break;
-        default:
-            // we currently only support Metadata/StoreData modes, TODO ExpressionString
-            break;
+            PutCommon(*(*it).second.get(), std::get<0>(derivedBlock), true /* sync */);
         }
     }
 }
