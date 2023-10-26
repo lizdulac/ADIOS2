@@ -76,7 +76,7 @@ if(ADIOS2_USE_Blosc2 STREQUAL AUTO)
   endif()
 elseif(ADIOS2_USE_Blosc2)
   # Prefect CONFIG mode
-  find_package(Blosc2 2.4 CONFIG REQUIRED)
+  find_package(Blosc2 2.4 CONFIG)
   if(NOT Blosc2_FOUND)
     find_package(Blosc2 2.4 MODULE REQUIRED)
   endif()
@@ -220,7 +220,7 @@ if(ADIOS2_USE_Kokkos)
         enable_language(HIP)
       endif()
       if(Kokkos_ENABLE_SYCL)
-	    set(ADIOS2_HAVE_Kokkos_SYCL TRUE)
+        set(ADIOS2_HAVE_Kokkos_SYCL TRUE)
       endif()
       set(ADIOS2_HAVE_GPU_Support TRUE)
     endif()
@@ -449,9 +449,11 @@ if(ADIOS2_USE_SST AND NOT WIN32)
     endif()
   endif()
   if(ADIOS2_HAVE_MPI)
-    set(CMAKE_REQUIRED_LIBRARIES MPI::MPI_C)
-    include(CheckCSourceRuns)
-    check_c_source_runs([=[
+    set(CMAKE_REQUIRED_LIBRARIES "MPI::MPI_C;Threads::Threads")
+    include(CheckCXXSourceRuns)
+    check_cxx_source_runs([=[
+        #include <chrono>
+        #include <future>
         #include <mpi.h>
         #include <stdlib.h>
 
@@ -461,9 +463,18 @@ if(ADIOS2_USE_SST AND NOT WIN32)
 
         int main()
         {
+          // Timeout after 5 second
+          auto task = std::async(std::launch::async, []() {
+                                 std::this_thread::sleep_for(std::chrono::seconds(5));
+                                 exit(EXIT_FAILURE);
+          });
+
+          char* port_name = new char[MPI_MAX_PORT_NAME];
           MPI_Init_thread(NULL, NULL, MPI_THREAD_MULTIPLE, NULL);
-          MPI_Open_port(MPI_INFO_NULL, malloc(sizeof(char) * MPI_MAX_PORT_NAME));
+          MPI_Open_port(MPI_INFO_NULL, port_name);
+          MPI_Close_port(port_name);
           MPI_Finalize();
+          exit(EXIT_SUCCESS);
         }]=]
     ADIOS2_HAVE_MPI_CLIENT_SERVER)
     unset(CMAKE_REQUIRED_LIBRARIES)
@@ -539,9 +550,9 @@ endif()
 
 # AWS S3
 if(ADIOS2_USE_AWSSDK STREQUAL AUTO)
-    find_package(AWSSDK QUIET COMPONENTS s3)
+    find_package(AWSSDK 1.10.15 COMPONENTS s3)
 elseif(ADIOS2_USE_AWSSDK)
-    find_package(AWSSDK REQUIRED COMPONENTS s3)
+    find_package(AWSSDK 1.10.15 REQUIRED COMPONENTS s3)
 endif()
 if(AWSSDK_FOUND)
     set(ADIOS2_HAVE_AWSSDK TRUE)

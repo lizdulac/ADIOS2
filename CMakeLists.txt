@@ -137,7 +137,11 @@ if((NOT BUILD_SHARED_LIBS) AND (NOT DEFINED CMAKE_POSITION_INDEPENDENT_CODE))
   set(CMAKE_POSITION_INDEPENDENT_CODE ON)
 endif()
 
+# Ctest creates BUILD_TESTING option and sets it to true by default
+# Here we disable BUILD_TESTING option by default
+option(BUILD_TESTING "Build testing" OFF)
 include(CTest)
+mark_as_advanced(CLEAR BUILD_TESTING)
 
 adios_option(Blosc2     "Enable support for c-blosc-2 transforms" AUTO)
 adios_option(BZip2      "Enable support for BZip2 transforms" AUTO)
@@ -168,6 +172,7 @@ adios_option(Sodium     "Enable support for Sodium for encryption" AUTO)
 adios_option(Catalyst   "Enable support for in situ visualization plugin using ParaView Catalyst" AUTO)
 adios_option(AWSSDK     "Enable support for S3 compatible storage using AWS SDK's S3 module" AUTO)
 adios_option(Derived    "Enable support for derived variables" OFF)
+
 include(${PROJECT_SOURCE_DIR}/cmake/DetectOptions.cmake)
 
 if(ADIOS2_HAVE_CUDA OR ADIOS2_HAVE_Kokkos_CUDA)
@@ -177,7 +182,7 @@ if(ADIOS2_HAVE_CUDA OR ADIOS2_HAVE_Kokkos_CUDA)
         if(DEFINED Kokkos_CUDA_ARCHITECTURES)
             set(CMAKE_CUDA_ARCHITECTURES ${Kokkos_CUDA_ARCHITECTURES})
         else()
-            # Mininum common non-deprecated architecture
+            # Minimum common non-deprecated architecture
             set(CMAKE_CUDA_ARCHITECTURES 52)
         endif()
     endif()
@@ -297,8 +302,6 @@ endif()
 #------------------------------------------------------------------------------#
 # Third party libraries
 #------------------------------------------------------------------------------#
-include(CTest)
-mark_as_advanced(BUILD_TESTING)
 add_subdirectory(thirdparty)
 
 #------------------------------------------------------------------------------#
@@ -319,7 +322,7 @@ add_subdirectory(plugins)
 #------------------------------------------------------------------------------#
 # Examples
 #------------------------------------------------------------------------------#
-option(ADIOS2_BUILD_EXAMPLES "Build examples" ON)
+option(ADIOS2_BUILD_EXAMPLES "Build examples" OFF)
 if(ADIOS2_BUILD_EXAMPLES)
   add_subdirectory(examples)
 endif()
