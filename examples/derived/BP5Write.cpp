@@ -4,26 +4,19 @@
 #include <vector>
 
 #include <adios2.h>
-#if ADIOS2_USE_MPI
 #include <mpi.h>
-#endif
 
 int main(int argc, char *argv[])
 {
     int rank, size;
-#if ADIOS2_USE_MPI
     int provided;
 
     // MPI_THREAD_MULTIPLE is only required if you enable the SST MPI_DP
     MPI_Init_thread(&argc, &argv, MPI_THREAD_MULTIPLE, &provided);
     MPI_Comm_rank(MPI_COMM_WORLD, &rank);
     MPI_Comm_size(MPI_COMM_WORLD, &size);
-#else
-    rank = 0;
-    size = 1;
-#endif
 
-    const size_t Nx = 2, Ny = 2, Nz = 10;
+    const size_t Nx = 10, Ny = 3, Nz = 1;
     const size_t steps = 2;
     /** Application variable */
     std::default_random_engine generator;
@@ -41,11 +34,7 @@ int main(int argc, char *argv[])
         simArray4[i] = distribution(generator);
     }
 
-#if ADIOS2_USE_MPI
     adios2::ADIOS adios(MPI_COMM_WORLD);
-#else
-    adios2::ADIOS adios;
-#endif
 
     adios2::IO bpIO = adios.DeclareIO("BPExpression");
     bpIO.SetEngine("bp5");
@@ -55,23 +44,25 @@ int main(int argc, char *argv[])
     bpIO.SetParameters("statsblocksize=5000");
 
     auto Ux =
-        bpIO.DefineVariable<float>("sim/Ux", {Nz, Ny, size * Nx}, {0, 0, rank * Nx}, {Nz, Ny, Nx});
+        bpIO.DefineVariable<float>("uvel", {Nz, Ny, size * Nx}, {0, 0, rank * Nx}, {Nz, Ny, Nx});
     auto Uy =
-        bpIO.DefineVariable<float>("sim/Uy", {Nz, Ny, size * Nx}, {0, 0, rank * Nx}, {Nz, Ny, Nx});
+        bpIO.DefineVariable<float>("vvel", {Nz, Ny, size * Nx}, {0, 0, rank * Nx}, {Nz, Ny, Nx});
     auto Uz =
-        bpIO.DefineVariable<float>("sim/Uz", {Nz, Ny, size * Nx}, {0, 0, rank * Nx}, {Nz, Ny, Nx});
+        bpIO.DefineVariable<float>("wvel", {Nz, Ny, size * Nx}, {0, 0, rank * Nx}, {Nz, Ny, Nx});
+
     auto magU = bpIO.DefineDerivedVariable("derive/magU",
-                                           "x:sim/Ux \n"
-                                           "y:sim/Uy \n"
-                                           "z:sim/Uz \n"
+                                           "x:uvel \n"
+                                           "y:vvel \n"
+                                           "z:wvel \n"
                                            "magnitude(x,y,z)",
                                            adios2::DerivedVarType::StoreData);
     auto addU = bpIO.DefineDerivedVariable("derive/addU",
-                                           "x:sim/Ux \n"
-                                           "y:sim/Uy \n"
-                                           "z:sim/Uz \n"
+                                           "x:uvel \n"
+                                           "y:vvel \n"
+                                           "z:wvel \n"
                                            "x+y+z",
-                                           adios2::DerivedVarType::StoreData);
+                                           adios2::DerivedVarType::MetadataOnly);
+
     // TODO add Operation to magU
 
     std::string filename = "expMagnitude.bp";
@@ -93,9 +84,7 @@ int main(int argc, char *argv[])
     {
         std::cout << "Wrote file " << filename << " to disk. \n";
     }
-#if ADIOS2_USE_MPI
     MPI_Finalize();
-#endif
 
     return 0;
 }

@@ -504,8 +504,10 @@ void BP5Writer::ComputeDerivedVariables()
     std::cout << " Parsing " << m_VariablesDerived.size() << " derived variables" << std::endl;
     for (auto it = m_VariablesDerived.begin(); it != m_VariablesDerived.end(); it++)
     {
+        // identify the variables used in the derived variable
         auto derivedVar = dynamic_cast<core::VariableDerived *>((*it).second.get());
         std::vector<std::string> varList = derivedVar->VariableNameList();
+        // to create a mapping between variable name and the varInfo (dim and data pointer)
         std::map<std::string, MinVarInfo *> nameToVarInfo;
         bool computeDerived = true;
         for (auto varName : varList)
