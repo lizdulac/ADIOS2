@@ -1,6 +1,6 @@
 %
 {
-#include "parser.hpp"
+#include "parser.h"
 #define YY_USER_ACTION yylloc.first_line = yylloc.last_line = yylineno;
     %
 }
@@ -70,7 +70,7 @@
     yylval.sval = strdup(yytext);
     return FUNCTION;
 }
-"curl"
+"pdf"
 {
     yylval.sval = strdup(yytext);
     return FUNCTION;

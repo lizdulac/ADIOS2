@@ -35,22 +35,21 @@
 
 /* Tokens.  */
 #ifndef YYTOKENTYPE
-#define YYTOKENTYPE
-/* Put the tokens into the symbol table, so that GDB and other debuggers
-   know about them.  */
-enum yytokentype
-{
-    COMMA = 258,
-    L_PAREN = 259,
-    R_PAREN = 260,
-    ENDL = 261,
-    FUNCTION = 262,
-    OPERATOR = 263,
-    INDICES = 264,
-    NUMBER = 265,
-    ALIAS = 266,
-    PATH = 267
-};
+# define YYTOKENTYPE
+   /* Put the tokens into the symbol table, so that GDB and other debuggers
+      know about them.  */
+   enum yytokentype {
+     COMMA = 258,
+     L_PAREN = 259,
+     R_PAREN = 260,
+     ENDL = 261,
+     FUNCTION = 262,
+     OPERATOR = 263,
+     INDICES = 264,
+     NUMBER = 265,
+     ALIAS = 266,
+     PATH = 267
+   };
 #endif
 /* Tokens.  */
 #define COMMA 258
@@ -64,36 +63,39 @@ enum yytokentype
 #define ALIAS 266
 #define PATH 267
 
-#if !defined YYSTYPE && !defined YYSTYPE_IS_DECLARED
+
+
+
+#if ! defined YYSTYPE && ! defined YYSTYPE_IS_DECLARED
 typedef union YYSTYPE
 #line 25 "parser.y"
 {
-    double dval;
-    int ival;
-    char *sval;
-    void *expr_ptr;
+  double dval;
+  int ival;
+  char* sval;
+  void* expr_ptr;
 }
 /* Line 1529 of yacc.c.  */
 #line 80 "parser.hpp"
-YYSTYPE;
-#define yystype YYSTYPE /* obsolescent; will be withdrawn */
-#define YYSTYPE_IS_DECLARED 1
-#define YYSTYPE_IS_TRIVIAL 1
+	YYSTYPE;
+# define yystype YYSTYPE /* obsolescent; will be withdrawn */
+# define YYSTYPE_IS_DECLARED 1
+# define YYSTYPE_IS_TRIVIAL 1
 #endif
 
 extern YYSTYPE yylval;
 
-#if !defined YYLTYPE && !defined YYLTYPE_IS_DECLARED
+#if ! defined YYLTYPE && ! defined YYLTYPE_IS_DECLARED
 typedef struct YYLTYPE
 {
-    int first_line;
-    int first_column;
-    int last_line;
-    int last_column;
+  int first_line;
+  int first_column;
+  int last_line;
+  int last_column;
 } YYLTYPE;
-#define yyltype YYLTYPE /* obsolescent; will be withdrawn */
-#define YYLTYPE_IS_DECLARED 1
-#define YYLTYPE_IS_TRIVIAL 1
+# define yyltype YYLTYPE /* obsolescent; will be withdrawn */
+# define YYLTYPE_IS_DECLARED 1
+# define YYLTYPE_IS_TRIVIAL 1
 #endif
 
 extern YYLTYPE yylloc;
@@ -105,6 +107,6 @@ namespace adios2
 {
 namespace detail
 {
-ASTNode *parse_expression(std::string input);
+adios2::detail::ASTNode *parse_expression(std::string input);
 }
 }
