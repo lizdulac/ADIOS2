@@ -24,6 +24,8 @@ struct OperatorFunctions
     std::function<Dims(std::vector<Dims>)> DimsFct;
 };
 
+std::vector<DerivedData> ExtractDimensionN(DerivedData inputData, DataType type, size_t dim);
+
 DerivedData AddFunc(std::vector<DerivedData> input, DataType type);
 DerivedData MagnitudeFunc(std::vector<DerivedData> input, DataType type);
 DerivedData Curl3DFunc(std::vector<DerivedData> input, DataType type);
