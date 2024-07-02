@@ -91,6 +91,27 @@ DerivedData Curl3DFunc(const std::vector<DerivedData> inputData, DataType type)
     return DerivedData();
 }
 
+// TODO: replace addFunc implementation with hash implementation
+// will require kokkos and maybe kokkos view
+DerivedData HashFunc(std::vector<DerivedData> inputData, DataType type)
+{
+    std::cout << "HashFunc called" << std::endl;
+    PERFSTUBS_SCOPED_TIMER("derived::Function::HashFunc");
+    size_t dataSize = std::accumulate(std::begin(inputData[0].Count), std::end(inputData[0].Count),
+                                      1, std::multiplies<size_t>());
+
+#define declare_type_hash(T)                                                                       \
+    if (type == helper::GetDataType<T>())                                                          \
+    {                                                                                              \
+        T *hashValues = ApplyOneToOne<T>(inputData, dataSize, [](T a, T b) { return a + b; });     \
+        return DerivedData({(void *)hashValues, inputData[0].Start, inputData[0].Count});          \
+    }
+    ADIOS2_FOREACH_PRIMITIVE_STDTYPE_1ARG(declare_type_hash)
+    helper::Throw<std::invalid_argument>("Derived", "Function", "HashFunc",
+                                         "Invalid variable types");
+    return DerivedData();
+}
+
 Dims SameDimsFunc(std::vector<Dims> input)
 {
     // check that all dimenstions are the same
@@ -124,6 +145,24 @@ Dims CurlDimsFunc(std::vector<Dims> input)
     Dims output = input[0];
     output.push_back(input.size());
     return output;
+}
+
+// TODO: hardcode output to float of some size
+// or from num blocks n, pow(2, ciel(log_2(n)) + 1) - 1
+Dims HashDimsFunc(std::vector<Dims> input)
+{
+    // check that all dimenstions are the same
+    if (input.size() > 1)
+    {
+        Dims first_element = input[0];
+        bool dim_are_equal = std::all_of(input.begin() + 1, input.end(),
+                                         [&first_element](Dims x) { return x == first_element; });
+        if (!dim_are_equal)
+            helper::Throw<std::invalid_argument>("Derived", "Function", "HashDimsFunc",
+                                                 "Invalid variable dimensions");
+    }
+    // return the first dimension
+    return input[0];
 }
 
 #define declare_template_instantiation(T)                                                          \

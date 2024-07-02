@@ -28,6 +28,7 @@ const std::map<ExpressionOperator, OperatorProperty> op_property = {
     {ExpressionOperator::OP_SQRT, {"SQRT", false}},
     {ExpressionOperator::OP_POW, {"POW", false}},
     {ExpressionOperator::OP_CURL, {"CURL", false}},
+    {ExpressionOperator::OP_MAGN, {"HASH", false}},
     {ExpressionOperator::OP_MAGN, {"MAGNITUDE", false}}};
 
 const std::map<std::string, ExpressionOperator> string_to_op = {
@@ -39,7 +40,8 @@ const std::map<std::string, ExpressionOperator> string_to_op = {
     {"SQRT", ExpressionOperator::OP_SQRT},      {"sqrt", ExpressionOperator::OP_SQRT},
     {"POW", ExpressionOperator::OP_POW},        {"^", ExpressionOperator::OP_POW},
     {"CURL", ExpressionOperator::OP_CURL},      {"curl", ExpressionOperator::OP_CURL},
-    {"MAGNITUDE", ExpressionOperator::OP_MAGN}, {"magnitude", ExpressionOperator::OP_MAGN}};
+    {"MAGNITUDE", ExpressionOperator::OP_MAGN}, {"magnitude", ExpressionOperator::OP_MAGN},
+    {"HASH", ExpressionOperator::OP_HASH},      {"hash", ExpressionOperator::OP_HASH}};
 
 inline std::string get_op_name(ExpressionOperator op) { return op_property.at(op).name; }
 
@@ -123,7 +125,8 @@ struct OperatorFunctions
 std::map<adios2::detail::ExpressionOperator, OperatorFunctions> OpFunctions = {
     {adios2::detail::ExpressionOperator::OP_ADD, {AddFunc, SameDimsFunc}},
     {adios2::detail::ExpressionOperator::OP_CURL, {Curl3DFunc, CurlDimsFunc}},
-    {adios2::detail::ExpressionOperator::OP_MAGN, {MagnitudeFunc, SameDimsFunc}}};
+    {adios2::detail::ExpressionOperator::OP_MAGN, {MagnitudeFunc, SameDimsFunc}},
+    {adios2::detail::ExpressionOperator::OP_HASH, {HashFunc, HashDimsFunc}}};
 
 Expression::Expression(std::string string_exp)
 : m_Shape({0}), m_Start({0}), m_Count({0}), ExprString(string_exp)

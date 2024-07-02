@@ -20,7 +20,8 @@ enum ExpressionOperator
     OP_SQRT,
     OP_POW,
     OP_MAGN,
-    OP_CURL
+    OP_CURL,
+    OP_HASH
 };
 }
 
