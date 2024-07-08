@@ -7,6 +7,10 @@
 #include "adios2/helper/adiosLog.h"
 #include <adios2-perfstubs-interface.h>
 #include <cmath>
+#ifdef ADIOS2_HAVE_KOKKOS
+#include "kokkos_murmur3.hpp"
+//#include "state-diff/include/kokkos_murmur3.hpp"
+#endif
 
 namespace adios2
 {
@@ -93,12 +97,14 @@ DerivedData Curl3DFunc(const std::vector<DerivedData> inputData, DataType type)
 
 // TODO: replace addFunc implementation with hash implementation
 // will require kokkos and maybe kokkos view
+// Only if ADIOS HAS Kokkos
 DerivedData HashFunc(std::vector<DerivedData> inputData, DataType type)
 {
     std::cout << "HashFunc called" << std::endl;
     PERFSTUBS_SCOPED_TIMER("derived::Function::HashFunc");
     size_t dataSize = std::accumulate(std::begin(inputData[0].Count), std::end(inputData[0].Count),
                                       1, std::multiplies<size_t>());
+    kokkos_murmur3::hash(inputData[0].Data, dataSize, 0/*(uint8_t*)seed*/);
 
 #define declare_type_hash(T)                                                                       \
     if (type == helper::GetDataType<T>())                                                          \

@@ -130,6 +130,19 @@ set_property(TARGET adios2_core PROPERTY OUTPUT_NAME adios2${ADIOS2_LIBRARY_SUFF
 
 set(maybe_adios2_core_derived)
 if (ADIOS2_HAVE_Derived_Variable)
+      message("*****HIIII building Derived Variables now...")
+if(ADIOS2_HAVE_Kokkos)
+      message("*****HIIII found Kokkos, call subroutine")
+  # Kokkos imposes us to set our CMAKE_CXX_COMPILER to Kokkos_CXX_COMPILER.
+  # The problem is that we do not want this for the whole project and with
+  # CMake we cannot set the CXX_COMPILER for a single target. The solution is
+  # to move the adios2 module that uses Kokkos to its independent subdir and
+  # set there CMAKE_CXX_COMPILER, which is possible (and scoped to that subdir)
+  # in cmake.
+  add_subdirectory(helper/derived_kokkos)
+  target_link_libraries(adios2_core PRIVATE adios2_core_derived)
+else()
+      message("*****HIIII couldn't find kokkos... weird")
   target_sources(adios2_core PRIVATE
       core/VariableDerived.cpp
       toolkit/derived/Expression.cpp
@@ -175,6 +188,8 @@ if (ADIOS2_HAVE_Derived_Variable)
 					   EXPORT_NAME core_derived
 					   OUTPUT_NAME adios2${ADIOS2_LIBRARY_SUFFIX}_core_derived)
   target_link_libraries(adios2_core PRIVATE adios2_core_derived)
+endif()
+
   set(maybe_adios2_core_derived adios2_core_derived)
   if(CMAKE_CXX_COMPILER_ID STREQUAL "MSVC")
     set_target_properties(adios2_core_derived PROPERTIES COMPILE_FLAGS "/wd4005 /wd4267 /wd4065 -DYY_NO_UNISTD_H")
