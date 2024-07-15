@@ -7,10 +7,10 @@
 #include "adios2/helper/adiosLog.h"
 #include <adios2-perfstubs-interface.h>
 #include <cmath>
-#ifdef ADIOS2_HAVE_KOKKOS
-#include "kokkos_murmur3.hpp"
+#include "Hash.hpp"
+//#ifdef ADIOS2_HAVE_KOKKOS
 //#include "state-diff/include/kokkos_murmur3.hpp"
-#endif
+//#endif
 
 namespace adios2
 {
@@ -104,8 +104,16 @@ DerivedData HashFunc(std::vector<DerivedData> inputData, DataType type)
     PERFSTUBS_SCOPED_TIMER("derived::Function::HashFunc");
     size_t dataSize = std::accumulate(std::begin(inputData[0].Count), std::end(inputData[0].Count),
                                       1, std::multiplies<size_t>());
-    kokkos_murmur3::hash(inputData[0].Data, dataSize, 0/*(uint8_t*)seed*/);
 
+    std::vector<uint8_t> hashOutput = stateDiffHash(inputData[0].Data, dataSize);
+    void *hashData = std::malloc(hashOutput.size());
+    std::memcpy(hashData, hashOutput.data(), hashOutput.size());
+    
+    return DerivedData({hashData, {0}, {hashOutput.size()}});
+    //kokkos_murmur3::hash(inputData[0].Data, dataSize, 0/*(uint8_t*)seed*/);
+    
+
+    /*
 #define declare_type_hash(T)                                                                       \
     if (type == helper::GetDataType<T>())                                                          \
     {                                                                                              \
@@ -115,7 +123,8 @@ DerivedData HashFunc(std::vector<DerivedData> inputData, DataType type)
     ADIOS2_FOREACH_PRIMITIVE_STDTYPE_1ARG(declare_type_hash)
     helper::Throw<std::invalid_argument>("Derived", "Function", "HashFunc",
                                          "Invalid variable types");
-    return DerivedData();
+    */
+    //    return DerivedData();
 }
 
 Dims SameDimsFunc(std::vector<Dims> input)
