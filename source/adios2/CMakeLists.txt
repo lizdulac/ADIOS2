@@ -172,16 +172,15 @@ if (ADIOS2_HAVE_Derived_Variable)
       ${CMAKE_CURRENT_BINARY_DIR}/lexer.cpp
       ${CMAKE_CURRENT_BINARY_DIR}/parser.cpp
       toolkit/derived/parser/ASTDriver.cpp
-      toolkit/derived/parser/ASTNode.cpp)
+      toolkit/derived/parser/ASTNode.cpp
+      toolkit/derived/Hash.cpp)
   set_target_properties(adios2_core_derived PROPERTIES
   					   VISIBILITY_INLINES_HIDDEN ON
 					   INCLUDE_DIRECTORIES "$<BUILD_INTERFACE:${ADIOS2_SOURCE_DIR}/source/adios2/toolkit/derived/parser>;$<BUILD_INTERFACE:${ADIOS2_BINARY_DIR}/source/adios2>"
 					   EXPORT_NAME core_derived
 					   OUTPUT_NAME adios2${ADIOS2_LIBRARY_SUFFIX}_core_derived)
-  message("Add state diff subdir")
-  add_subdirectory(toolkit/derived/state-diff)
-  message("Added state diff subdir")
-  target_link_libraries(adios2_core PRIVATE adios2_core_derived Kokkos::kokkos)
+  target_link_libraries(adios2_core_derived PRIVATE Kokkos::kokkos Deduplicator::StateDiff)
+  target_link_libraries(adios2_core PRIVATE adios2_core_derived)
   set(maybe_adios2_core_derived adios2_core_derived)
   if(CMAKE_CXX_COMPILER_ID STREQUAL "MSVC")
     set_target_properties(adios2_core_derived PROPERTIES COMPILE_FLAGS "/wd4005 /wd4267 /wd4065 -DYY_NO_UNISTD_H")

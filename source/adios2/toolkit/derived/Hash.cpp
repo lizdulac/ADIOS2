@@ -1,14 +1,17 @@
-#include <vector>
+#ifndef HASH_CPP
+#define HASH_CPP
+
 #include <random>
 #include <algorithm>
 #include <chrono>
 #include <string>
 //#include "stdio.h"
 #include <iostream>
-//#include "state_diff.hpp"
+//#include <state_diff.hpp>
+#include <compare_tree_approach.hpp>
 #include <omp.h>
 #include <Kokkos_Core.hpp>
-#include "state-diff/include/compare_tree_approach.hpp"
+//#include "state-diff/include/compare_tree_approach.hpp"
 
 std::vector<uint8_t> stateDiffHash(void *blockData, size_t blockSize) {
   int data_len = (int)blockSize;
@@ -53,7 +56,7 @@ std::vector<uint8_t> stateDiffHash(void *blockData, size_t blockSize) {
 
     std::vector<float> data_run0_h(blockSize);
     std::memcpy(data_run0_h.data(), blockData, blockSize * sizeof(float));
-    
+
     float* data_run0_ptr = (float*)data_run0_h.data();
     Kokkos::View<float*> data_run0_d("Run0 Data", data_run0_h.size());
     Kokkos::View<float*, Kokkos::HostSpace, Kokkos::MemoryTraits<Kokkos::Unmanaged> > data_run0_h_kokkos(data_run0_ptr, data_run0_h.size());
@@ -70,18 +73,19 @@ std::vector<uint8_t> stateDiffHash(void *blockData, size_t blockSize) {
     std::vector<uint8_t> serialized_buffer;
     serialized_buffer = tree_object.serialize();
     std::cout << "EXEC STATE:: Tree serialized" << std::endl;
-    
+
     /*
     // Deserialize tree
     CompareTreeDeduplicator new_tree_object(chunk_size, root_level, fuzzy_hash, error_tolerance, dtype);
     new_tree_object.setup(data_len);
     new_tree_object.deserialize(serialized_buffer);
     std::cout << "EXEC STATE:: Tree deserialized" << std::endl;
-
+    */
+    /*
     if (tree_object.num_nodes != new_tree_object.num_nodes)  {
       test_status = -1;
     }
-    
+
     // // if CUDA APIs are desired, free device memory
     // cudaFree(data_run0_d);
   }
@@ -92,3 +96,4 @@ std::vector<uint8_t> stateDiffHash(void *blockData, size_t blockSize) {
     // return data
     return serialized_buffer;
 }
+#endif

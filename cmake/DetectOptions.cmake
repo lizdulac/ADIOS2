@@ -202,6 +202,8 @@ if(ADIOS2_USE_Kokkos AND ADIOS2_USE_CUDA)
   message(FATAL_ERROR "ADIOS2_USE_Kokkos is incompatible with ADIOS2_USE_CUDA")
 endif()
 
+find_package(StateDiff REQUIRED)
+
 # Kokkos
 if(ADIOS2_USE_Kokkos)
   if(ADIOS2_USE_Kokkos STREQUAL AUTO)
