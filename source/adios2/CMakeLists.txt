@@ -137,7 +137,8 @@ if (ADIOS2_HAVE_Derived_Variable)
   target_sources(adios2_core PRIVATE
       core/VariableDerived.cpp
       toolkit/derived/Expression.cpp
-      toolkit/derived/Function.cpp toolkit/derived/Function.tcc)
+      toolkit/derived/Function.cpp toolkit/derived/Function.tcc
+      toolkit/derived/Hash.cpp)
   set_target_properties(adios2_core PROPERTIES
   				   INCLUDE_DIRECTORIES "$<BUILD_INTERFACE:${ADIOS2_SOURCE_DIR}/source/adios2/toolkit/derived/parser>;$<BUILD_INTERFACE:${ADIOS2_BINARY_DIR}/source/adios2>")
   find_package(BISON "3.8.2")
@@ -168,24 +169,25 @@ if (ADIOS2_HAVE_Derived_Variable)
   elseif(CMAKE_CXX_COMPILER_ID STREQUAL "MSVC")
     SET_SOURCE_FILES_PROPERTIES(toolkit/derived/Expression.cpp toolkit/derived/Function.cpp PROPERTIES COMPILE_FLAGS "/wd4005 /wd4065 /wd4267 -DYY_NO_UNISTD_H")
   endif()
-  add_library(adios2_core_derived
+  add_library(adios2_core_derived SHARED
       ${CMAKE_CURRENT_BINARY_DIR}/lexer.cpp
       ${CMAKE_CURRENT_BINARY_DIR}/parser.cpp
       toolkit/derived/parser/ASTDriver.cpp
-      toolkit/derived/parser/ASTNode.cpp
-      toolkit/derived/Hash.cpp)
+      toolkit/derived/parser/ASTNode.cpp)
   set_target_properties(adios2_core_derived PROPERTIES
   					   VISIBILITY_INLINES_HIDDEN ON
 					   INCLUDE_DIRECTORIES "$<BUILD_INTERFACE:${ADIOS2_SOURCE_DIR}/source/adios2/toolkit/derived/parser>;$<BUILD_INTERFACE:${ADIOS2_BINARY_DIR}/source/adios2>"
 					   EXPORT_NAME core_derived
 					   OUTPUT_NAME adios2${ADIOS2_LIBRARY_SUFFIX}_core_derived)
-  target_link_libraries(adios2_core_derived PRIVATE Kokkos::kokkos Deduplicator::StateDiff)
-  target_link_libraries(adios2_core PRIVATE adios2_core_derived)
+  target_link_libraries(adios2_core PRIVATE adios2_core_derived Deduplicator::StateDiff Kokkos::kokkos)
   set(maybe_adios2_core_derived adios2_core_derived)
   if(CMAKE_CXX_COMPILER_ID STREQUAL "MSVC")
     set_target_properties(adios2_core_derived PROPERTIES COMPILE_FLAGS "/wd4005 /wd4267 /wd4065 -DYY_NO_UNISTD_H")
   endif()
 endif()
+
+  target_link_libraries(adios2_core PRIVATE Deduplicator::StateDiff Kokkos::kokkos pthread)
+
 
 set(maybe_adios2_core_cuda)
 if(ADIOS2_HAVE_CUDA)

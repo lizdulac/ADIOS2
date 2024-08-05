@@ -7,9 +7,8 @@
 #include "adios2/helper/adiosLog.h"
 #include <adios2-perfstubs-interface.h>
 #include <cmath>
-#include "Hash.hpp"
+#include "Hash.h"
 //#ifdef ADIOS2_HAVE_KOKKOS
-//#include "state-diff/include/kokkos_murmur3.hpp"
 //#endif
 
 namespace adios2

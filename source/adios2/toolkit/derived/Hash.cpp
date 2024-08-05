@@ -1,5 +1,5 @@
-#ifndef HASH_CPP
-#define HASH_CPP
+#ifndef ADIOS2_HASH_CPP
+#define ADIOS2_HASH_CPP
 
 #include <random>
 #include <algorithm>
@@ -7,8 +7,8 @@
 #include <string>
 //#include "stdio.h"
 #include <iostream>
-//#include <state_diff.hpp>
-#include <compare_tree_approach.hpp>
+#include <state_diff.hpp>
+//#include <compare_tree_approach.hpp>
 #include <omp.h>
 #include <Kokkos_Core.hpp>
 //#include "state-diff/include/compare_tree_approach.hpp"

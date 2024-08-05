@@ -9,11 +9,31 @@ module load craype-accel-amd-gfx90a
 
 ######## User Configurations ########
 Kokkos_HOME=$HOME/Coeus-Hackathon/kokkos/
+StateDiff_HOME=$HOME/Coeus-Hackathon/state-diff/
 ADIOS2_HOME=$(pwd)
 BUILD_DIR=${ADIOS2_HOME}/build-kokkos-crusher
 INSTALL_DIR=${ADIOS2_HOME}/install-kokkos-crusher
 
 num_build_procs=4
+
+######## StateDiff ########
+mkdir -p "${BUILD_DIR}/state-diff"
+rm -f "${BUILD_DIR}/state-diff/CMakeCache.txt"
+rm -rf "${BUILD_DIR}/state-diff/CMakeFiles"
+
+ARGS=(
+    -D CMAKE_BUILD_TYPE=RelWithDebInfo
+    -D CMAKE_INSTALL_PREFIX="${INSTALL_DIR}"
+	-D CMAKE_CXX_COMPILER=hipcc
+
+    -D CMAKE_CXX_STANDARD=17
+    -D CMAKE_CXX_EXTENSIONS=OFF
+    -D CMAKE_POSITION_INDEPENDENT_CODE=TRUE
+	-D BUILD_SHARED_LIBS=ON
+)
+cmake "${ARGS[@]}" -S "${StateDiff_HOME}" -B "${BUILD_DIR}/state-diff"
+cmake --build "${BUILD_DIR}/state-diff" -j${num_build_procs}
+cmake --install "${BUILD_DIR}/state-diff"
 
 ######## Kokkos ########
 mkdir -p "${BUILD_DIR}/kokkos"
@@ -51,12 +71,13 @@ ARGS_ADIOS=(
 
     -D ADIOS2_USE_Kokkos=ON
     -D Kokkos_ROOT="${INSTALL_DIR}"
+    -D StateDiff_ROOT="${INSTALL_DIR}"
 
     -D BUILD_TESTING=ON
     -D ADIOS2_USE_Derived_Variable=ON
     -D ADIOS2_USE_SST=OFF
     #-D StateDiff_DIR=/ccs/home/ldulac/Coeus-Hackathon/state-diff/build/install/lib/cmake/StateDiff
-    -D StateDiff_ROOT=/ccs/home/ldulac/Coeus-Hackathon/state-diff/build/install
+    #-D StateDiff_ROOT=/ccs/home/ldulac/Coeus-Hackathon/state-diff/build/install
 
     -D CMAKE_POSITION_INDEPENDENT_CODE=TRUE
     -D BUILD_SHARED_LIBS=ON

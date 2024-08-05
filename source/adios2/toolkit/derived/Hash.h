@@ -1,5 +1,5 @@
-#ifndef HASH_H
-#define HASH_H
+#ifndef ADIOS2_HASH_H
+#define ADIOS2_HASH_H
 
 #include <vector>
 
