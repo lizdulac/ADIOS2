@@ -16,25 +16,6 @@ INSTALL_DIR=${ADIOS2_HOME}/install-kokkos-crusher
 
 num_build_procs=4
 
-######## StateDiff ########
-mkdir -p "${BUILD_DIR}/state-diff"
-rm -f "${BUILD_DIR}/state-diff/CMakeCache.txt"
-rm -rf "${BUILD_DIR}/state-diff/CMakeFiles"
-
-ARGS=(
-    -D CMAKE_BUILD_TYPE=RelWithDebInfo
-    -D CMAKE_INSTALL_PREFIX="${INSTALL_DIR}"
-	-D CMAKE_CXX_COMPILER=hipcc
-
-    -D CMAKE_CXX_STANDARD=17
-    -D CMAKE_CXX_EXTENSIONS=OFF
-    -D CMAKE_POSITION_INDEPENDENT_CODE=TRUE
-	-D BUILD_SHARED_LIBS=ON
-)
-cmake "${ARGS[@]}" -S "${StateDiff_HOME}" -B "${BUILD_DIR}/state-diff"
-cmake --build "${BUILD_DIR}/state-diff" -j${num_build_procs}
-cmake --install "${BUILD_DIR}/state-diff"
-
 ######## Kokkos ########
 mkdir -p "${BUILD_DIR}/kokkos"
 rm -f "${BUILD_DIR}/kokkos/CMakeCache.txt"
@@ -59,6 +40,28 @@ cmake "${ARGS[@]}" -S "${Kokkos_HOME}" -B "${BUILD_DIR}/kokkos"
 cmake --build "${BUILD_DIR}/kokkos" -j${num_build_procs}
 cmake --install "${BUILD_DIR}/kokkos"
 
+######## StateDiff ########
+mkdir -p "${BUILD_DIR}/state-diff"
+rm -f "${BUILD_DIR}/state-diff/CMakeCache.txt"
+rm -rf "${BUILD_DIR}/state-diff/CMakeFiles"
+
+ARGS=(
+    -D CMAKE_BUILD_TYPE=RelWithDebInfo
+    -D CMAKE_INSTALL_PREFIX="${INSTALL_DIR}"
+    #-D CMAKE_CXX_COMPILER=/opt/cray/pe/gcc-native/12/bin/g++
+	-D CMAKE_CXX_COMPILER=hipcc
+
+    -D Kokkos_ROOT="${INSTALL_DIR}"
+
+    -D CMAKE_CXX_STANDARD=17
+    -D CMAKE_CXX_EXTENSIONS=OFF
+    -D CMAKE_POSITION_INDEPENDENT_CODE=TRUE
+	-D BUILD_SHARED_LIBS=ON
+)
+cmake "${ARGS[@]}" -S "${StateDiff_HOME}" -B "${BUILD_DIR}/state-diff"
+cmake --build "${BUILD_DIR}/state-diff" -j${num_build_procs}
+cmake --install "${BUILD_DIR}/state-diff"
+
 ######## ADIOS2 ########
 mkdir -p "${BUILD_DIR}/adios2"
 rm -f "${BUILD_DIR}/adios2/CMakeCache.txt"
@@ -66,8 +69,11 @@ rm -rf "${BUILD_DIR}/adios2/CMakeFiles"
 
 ARGS_ADIOS=(
     -D CMAKE_INSTALL_PREFIX="${INSTALL_DIR}"
-    -D CMAKE_CXX_COMPILER=g++
+    #-D CMAKE_CXX_COMPILER=/opt/cray/pe/gcc-native/12/bin/g++
+    #-D CMAKE_C_COMPILER=/opt/cray/pe/gcc-native/12/bin/gcc
+    #-D CMAKE_CXX_COMPILER=g++
     -D CMAKE_C_COMPILER=gcc
+	-D CMAKE_CXX_COMPILER=hipcc
 
     -D ADIOS2_USE_Kokkos=ON
     -D Kokkos_ROOT="${INSTALL_DIR}"
