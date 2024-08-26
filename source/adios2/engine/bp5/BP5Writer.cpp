@@ -559,6 +559,7 @@ void BP5Writer::ComputeDerivedVariables()
             {
                 (*it).second->m_Start = std::get<1>(derivedBlock);
                 (*it).second->m_Count = std::get<2>(derivedBlock);
+		std::cout << "EndStep Count: " << std::get<2>(derivedBlock) << std::endl;
             }
             PutCommon(*(*it).second.get(), std::get<0>(derivedBlock), true /* sync */);
             free(std::get<0>(derivedBlock));

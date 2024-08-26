@@ -85,12 +85,10 @@ Variable<T> *IO::InquireVariable(const std::string &name) noexcept
     {
         return nullptr;
     }
-
     if (itVariable->second->m_Type != helper::GetDataType<T>())
     {
         return nullptr;
     }
-
     Variable<T> *variable = static_cast<Variable<T> *>(itVariable->second.get());
     if (m_ReadStreaming)
     {

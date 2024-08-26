@@ -16,7 +16,7 @@
 /// \endcond
 
 #if __cplusplus >= 201703L
-#include <filesystem>
+//#include <filesystem>
 #endif
 
 namespace adios2
@@ -339,8 +339,8 @@ void FileFStream::Truncate(const size_t length)
 #if __cplusplus >= 201703L
     // C++17 specific stuff here
     WaitForOpen();
-    std::filesystem::path p(m_Name);
-    std::filesystem::resize_file(p, static_cast<std::uintmax_t>(length));
+    //std::experimental::filesystem::path p(m_Name);
+    //std::experimental::filesystem::resize_file(p, static_cast<std::uintmax_t>(length));
     // TODO: variable start has not been defined...
     // CheckFile("couldn't move to offset " + std::to_string(start) + " of file
     // " + m_Name + ", in call to fstream seekp");

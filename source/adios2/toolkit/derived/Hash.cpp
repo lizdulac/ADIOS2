@@ -14,7 +14,7 @@
 //#include "state-diff/include/compare_tree_approach.hpp"
 
 std::vector<uint8_t> stateDiffHash(void *blockData, size_t blockSize) {
-  int data_len = (int)blockSize;
+  int data_len = (int)blockSize / sizeof(float);
   
   // Define the parameters
   float max_float = 100.0; // maximum floating-point (FP) value in synthetic data
@@ -27,7 +27,12 @@ std::vector<uint8_t> stateDiffHash(void *blockData, size_t blockSize) {
   int seed = 0x123; // Random number seed to generate the synthetic data
   int root_level = 1; // builds the tree from the leaf level to level 1 (root level). For better parallelism, set root_level to 12 or 13.
 
-  int num_chunks =  data_len*sizeof(float) / chunk_size;
+  double num_chunks =  data_len * sizeof(float) / chunk_size;
+  std::cout << "stateDiffHash variables" << std::endl;
+  std::cout << "blockSize " << blockSize << std::endl;
+  std::cout << "sizeof(float) " << sizeof(float) << std::endl;
+  std::cout << "num_chunks " << num_chunks << std::endl;
+  
   //  std::cout << "Nunber of leaf nodes = " << num_chunks << std::endl;
 
   /*
@@ -54,8 +59,8 @@ std::vector<uint8_t> stateDiffHash(void *blockData, size_t blockSize) {
     // cudaMalloc(&data_run0_d, data_len * sizeof(float));
     // cudaMemcpy(data_run0_d, data_run0_h.data(), data_len * sizeof(float), cudaMemcpyHostToDevice);
 
-    std::vector<float> data_run0_h(blockSize);
-    std::memcpy(data_run0_h.data(), blockData, blockSize * sizeof(float));
+    std::vector<float> data_run0_h(blockSize / sizeof(float));
+    std::memcpy(data_run0_h.data(), blockData, blockSize);
 
     float* data_run0_ptr = (float*)data_run0_h.data();
     Kokkos::View<float*> data_run0_d("Run0 Data", data_run0_h.size());
@@ -72,7 +77,7 @@ std::vector<uint8_t> stateDiffHash(void *blockData, size_t blockSize) {
     // Serialize tree
     std::vector<uint8_t> serialized_buffer;
     serialized_buffer = tree_object.serialize();
-    std::cout << "EXEC STATE:: Tree serialized" << std::endl;
+    std::cout << "EXEC STATE:: Tree serialized" << serialized_buffer.size() << std::endl;
 
     /*
     // Deserialize tree

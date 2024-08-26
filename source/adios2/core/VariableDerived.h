@@ -18,8 +18,9 @@ class VariableDerived : public VariableBase
 
 public:
     adios2::derived::Expression m_Expr;
+    DataType m_InType;
     VariableDerived(const std::string &name, adios2::derived::Expression expr,
-                    const DataType exprType, const bool isConstant, const DerivedVarType varType);
+                    const DataType inputType, const bool isConstant, const DerivedVarType varType, const DataType outputType);
     ~VariableDerived() = default;
 
     DerivedVarType GetDerivedType();

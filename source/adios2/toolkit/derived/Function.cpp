@@ -100,13 +100,20 @@ DerivedData Curl3DFunc(const std::vector<DerivedData> inputData, DataType type)
 DerivedData HashFunc(std::vector<DerivedData> inputData, DataType type)
 {
     std::cout << "HashFunc called" << std::endl;
+    std::cout << "type: " << type << std::endl;
     PERFSTUBS_SCOPED_TIMER("derived::Function::HashFunc");
     size_t dataSize = std::accumulate(std::begin(inputData[0].Count), std::end(inputData[0].Count),
                                       1, std::multiplies<size_t>());
+#define declare_type_hash(T)                                                                       \
+    if (type == helper::GetDataType<T>())                                                          \
+    {                                                                                              \
+      dataSize *= sizeof(T);					                                   \
+    }
+    ADIOS2_FOREACH_PRIMITIVE_STDTYPE_1ARG(declare_type_hash)
 
     std::vector<uint8_t> hashOutput = stateDiffHash(inputData[0].Data, dataSize);
     void *hashData = std::malloc(hashOutput.size());
-    std::memcpy(hashData, hashOutput.data(), hashOutput.size());
+    std::memcpy(hashData, hashOutput.data(), hashOutput.size() * sizeof(uint8_t));
     
     return DerivedData({hashData, {0}, {hashOutput.size()}});
     //kokkos_murmur3::hash(inputData[0].Data, dataSize, 0/*(uint8_t*)seed*/);
@@ -176,7 +183,8 @@ Dims HashDimsFunc(std::vector<Dims> input)
                                                  "Invalid variable dimensions");
     }
     // return the first dimension
-    return input[0];
+    //return input[0];
+    return {32};
 }
 
 #define declare_template_instantiation(T)                                                          \

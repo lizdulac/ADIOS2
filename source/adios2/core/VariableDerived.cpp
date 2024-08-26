@@ -7,11 +7,11 @@ namespace core
 {
 
 VariableDerived::VariableDerived(const std::string &name, adios2::derived::Expression expr,
-                                 const DataType exprType, const bool isConstant,
-                                 const DerivedVarType varType)
-: VariableBase(name, exprType, helper::GetDataTypeSize(exprType), expr.GetShape(), expr.GetStart(),
+                                 const DataType inputType, const bool isConstant,
+                                 const DerivedVarType varType, const DataType outputType)
+: VariableBase(name, outputType, helper::GetDataTypeSize(outputType), expr.GetShape(), expr.GetStart(),
                expr.GetCount(), isConstant),
-  m_DerivedType(varType), m_Expr(expr)
+  m_DerivedType(varType), m_Expr(expr), m_InType(inputType)
 {
 }
 
@@ -64,7 +64,7 @@ VariableDerived::ApplyExpression(std::map<std::string, std::unique_ptr<MinVarInf
     }
     // TODO check that the dimensions are still corrects
     std::vector<adios2::derived::DerivedData> outputData =
-        m_Expr.ApplyExpression(m_Type, numBlocks, inputData);
+        m_Expr.ApplyExpression(m_InType, numBlocks, inputData);
 
     std::vector<std::tuple<void *, Dims, Dims>> blockData;
     for (size_t i = 0; i < numBlocks; i++)
@@ -108,7 +108,7 @@ VariableDerived::ApplyExpression(std::map<std::string, std::vector<void *>> Name
         inputData.insert({variable.first, varData});
     }
     std::vector<adios2::derived::DerivedData> outputData =
-        m_Expr.ApplyExpression(m_Type, numBlocks, inputData);
+        m_Expr.ApplyExpression(m_InType, numBlocks, inputData);
     std::vector<void *> blockData;
     for (size_t i = 0; i < numBlocks; i++)
     {

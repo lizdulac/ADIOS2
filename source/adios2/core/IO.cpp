@@ -888,7 +888,7 @@ VariableDerived &IO::DefineDerivedVariable(const std::string &name, const std::s
         DataType var_type = InquireVariableType(var_name);
         if (expressionType == DataType::None)
             expressionType = var_type;
-        if (expressionType != var_type)
+         if (expressionType != var_type)
             helper::Throw<std::invalid_argument>("Core", "IO", "DefineDerivedVariable",
                                                  "all variables within a derived variable "
                                                  " must have the same type ");
@@ -908,7 +908,7 @@ VariableDerived &IO::DefineDerivedVariable(const std::string &name, const std::s
     // create derived variable with the expression
     auto itVariablePair = m_VariablesDerived.emplace(
         name, std::unique_ptr<VariableBase>(
-                  new VariableDerived(name, derived_exp, expressionType, isConstant, varType)));
+					    new VariableDerived(name, derived_exp, expressionType, isConstant, varType, DataType::UInt8)));
     VariableDerived &variable = static_cast<VariableDerived &>(*itVariablePair.first->second);
 
     // check IO placeholder for variable operations

@@ -72,8 +72,8 @@ ARGS_ADIOS=(
     #-D CMAKE_CXX_COMPILER=/opt/cray/pe/gcc-native/12/bin/g++
     #-D CMAKE_C_COMPILER=/opt/cray/pe/gcc-native/12/bin/gcc
     #-D CMAKE_CXX_COMPILER=g++
-    -D CMAKE_C_COMPILER=gcc
-	-D CMAKE_CXX_COMPILER=hipcc
+    #-D CMAKE_C_COMPILER=gcc
+	#-D CMAKE_CXX_COMPILER=hipcc
 
     -D ADIOS2_USE_Kokkos=ON
     -D Kokkos_ROOT="${INSTALL_DIR}"
@@ -85,6 +85,9 @@ ARGS_ADIOS=(
     #-D StateDiff_DIR=/ccs/home/ldulac/Coeus-Hackathon/state-diff/build/install/lib/cmake/StateDiff
     #-D StateDiff_ROOT=/ccs/home/ldulac/Coeus-Hackathon/state-diff/build/install
 
+    #-D CMAKE_CXX_STANDARD=17
+    #-D CMAKE_CXX_EXTENSIONS=OFF
+    #-D CMAKE_CXX_FLAGS=-std=c++17
     -D CMAKE_POSITION_INDEPENDENT_CODE=TRUE
     -D BUILD_SHARED_LIBS=ON
 )
