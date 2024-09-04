@@ -13,7 +13,8 @@
 #include <Kokkos_Core.hpp>
 //#include "state-diff/include/compare_tree_approach.hpp"
 
-std::vector<uint8_t> stateDiffHash(void *blockData, size_t blockSize) {
+std::vector<uint8_t> stateDiffHash(float *blockData, size_t blockSize) {
+  std::cout << "stateDiffHash" << std::endl;
   int data_len = (int)blockSize / sizeof(float);
   
   // Define the parameters
@@ -21,7 +22,8 @@ std::vector<uint8_t> stateDiffHash(void *blockData, size_t blockSize) {
   float min_float = 0.0; // minimum FP value in synthetic data
   //  int data_len = (1024*1024*1024) / 4; // number of FP elements in the synthetic data (1GB)
   float error_tolerance = 1e-4; // Application error tolerance
-  int chunk_size = 512; // Target chunk size. This example uses 16 bytes
+  //int chunk_size = 512; // Target chunk size. This example uses 16 bytes
+  int chunk_size = 4096; // 4KB example
   bool fuzzy_hash = true; // Set to true to use our rounding hash algorithm. Otherwise, directly hash blocks of FP values
   char dtype = 'f'; // float
   int seed = 0x123; // Random number seed to generate the synthetic data

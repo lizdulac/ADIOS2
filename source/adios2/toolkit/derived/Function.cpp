@@ -102,8 +102,10 @@ DerivedData HashFunc(std::vector<DerivedData> inputData, DataType type)
     std::cout << "HashFunc called" << std::endl;
     std::cout << "type: " << type << std::endl;
     PERFSTUBS_SCOPED_TIMER("derived::Function::HashFunc");
-    size_t dataSize = std::accumulate(std::begin(inputData[0].Count), std::end(inputData[0].Count),
-                                      1, std::multiplies<size_t>());
+    if (inputData[0].Start.size() != 1)
+      std::cout << "An error message is supposed to go here" << std::endl;
+    size_t start = inputData[0].Start[0];
+    size_t dataSize = std::accumulate(std::begin(inputData[0].Count), std::end(inputData[0].Count), 1, std::multiplies<size_t>());
 #define declare_type_hash(T)                                                                       \
     if (type == helper::GetDataType<T>())                                                          \
     {                                                                                              \
@@ -111,11 +113,17 @@ DerivedData HashFunc(std::vector<DerivedData> inputData, DataType type)
     }
     ADIOS2_FOREACH_PRIMITIVE_STDTYPE_1ARG(declare_type_hash)
 
-    std::vector<uint8_t> hashOutput = stateDiffHash(inputData[0].Data, dataSize);
+      std::vector<uint8_t> hashOutput = stateDiffHash((float*)inputData[0].Data + start, dataSize);
+    //std::vector<uint8_t> hashOutput = stateDiffHash(inputData[0].Data, dataSize);
     void *hashData = std::malloc(hashOutput.size());
     std::memcpy(hashData, hashOutput.data(), hashOutput.size() * sizeof(uint8_t));
+    size_t out_start = start * 33 / 4096;
+    size_t out_count = dataSize * 33 / 4096;
+
+    std::cout << "Function.cpp Hash function returning DerivedData" << std::endl;
     
-    return DerivedData({hashData, {0}, {hashOutput.size()}});
+    return DerivedData({hashData, {out_start}, {out_count}});
+    //return DerivedData({hashData, {0}, {hashOutput.size()}});
     //kokkos_murmur3::hash(inputData[0].Data, dataSize, 0/*(uint8_t*)seed*/);
     
 
@@ -173,18 +181,17 @@ Dims CurlDimsFunc(std::vector<Dims> input)
 Dims HashDimsFunc(std::vector<Dims> input)
 {
     // check that all dimenstions are the same
-    if (input.size() > 1)
+    if (input.size() != 1)
     {
-        Dims first_element = input[0];
-        bool dim_are_equal = std::all_of(input.begin() + 1, input.end(),
-                                         [&first_element](Dims x) { return x == first_element; });
-        if (!dim_are_equal)
-            helper::Throw<std::invalid_argument>("Derived", "Function", "HashDimsFunc",
-                                                 "Invalid variable dimensions");
+      helper::Throw<std::invalid_argument>("Derived", "Function", "HashDimsFunc",
+					   "Invalid variable dimensions");
     }
-    // return the first dimension
-    //return input[0];
-    return {32};
+
+    size_t size = (size_t)(input[0][0] * 33 / 4096); // Assume chunk size of 4KB
+
+    std::cout << "Function.cpp HashDimsFunc input size: " << input[0][0];
+    std::cout << " -> output size " << size << std::endl;
+    return {size};
 }
 
 #define declare_template_instantiation(T)                                                          \

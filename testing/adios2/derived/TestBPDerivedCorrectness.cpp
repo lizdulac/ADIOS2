@@ -5,6 +5,9 @@
 #include <string>
 #include <sys/mman.h>
 #include <unistd.h>
+//#if ADIOS2_HAVE_MPI
+#include <mpi.h>
+//#endif
 
 #include <cmath>
 #include <iostream>
@@ -52,7 +55,17 @@ read_file(const std::string &fn, std::vector<T> &buff) {
 // Experimental
 TEST(DerivedCorrectness, HashTest)
 {
+    int rank, size;
+    //#if ADIOS2_HAVE_MPI
+
+    // MPI_THREAD_MULTIPLE is only required if you enable the SST MPI_DP
+    MPI_Init_thread(nullptr, nullptr, MPI_THREAD_MULTIPLE, &size);
+    MPI_Comm_rank(MPI_COMM_WORLD, &rank);
+    MPI_Comm_size(MPI_COMM_WORLD, &size);
+
+    //#endif
     const size_t steps = 1;
+
     std::string in_file = "/lustre/orion/csc143/proj-shared/dulac/sample/m000p.mpirestart-combined-0-10.dat";
     std::string out_file = in_file + ".tree";
 
@@ -61,19 +74,35 @@ TEST(DerivedCorrectness, HashTest)
     size_t size_in = read_file(in_file, in_buff);
     std::vector<uint8_t> out_buff;
     size_t size_out = read_file(out_file, out_buff);
-    std::cout << "Hash data size in: " << size_in << std::endl;
-    std::cout << "size of in vector " << in_buff.size() << std::endl;
-    std::cout << "Hash tree size out: " << size_out << std::endl;
-    std::cout << "size of out vector " << out_buff.size() << std::endl;
+    if (rank == 0) {
+      std::cout << "Hash data size in: " << size_in << std::endl;
+      std::cout << "size of in vector " << in_buff.size() << std::endl;
+      std::cout << "Hash tree size out: " << size_out << std::endl;
+      std::cout << "size of out vector " << out_buff.size() << std::endl;
+    }
 
+    //#if ADIOS2_HAVE_MPI
+    adios2::ADIOS adios(MPI_COMM_WORLD);
+    //std::cout << "Running example with mpi" << std::endl;
+    /*#else
     adios2::ADIOS adios;
+    std::cout << "Running example withOUT mpi" << std::endl;
+    #endif*/
 
     adios2::IO bpOut = adios.DeclareIO("BPWriteAddExpression");
 
     std::string varname = "sim/data";
     std::string derivedname = "derived/hash";
 
-    auto InputData = bpOut.DefineVariable<float>(varname, {in_buff.size()}, {0}, {in_buff.size()});
+    size_t in_count = (size_t)(in_buff.size() / size);
+    size_t in_shape = in_buff.size();
+    size_t in_start = in_count * rank;
+    //double count_ratio = 33 / 4096; // assume chunk size 4KB
+    
+    std::cout << "Rank " << rank << " defining variables with shape ";
+    std::cout << in_shape << ", start " << in_start;
+    std::cout << ", count " << in_count << std::endl;
+    auto InputData = bpOut.DefineVariable<float>(varname, {in_shape}, {in_start}, {in_count});
     // clang-format off
     bpOut.DefineDerivedVariable(derivedname,
                                 "x =" + varname + " \n"
@@ -89,6 +118,7 @@ TEST(DerivedCorrectness, HashTest)
         bpFileWriter.Put(InputData, in_buff.data());
         bpFileWriter.EndStep();
     }
+    std::cout << "Rank " << rank << " calling writer Close" << std::endl;
     bpFileWriter.Close();
 
     adios2::IO bpIn = adios.DeclareIO("BPReadExpression");
@@ -102,17 +132,25 @@ TEST(DerivedCorrectness, HashTest)
     {
         bpFileReader.BeginStep();
         bpFileReader.Get(varname, readData);
+	std::cout << "Rank " << rank << " Inquiring Hash" << std::endl;
 	auto varhash = bpIn.InquireVariable<uint8_t>(derivedname);
+	std::cout << "Rank " << rank << " Getting Hash" << std::endl;
         bpFileReader.Get(varhash, readHash);
+	std::cout << "Rank " << rank << " EndStep" << std::endl;
         bpFileReader.EndStep();
 
+	std::cout << "Rank " << rank << " looping over out_buff.size() of " << out_buff.size() << std::endl;
         for (size_t ind = 0; ind < out_buff.size(); ++ind)
         {
 	  //std::cout << "Hash[" << ind << "] = " << out_buff[ind] << " (" << readHash[ind] << " read) "; 
 	  //EXPECT_TRUE(fabs(readHash[ind] - out_buff[ind]) < epsilon);
         }
     }
+    std::cout << "Rank " << rank << " reader.Close()" << std::endl;
     bpFileReader.Close();
+    //#if ADIOS2_HAVE_MPI
+    MPI_Finalize();
+    //#endif
 }
 /*
 TEST(DerivedCorrectness, AddCorrectnessTest)

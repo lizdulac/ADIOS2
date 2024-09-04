@@ -3,5 +3,5 @@
 
 #include <vector>
 
-std::vector<uint8_t> stateDiffHash(void *blockData, size_t blockSize);
+std::vector<uint8_t> stateDiffHash(float *blockData, size_t blockSize);
 #endif
