@@ -82,33 +82,42 @@ ExpressionOperator convert_op(std::string opname)
 
 adios2::derived::ExpressionTree ASTNode_to_ExpressionTree(adios2::detail::ASTNode *node)
 {
-    adios2::derived::ExpressionTree exprTree_node(convert_op(node->get_opname()));
-    for (adios2::detail::ASTNode *e : node->get_subexprs())
+    OperatorNode *root = dynamic_cast<OperatorNode*>(node);
+    if (!root)
+      {
+	// error, expected OperatorNode as root of AST
+      }
+    adios2::derived::ExpressionTree exprTree_node(convert_op(root->get_opname()));
+    for (adios2::detail::ASTNode *e : root->get_subexprs())
     {
-        switch (convert_op(e->get_opname()))
-        {
-        case adios2::detail::ExpressionOperator::OP_ALIAS: // add variable given by alias
-            // add an index operation in the chain if the variable contains indeces
-            /*if (e->lookup_var_indices(e->alias) != "")
+      if (VariableNode *varnode = dynamic_cast<VariableNode*>(e))
+	{
+	  // add variable given by alias
+	  exprTree_node.add_child(varnode->get_varname());
+	}
+      else if (IndexNode *idxnode = dynamic_cast<IndexNode*>(e))
+	{
+	  // add an index operation in the chain if the variable contains indeces
+	  /*if (e->lookup_var_indices(e->alias) != "")
             {
-                ExpressionTree index_expr(adios2::detail::ExpressionOperator::OP_INDEX);
-                index_expr.set_indeces(e->lookup_var_indices(e->alias));
+	        ExpressionTree index_expr(adios2::detail::ExpressionOperator::OP_INDEX);
+	        index_expr.set_indeces(e->lookup_var_indices(e->alias));
                 index_expr.add_child(e->lookup_var_path(e->alias));
                 expTree_node->add_child(expr);
             }*/
-            exprTree_node.add_child(e->get_varname());
-            break;
-        case adios2::detail::ExpressionOperator::OP_PATH: // add variable name
-            exprTree_node.add_child(e->get_varname());
-            break;
-        case adios2::detail::ExpressionOperator::OP_NUM: // set the base value for the operation
-            exprTree_node.set_base(e->get_value());
-            break;
-        default: // if the children nodes are other expressions, convert them to expressions
-            auto temp_node = ASTNode_to_ExpressionTree(e);
+	}
+      else if (NumberNode *numnode = dynamic_cast<NumberNode*>(e))
+	{
+	  // set the base value for the operation
+          // exprTree_node.set_base(e->get_value());
+	}
+      else if (OperatorNode *opnode = dynamic_cast<OperatorNode*>(e))
+	{
+	  // if the children nodes are other expressions, convert them to expressions
+	  adios2::derived::ExpressionTree temp_node = ASTNode_to_ExpressionTree(opnode);
             // move from a binary to a multinary tree if the child has the same operation
-            if (convert_op(e->get_opname()) == convert_op(node->get_opname()) &&
-                adios2::detail::op_property.at(convert_op(e->get_opname())).is_associative)
+            if (convert_op(opnode->get_opname()) == convert_op(root->get_opname()) &&
+                adios2::detail::op_property.at(convert_op(opnode->get_opname())).is_associative)
             {
                 // concatenate exprTree with temp_node
                 for (std::tuple<adios2::derived::ExpressionTree, std::string, bool> childTree :
@@ -124,7 +133,11 @@ adios2::derived::ExpressionTree ASTNode_to_ExpressionTree(adios2::detail::ASTNod
             {
                 exprTree_node.add_child(temp_node);
             }
-        }
+	}
+      else
+	{
+	  // error, cannot resolve ASTNode type
+	}
     }
     return exprTree_node;
 }

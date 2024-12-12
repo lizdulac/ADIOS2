@@ -40,9 +40,10 @@ public:
     void add_lookup_entry(std::string alias, std::string var_name, indx_type indices);
     void add_lookup_entry(std::string alias, std::string var_name);
 
-    void createNode(std::string, size_t);
-    void createNode(std::string);
-    void createNode(std::string, indx_type);
+    void createOperatorNode(std::string opname, size_t numsubexprs);
+    void createVariableNode(std::string alias);
+    void createIndexNode(std::string alias, indx_type indices);
+    void createNumberNode(std::string value);
 
     // Whether to generate parser debug traces.
     bool trace_parsing = false;

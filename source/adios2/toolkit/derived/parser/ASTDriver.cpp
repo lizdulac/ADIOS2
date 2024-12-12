@@ -31,16 +31,27 @@ ASTNode *ASTDriver::getAST()
 
 void ASTDriver::resolve(ASTNode *node)
 {
-    if (!node->get_alias().empty())
+    if (VariableNode *varnode = dynamic_cast<VariableNode*>(node))
     {
         std::tuple<std::string, indx_type> var_info;
-        var_info = lookup_var(node->get_alias());
-        node->set_varname(std::get<0>(var_info));
-        node->set_indices(std::get<1>(var_info));
+        var_info = lookup_var(varnode->get_alias());
+        varnode->set_varname(std::get<0>(var_info));
+	indx_type i = std::get<1>(var_info);
+	if (i.size() > 0)
+	  {
+	    node = new IndexNode(varnode, i);
+	  }
     }
-    for (ASTNode *subexpr : node->get_subexprs())
+    else if (OperatorNode *opnode = dynamic_cast<OperatorNode*>(node))
+    {   
+        for (ASTNode *subexpr : opnode->get_subexprs())
+        {
+            resolve(subexpr);
+        }
+    }
+    else if (IndexNode *idxnode = dynamic_cast<IndexNode*>(node))
     {
-        resolve(subexpr);
+        resolve(idxnode->get_varnode());
     }
 }
 
@@ -71,9 +82,9 @@ void ASTDriver::add_lookup_entry(std::string alias, std::string var_name)
     aliases.insert({alias, {var_name, {}}});
 }
 
-void ASTDriver::createNode(std::string op_name, size_t numsubexprs)
+void ASTDriver::createOperatorNode(std::string op_name, size_t numsubexprs)
 {
-    ASTNode *node = new ASTNode(op_name, numsubexprs);
+    OperatorNode *node = new OperatorNode(op_name, numsubexprs);
     for (size_t i = 1; i <= numsubexprs; ++i)
     {
         // TODO: check that holding contains ASTNode(s)
@@ -85,17 +96,23 @@ void ASTDriver::createNode(std::string op_name, size_t numsubexprs)
     holding.push(node);
 }
 
-void ASTDriver::createNode(std::string alias)
+void ASTDriver::createVariableNode(std::string alias)
 {
-    ASTNode *node = new ASTNode("ALIAS", alias);
+    VariableNode *node = new VariableNode(alias);
     holding.push(node);
 }
 
-void ASTDriver::createNode(std::string alias, indx_type indices)
+void ASTDriver::createIndexNode(std::string alias, indx_type indices)
 {
-    ASTNode *node = new ASTNode("INDEX", indices);
-    node->pushback_subexpr(new ASTNode("ALIAS", alias));
+    VariableNode *var = new VariableNode(alias);
+    IndexNode *node = new IndexNode(var, indices);
     holding.push(node);
+}
+
+void ASTDriver::createNumberNode(std::string value)
+{
+  NumberNode *node = new NumberNode(value);
+  holding.push(node);
 }
 
 }
