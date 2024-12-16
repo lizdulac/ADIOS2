@@ -38,7 +38,7 @@ TEST_P(DerivedCorrectnessP, ParserTest)
     bpOut.DefineDerivedVariable("constMult", "x= var1 \n y= var2 \n 2 * x * y * 5", mode);
     //bpOut.DefineDerivedVariable("Index", "x= var1 \n y= var2 \n x[1:5:2]", mode);
     //bpOut.DefineDerivedVariable("SubexprConst", "x= var1 \n y= var2 \n ((x + 5.9) * (-7.8 - y))/2", mode);
-    bpOut.DefineDerivedVariable("SubexprConst", "x= var1 \n y= var2 \n ((x + 5) * (-7 - y))/2", mode);
+    bpOut.DefineDerivedVariable("SubexprConst", "x= var1 \n y= var2 \n ((x + 5) * (-7 - y)) * 2", mode);
 }
 
 /*
