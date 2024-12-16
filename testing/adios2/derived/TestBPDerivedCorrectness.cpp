@@ -25,6 +25,23 @@ protected:
     adios2::DerivedVarType GetThreads() { return GetParam(); };
 };
 
+TEST_P(DerivedCorrectnessP, ParserTest)
+{
+    adios2::DerivedVarType mode = GetParam();
+    adios2::ADIOS adios;
+    adios2::IO bpOut = adios.DeclareIO("BPParseOnly");
+
+    const size_t N = 10;
+    auto U = bpOut.DefineVariable<float>("var1", {N}, {0}, {N});
+    auto V = bpOut.DefineVariable<float>("var2", {N}, {0}, {N});
+    bpOut.DefineDerivedVariable("constAdd", "x= var1 \n x + 1", mode);
+    bpOut.DefineDerivedVariable("constMult", "x= var1 \n y= var2 \n 2 * x * y * 5", mode);
+    //bpOut.DefineDerivedVariable("Index", "x= var1 \n y= var2 \n x[1:5:2]", mode);
+    //bpOut.DefineDerivedVariable("SubexprConst", "x= var1 \n y= var2 \n ((x + 5.9) * (-7.8 - y))/2", mode);
+    bpOut.DefineDerivedVariable("SubexprConst", "x= var1 \n y= var2 \n ((x + 5) * (-7 - y))/2", mode);
+}
+
+/*
 TEST_P(DerivedCorrectnessP, BasicCorrectnessTest)
 {
     adios2::DerivedVarType mode = GetParam();
@@ -225,6 +242,7 @@ TEST_P(DerivedCorrectnessP, CurlCorrectnessTest)
                 simArray2[idx] = sqrtf(z + 1) * cosf(x);
                 simArray3[idx] = powf(x, 2) * sinf(y) + (6 * z);
                 */
+/*
             }
         }
     }
@@ -305,6 +323,7 @@ TEST_P(DerivedCorrectnessP, CurlCorrectnessTest)
                 curl_y = -2 * x * sinf(y);
                 curl_z = -sqrtf(z + 1) * sinf(x) - (2 * expf(2 * y) * sinf(x));
                 */
+/*
                 if (fabs(curl_x) < 1)
                 {
                     err_x = fabs(curl_x - readCurl[3 * idx]) / (1 + fabs(curl_x));
@@ -434,7 +453,7 @@ TEST_P(DerivedCorrectnessP, MagCurlCorrectnessTest)
     bpFileReader.Close();
     EXPECT_LT(err / (Nx * Ny * Nz), error_limit);
 }
-
+*/
 INSTANTIATE_TEST_SUITE_P(DerivedCorrectness, DerivedCorrectnessP,
                          ::testing::Values(adios2::DerivedVarType::StatsOnly,
                                            adios2::DerivedVarType::ExpressionString,

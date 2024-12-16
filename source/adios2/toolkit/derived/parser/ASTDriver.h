@@ -46,9 +46,9 @@ public:
     void createNumberNode(std::string value);
 
     // Whether to generate parser debug traces.
-    bool trace_parsing = false;
+    bool trace_parsing = true;
     // Whether to generate scanner debug traces.
-    bool trace_scanning = false;
+    bool trace_scanning = true;
     // The token's location used by the scanner.
     adios2::detail::location location;
 

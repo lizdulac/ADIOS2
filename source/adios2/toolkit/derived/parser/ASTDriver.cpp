@@ -9,7 +9,11 @@ using indx_type = std::vector<std::tuple<int, int, int>>;
 
 ASTDriver::ASTDriver() {}
 
-ASTDriver::ASTDriver(const std::string input) { ASTDriver::parse(input); }
+ASTDriver::ASTDriver(const std::string input)
+{
+  std::cout << "ASTDriver parsing input expression \"" << input << "\"" << std::endl;
+  ASTDriver::parse(input);
+}
 
 ASTDriver::~ASTDriver()
 {
@@ -26,6 +30,8 @@ ASTNode *ASTDriver::getAST()
     // TODO: check only one ASTNode remains in holding
     // else throw error that parsing failed
     resolve(holding.top());
+    std::cout << "ASTDriver, expression has been parsed. Created Abstract Syntax Tree:\n";
+    std::cout << holding.top()->printpretty() << std::endl;
     return holding.top();
 }
 
