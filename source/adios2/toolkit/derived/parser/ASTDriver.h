@@ -41,6 +41,8 @@ public:
     void add_lookup_entry(std::string alias, std::string var_name);
 
     void createOperatorNode(std::string opname, size_t numsubexprs);
+    void createRelationNode(std::string relation);
+    void createConditionNode(std::string condition);
     void createVariableNode(std::string alias);
     void createIndexNode(std::string alias, indx_type indices);
     void createNumberNode(std::string value);

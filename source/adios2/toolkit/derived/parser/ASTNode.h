@@ -71,6 +71,42 @@ private:
     std::string opname;
 };
 
+class ConditionNode : public ASTNode
+{
+public:
+    ConditionNode(std::string cond, ASTNode *expr1, ASTNode *expr2);
+    ~ConditionNode();
+
+    std::string printpretty(std::string = "");
+
+    ASTNode *get_subexpr1();
+    ASTNode *get_subexpr2();
+    std::string get_condition();
+
+private:
+    ASTNode *subexpr1;
+    ASTNode *subexpr2;
+    std::string condition;
+};
+
+class RelationNode : public ASTNode
+{
+public:
+    RelationNode(std::string rel, ASTNode *cond1, ASTNode *cond2);
+    ~RelationNode();
+
+    std::string printpretty(std::string = "");
+
+    ASTNode *get_condition1();
+    ASTNode *get_condition2();
+    std::string get_relation();
+
+private:
+    ASTNode *condition1;
+    ASTNode *condition2;
+    std::string relation;
+};
+
 class NumberNode : public ASTNode
 {
 public:
