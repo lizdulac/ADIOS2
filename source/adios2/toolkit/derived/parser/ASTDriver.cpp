@@ -104,9 +104,9 @@ void ASTDriver::createOperatorNode(std::string op_name, size_t numsubexprs)
 
 void ASTDriver::createConditionNode(std::string condition)
 {
-    ASTNode *subexpr1 = holding.top();
-    holding.pop();
     ASTNode *subexpr2 = holding.top();
+    holding.pop();
+    ASTNode *subexpr1 = holding.top();
     holding.pop();
     ConditionNode *node = new ConditionNode(condition, subexpr1, subexpr2);
     holding.push(node);
@@ -114,9 +114,9 @@ void ASTDriver::createConditionNode(std::string condition)
 
 void ASTDriver::createRelationNode(std::string relation)
 {
-    ASTNode *subexpr1 = holding.top();
-    holding.pop();
     ASTNode *subexpr2 = holding.top();
+    holding.pop();
+    ASTNode *subexpr1 = holding.top();
     holding.pop();
     ConditionNode *node = new ConditionNode(relation, subexpr1, subexpr2);
     holding.push(node);
