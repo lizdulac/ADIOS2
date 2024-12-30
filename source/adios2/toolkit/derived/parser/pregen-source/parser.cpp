@@ -164,104 +164,6 @@ namespace adios2 { namespace detail {
   | symbol.  |
   `---------*/
 
-  // basic_symbol.
-  template <typename Base>
-  parser::basic_symbol<Base>::basic_symbol (const basic_symbol& that)
-    : Base (that)
-    , value (that.value)
-    , location (that.location)
-  {}
-
-
-  /// Constructor for valueless symbols.
-  template <typename Base>
-  parser::basic_symbol<Base>::basic_symbol (typename Base::kind_type t, YY_MOVE_REF (location_type) l)
-    : Base (t)
-    , value ()
-    , location (l)
-  {}
-
-  template <typename Base>
-  parser::basic_symbol<Base>::basic_symbol (typename Base::kind_type t, YY_RVREF (value_type) v, YY_RVREF (location_type) l)
-    : Base (t)
-    , value (YY_MOVE (v))
-    , location (YY_MOVE (l))
-  {}
-
-
-  template <typename Base>
-  parser::symbol_kind_type
-  parser::basic_symbol<Base>::type_get () const YY_NOEXCEPT
-  {
-    return this->kind ();
-  }
-
-
-  template <typename Base>
-  bool
-  parser::basic_symbol<Base>::empty () const YY_NOEXCEPT
-  {
-    return this->kind () == symbol_kind::S_YYEMPTY;
-  }
-
-  template <typename Base>
-  void
-  parser::basic_symbol<Base>::move (basic_symbol& s)
-  {
-    super_type::move (s);
-    value = YY_MOVE (s.value);
-    location = YY_MOVE (s.location);
-  }
-
-  // by_kind.
-  parser::by_kind::by_kind () YY_NOEXCEPT
-    : kind_ (symbol_kind::S_YYEMPTY)
-  {}
-
-#if 201103L <= YY_CPLUSPLUS
-  parser::by_kind::by_kind (by_kind&& that) YY_NOEXCEPT
-    : kind_ (that.kind_)
-  {
-    that.clear ();
-  }
-#endif
-
-  parser::by_kind::by_kind (const by_kind& that) YY_NOEXCEPT
-    : kind_ (that.kind_)
-  {}
-
-  parser::by_kind::by_kind (token_kind_type t) YY_NOEXCEPT
-    : kind_ (yytranslate_ (t))
-  {}
-
-
-
-  void
-  parser::by_kind::clear () YY_NOEXCEPT
-  {
-    kind_ = symbol_kind::S_YYEMPTY;
-  }
-
-  void
-  parser::by_kind::move (by_kind& that)
-  {
-    kind_ = that.kind_;
-    that.clear ();
-  }
-
-  parser::symbol_kind_type
-  parser::by_kind::kind () const YY_NOEXCEPT
-  {
-    return kind_;
-  }
-
-
-  parser::symbol_kind_type
-  parser::by_kind::type_get () const YY_NOEXCEPT
-  {
-    return this->kind ();
-  }
-
 
 
   // by_state.
@@ -303,8 +205,108 @@ namespace adios2 { namespace detail {
   {}
 
   parser::stack_symbol_type::stack_symbol_type (YY_RVREF (stack_symbol_type) that)
-    : super_type (YY_MOVE (that.state), YY_MOVE (that.value), YY_MOVE (that.location))
+    : super_type (YY_MOVE (that.state), YY_MOVE (that.location))
   {
+    switch (that.kind ())
+    {
+      case symbol_kind::S_argument_expression_list: // argument_expression_list
+        value.YY_MOVE_OR_COPY< int > (YY_MOVE (that.value));
+        break;
+
+      case symbol_kind::S_IDENTIFIER: // IDENTIFIER
+      case symbol_kind::S_CONSTANT: // CONSTANT
+      case symbol_kind::S_STRING_LITERAL: // STRING_LITERAL
+      case symbol_kind::S_SIZEOF: // SIZEOF
+      case symbol_kind::S_PTR_OP: // PTR_OP
+      case symbol_kind::S_INC_OP: // INC_OP
+      case symbol_kind::S_DEC_OP: // DEC_OP
+      case symbol_kind::S_LEFT_OP: // LEFT_OP
+      case symbol_kind::S_RIGHT_OP: // RIGHT_OP
+      case symbol_kind::S_LE_OP: // LE_OP
+      case symbol_kind::S_GE_OP: // GE_OP
+      case symbol_kind::S_EQ_OP: // EQ_OP
+      case symbol_kind::S_NE_OP: // NE_OP
+      case symbol_kind::S_AND_OP: // AND_OP
+      case symbol_kind::S_OR_OP: // OR_OP
+      case symbol_kind::S_MUL_ASSIGN: // MUL_ASSIGN
+      case symbol_kind::S_DIV_ASSIGN: // DIV_ASSIGN
+      case symbol_kind::S_MOD_ASSIGN: // MOD_ASSIGN
+      case symbol_kind::S_ADD_ASSIGN: // ADD_ASSIGN
+      case symbol_kind::S_SUB_ASSIGN: // SUB_ASSIGN
+      case symbol_kind::S_LEFT_ASSIGN: // LEFT_ASSIGN
+      case symbol_kind::S_RIGHT_ASSIGN: // RIGHT_ASSIGN
+      case symbol_kind::S_AND_ASSIGN: // AND_ASSIGN
+      case symbol_kind::S_XOR_ASSIGN: // XOR_ASSIGN
+      case symbol_kind::S_OR_ASSIGN: // OR_ASSIGN
+      case symbol_kind::S_TYPE_NAME: // TYPE_NAME
+      case symbol_kind::S_SEMICOLON: // SEMICOLON
+      case symbol_kind::S_LBRACE: // LBRACE
+      case symbol_kind::S_RBRACE: // RBRACE
+      case symbol_kind::S_COMMA: // COMMA
+      case symbol_kind::S_COLON: // COLON
+      case symbol_kind::S_ASSIGN: // ASSIGN
+      case symbol_kind::S_LPAREN: // LPAREN
+      case symbol_kind::S_RPAREN: // RPAREN
+      case symbol_kind::S_LBRACKET: // LBRACKET
+      case symbol_kind::S_RBRACKET: // RBRACKET
+      case symbol_kind::S_PERIOD: // PERIOD
+      case symbol_kind::S_AMPERSAND: // AMPERSAND
+      case symbol_kind::S_EXCLAMATION: // EXCLAMATION
+      case symbol_kind::S_TILDE: // TILDE
+      case symbol_kind::S_MINUS_OP: // MINUS_OP
+      case symbol_kind::S_ADD_OP: // ADD_OP
+      case symbol_kind::S_MULT_OP: // MULT_OP
+      case symbol_kind::S_DIV_OP: // DIV_OP
+      case symbol_kind::S_MOD_OP: // MOD_OP
+      case symbol_kind::S_LT_OP: // LT_OP
+      case symbol_kind::S_GT_OP: // GT_OP
+      case symbol_kind::S_EXP_OP: // EXP_OP
+      case symbol_kind::S_PIPE: // PIPE
+      case symbol_kind::S_QUESTION: // QUESTION
+      case symbol_kind::S_TYPEDEF: // TYPEDEF
+      case symbol_kind::S_EXTERN: // EXTERN
+      case symbol_kind::S_STATIC: // STATIC
+      case symbol_kind::S_AUTO: // AUTO
+      case symbol_kind::S_REGISTER: // REGISTER
+      case symbol_kind::S_INLINE: // INLINE
+      case symbol_kind::S_RESTRICT: // RESTRICT
+      case symbol_kind::S_CHAR: // CHAR
+      case symbol_kind::S_SHORT: // SHORT
+      case symbol_kind::S_INT: // INT
+      case symbol_kind::S_LONG: // LONG
+      case symbol_kind::S_SIGNED: // SIGNED
+      case symbol_kind::S_UNSIGNED: // UNSIGNED
+      case symbol_kind::S_FLOAT: // FLOAT
+      case symbol_kind::S_DOUBLE: // DOUBLE
+      case symbol_kind::S_CONST: // CONST
+      case symbol_kind::S_VOLATILE: // VOLATILE
+      case symbol_kind::S_VOID: // VOID
+      case symbol_kind::S_BOOL: // BOOL
+      case symbol_kind::S_COMPLEX: // COMPLEX
+      case symbol_kind::S_IMAGINARY: // IMAGINARY
+      case symbol_kind::S_STRUCT: // STRUCT
+      case symbol_kind::S_UNION: // UNION
+      case symbol_kind::S_ENUM: // ENUM
+      case symbol_kind::S_ELLIPSIS: // ELLIPSIS
+      case symbol_kind::S_CASE: // CASE
+      case symbol_kind::S_DEFAULT: // DEFAULT
+      case symbol_kind::S_IF: // IF
+      case symbol_kind::S_ELSE: // ELSE
+      case symbol_kind::S_SWITCH: // SWITCH
+      case symbol_kind::S_WHILE: // WHILE
+      case symbol_kind::S_DO: // DO
+      case symbol_kind::S_FOR: // FOR
+      case symbol_kind::S_GOTO: // GOTO
+      case symbol_kind::S_CONTINUE: // CONTINUE
+      case symbol_kind::S_BREAK: // BREAK
+      case symbol_kind::S_RETURN: // RETURN
+        value.YY_MOVE_OR_COPY< std::string > (YY_MOVE (that.value));
+        break;
+
+      default:
+        break;
+    }
+
 #if 201103L <= YY_CPLUSPLUS
     // that is emptied.
     that.state = empty_state;
@@ -312,8 +314,108 @@ namespace adios2 { namespace detail {
   }
 
   parser::stack_symbol_type::stack_symbol_type (state_type s, YY_MOVE_REF (symbol_type) that)
-    : super_type (s, YY_MOVE (that.value), YY_MOVE (that.location))
+    : super_type (s, YY_MOVE (that.location))
   {
+    switch (that.kind ())
+    {
+      case symbol_kind::S_argument_expression_list: // argument_expression_list
+        value.move< int > (YY_MOVE (that.value));
+        break;
+
+      case symbol_kind::S_IDENTIFIER: // IDENTIFIER
+      case symbol_kind::S_CONSTANT: // CONSTANT
+      case symbol_kind::S_STRING_LITERAL: // STRING_LITERAL
+      case symbol_kind::S_SIZEOF: // SIZEOF
+      case symbol_kind::S_PTR_OP: // PTR_OP
+      case symbol_kind::S_INC_OP: // INC_OP
+      case symbol_kind::S_DEC_OP: // DEC_OP
+      case symbol_kind::S_LEFT_OP: // LEFT_OP
+      case symbol_kind::S_RIGHT_OP: // RIGHT_OP
+      case symbol_kind::S_LE_OP: // LE_OP
+      case symbol_kind::S_GE_OP: // GE_OP
+      case symbol_kind::S_EQ_OP: // EQ_OP
+      case symbol_kind::S_NE_OP: // NE_OP
+      case symbol_kind::S_AND_OP: // AND_OP
+      case symbol_kind::S_OR_OP: // OR_OP
+      case symbol_kind::S_MUL_ASSIGN: // MUL_ASSIGN
+      case symbol_kind::S_DIV_ASSIGN: // DIV_ASSIGN
+      case symbol_kind::S_MOD_ASSIGN: // MOD_ASSIGN
+      case symbol_kind::S_ADD_ASSIGN: // ADD_ASSIGN
+      case symbol_kind::S_SUB_ASSIGN: // SUB_ASSIGN
+      case symbol_kind::S_LEFT_ASSIGN: // LEFT_ASSIGN
+      case symbol_kind::S_RIGHT_ASSIGN: // RIGHT_ASSIGN
+      case symbol_kind::S_AND_ASSIGN: // AND_ASSIGN
+      case symbol_kind::S_XOR_ASSIGN: // XOR_ASSIGN
+      case symbol_kind::S_OR_ASSIGN: // OR_ASSIGN
+      case symbol_kind::S_TYPE_NAME: // TYPE_NAME
+      case symbol_kind::S_SEMICOLON: // SEMICOLON
+      case symbol_kind::S_LBRACE: // LBRACE
+      case symbol_kind::S_RBRACE: // RBRACE
+      case symbol_kind::S_COMMA: // COMMA
+      case symbol_kind::S_COLON: // COLON
+      case symbol_kind::S_ASSIGN: // ASSIGN
+      case symbol_kind::S_LPAREN: // LPAREN
+      case symbol_kind::S_RPAREN: // RPAREN
+      case symbol_kind::S_LBRACKET: // LBRACKET
+      case symbol_kind::S_RBRACKET: // RBRACKET
+      case symbol_kind::S_PERIOD: // PERIOD
+      case symbol_kind::S_AMPERSAND: // AMPERSAND
+      case symbol_kind::S_EXCLAMATION: // EXCLAMATION
+      case symbol_kind::S_TILDE: // TILDE
+      case symbol_kind::S_MINUS_OP: // MINUS_OP
+      case symbol_kind::S_ADD_OP: // ADD_OP
+      case symbol_kind::S_MULT_OP: // MULT_OP
+      case symbol_kind::S_DIV_OP: // DIV_OP
+      case symbol_kind::S_MOD_OP: // MOD_OP
+      case symbol_kind::S_LT_OP: // LT_OP
+      case symbol_kind::S_GT_OP: // GT_OP
+      case symbol_kind::S_EXP_OP: // EXP_OP
+      case symbol_kind::S_PIPE: // PIPE
+      case symbol_kind::S_QUESTION: // QUESTION
+      case symbol_kind::S_TYPEDEF: // TYPEDEF
+      case symbol_kind::S_EXTERN: // EXTERN
+      case symbol_kind::S_STATIC: // STATIC
+      case symbol_kind::S_AUTO: // AUTO
+      case symbol_kind::S_REGISTER: // REGISTER
+      case symbol_kind::S_INLINE: // INLINE
+      case symbol_kind::S_RESTRICT: // RESTRICT
+      case symbol_kind::S_CHAR: // CHAR
+      case symbol_kind::S_SHORT: // SHORT
+      case symbol_kind::S_INT: // INT
+      case symbol_kind::S_LONG: // LONG
+      case symbol_kind::S_SIGNED: // SIGNED
+      case symbol_kind::S_UNSIGNED: // UNSIGNED
+      case symbol_kind::S_FLOAT: // FLOAT
+      case symbol_kind::S_DOUBLE: // DOUBLE
+      case symbol_kind::S_CONST: // CONST
+      case symbol_kind::S_VOLATILE: // VOLATILE
+      case symbol_kind::S_VOID: // VOID
+      case symbol_kind::S_BOOL: // BOOL
+      case symbol_kind::S_COMPLEX: // COMPLEX
+      case symbol_kind::S_IMAGINARY: // IMAGINARY
+      case symbol_kind::S_STRUCT: // STRUCT
+      case symbol_kind::S_UNION: // UNION
+      case symbol_kind::S_ENUM: // ENUM
+      case symbol_kind::S_ELLIPSIS: // ELLIPSIS
+      case symbol_kind::S_CASE: // CASE
+      case symbol_kind::S_DEFAULT: // DEFAULT
+      case symbol_kind::S_IF: // IF
+      case symbol_kind::S_ELSE: // ELSE
+      case symbol_kind::S_SWITCH: // SWITCH
+      case symbol_kind::S_WHILE: // WHILE
+      case symbol_kind::S_DO: // DO
+      case symbol_kind::S_FOR: // FOR
+      case symbol_kind::S_GOTO: // GOTO
+      case symbol_kind::S_CONTINUE: // CONTINUE
+      case symbol_kind::S_BREAK: // BREAK
+      case symbol_kind::S_RETURN: // RETURN
+        value.move< std::string > (YY_MOVE (that.value));
+        break;
+
+      default:
+        break;
+    }
+
     // that is emptied.
     that.kind_ = symbol_kind::S_YYEMPTY;
   }
@@ -323,7 +425,106 @@ namespace adios2 { namespace detail {
   parser::stack_symbol_type::operator= (const stack_symbol_type& that)
   {
     state = that.state;
-    value = that.value;
+    switch (that.kind ())
+    {
+      case symbol_kind::S_argument_expression_list: // argument_expression_list
+        value.copy< int > (that.value);
+        break;
+
+      case symbol_kind::S_IDENTIFIER: // IDENTIFIER
+      case symbol_kind::S_CONSTANT: // CONSTANT
+      case symbol_kind::S_STRING_LITERAL: // STRING_LITERAL
+      case symbol_kind::S_SIZEOF: // SIZEOF
+      case symbol_kind::S_PTR_OP: // PTR_OP
+      case symbol_kind::S_INC_OP: // INC_OP
+      case symbol_kind::S_DEC_OP: // DEC_OP
+      case symbol_kind::S_LEFT_OP: // LEFT_OP
+      case symbol_kind::S_RIGHT_OP: // RIGHT_OP
+      case symbol_kind::S_LE_OP: // LE_OP
+      case symbol_kind::S_GE_OP: // GE_OP
+      case symbol_kind::S_EQ_OP: // EQ_OP
+      case symbol_kind::S_NE_OP: // NE_OP
+      case symbol_kind::S_AND_OP: // AND_OP
+      case symbol_kind::S_OR_OP: // OR_OP
+      case symbol_kind::S_MUL_ASSIGN: // MUL_ASSIGN
+      case symbol_kind::S_DIV_ASSIGN: // DIV_ASSIGN
+      case symbol_kind::S_MOD_ASSIGN: // MOD_ASSIGN
+      case symbol_kind::S_ADD_ASSIGN: // ADD_ASSIGN
+      case symbol_kind::S_SUB_ASSIGN: // SUB_ASSIGN
+      case symbol_kind::S_LEFT_ASSIGN: // LEFT_ASSIGN
+      case symbol_kind::S_RIGHT_ASSIGN: // RIGHT_ASSIGN
+      case symbol_kind::S_AND_ASSIGN: // AND_ASSIGN
+      case symbol_kind::S_XOR_ASSIGN: // XOR_ASSIGN
+      case symbol_kind::S_OR_ASSIGN: // OR_ASSIGN
+      case symbol_kind::S_TYPE_NAME: // TYPE_NAME
+      case symbol_kind::S_SEMICOLON: // SEMICOLON
+      case symbol_kind::S_LBRACE: // LBRACE
+      case symbol_kind::S_RBRACE: // RBRACE
+      case symbol_kind::S_COMMA: // COMMA
+      case symbol_kind::S_COLON: // COLON
+      case symbol_kind::S_ASSIGN: // ASSIGN
+      case symbol_kind::S_LPAREN: // LPAREN
+      case symbol_kind::S_RPAREN: // RPAREN
+      case symbol_kind::S_LBRACKET: // LBRACKET
+      case symbol_kind::S_RBRACKET: // RBRACKET
+      case symbol_kind::S_PERIOD: // PERIOD
+      case symbol_kind::S_AMPERSAND: // AMPERSAND
+      case symbol_kind::S_EXCLAMATION: // EXCLAMATION
+      case symbol_kind::S_TILDE: // TILDE
+      case symbol_kind::S_MINUS_OP: // MINUS_OP
+      case symbol_kind::S_ADD_OP: // ADD_OP
+      case symbol_kind::S_MULT_OP: // MULT_OP
+      case symbol_kind::S_DIV_OP: // DIV_OP
+      case symbol_kind::S_MOD_OP: // MOD_OP
+      case symbol_kind::S_LT_OP: // LT_OP
+      case symbol_kind::S_GT_OP: // GT_OP
+      case symbol_kind::S_EXP_OP: // EXP_OP
+      case symbol_kind::S_PIPE: // PIPE
+      case symbol_kind::S_QUESTION: // QUESTION
+      case symbol_kind::S_TYPEDEF: // TYPEDEF
+      case symbol_kind::S_EXTERN: // EXTERN
+      case symbol_kind::S_STATIC: // STATIC
+      case symbol_kind::S_AUTO: // AUTO
+      case symbol_kind::S_REGISTER: // REGISTER
+      case symbol_kind::S_INLINE: // INLINE
+      case symbol_kind::S_RESTRICT: // RESTRICT
+      case symbol_kind::S_CHAR: // CHAR
+      case symbol_kind::S_SHORT: // SHORT
+      case symbol_kind::S_INT: // INT
+      case symbol_kind::S_LONG: // LONG
+      case symbol_kind::S_SIGNED: // SIGNED
+      case symbol_kind::S_UNSIGNED: // UNSIGNED
+      case symbol_kind::S_FLOAT: // FLOAT
+      case symbol_kind::S_DOUBLE: // DOUBLE
+      case symbol_kind::S_CONST: // CONST
+      case symbol_kind::S_VOLATILE: // VOLATILE
+      case symbol_kind::S_VOID: // VOID
+      case symbol_kind::S_BOOL: // BOOL
+      case symbol_kind::S_COMPLEX: // COMPLEX
+      case symbol_kind::S_IMAGINARY: // IMAGINARY
+      case symbol_kind::S_STRUCT: // STRUCT
+      case symbol_kind::S_UNION: // UNION
+      case symbol_kind::S_ENUM: // ENUM
+      case symbol_kind::S_ELLIPSIS: // ELLIPSIS
+      case symbol_kind::S_CASE: // CASE
+      case symbol_kind::S_DEFAULT: // DEFAULT
+      case symbol_kind::S_IF: // IF
+      case symbol_kind::S_ELSE: // ELSE
+      case symbol_kind::S_SWITCH: // SWITCH
+      case symbol_kind::S_WHILE: // WHILE
+      case symbol_kind::S_DO: // DO
+      case symbol_kind::S_FOR: // FOR
+      case symbol_kind::S_GOTO: // GOTO
+      case symbol_kind::S_CONTINUE: // CONTINUE
+      case symbol_kind::S_BREAK: // BREAK
+      case symbol_kind::S_RETURN: // RETURN
+        value.copy< std::string > (that.value);
+        break;
+
+      default:
+        break;
+    }
+
     location = that.location;
     return *this;
   }
@@ -332,7 +533,106 @@ namespace adios2 { namespace detail {
   parser::stack_symbol_type::operator= (stack_symbol_type& that)
   {
     state = that.state;
-    value = that.value;
+    switch (that.kind ())
+    {
+      case symbol_kind::S_argument_expression_list: // argument_expression_list
+        value.move< int > (that.value);
+        break;
+
+      case symbol_kind::S_IDENTIFIER: // IDENTIFIER
+      case symbol_kind::S_CONSTANT: // CONSTANT
+      case symbol_kind::S_STRING_LITERAL: // STRING_LITERAL
+      case symbol_kind::S_SIZEOF: // SIZEOF
+      case symbol_kind::S_PTR_OP: // PTR_OP
+      case symbol_kind::S_INC_OP: // INC_OP
+      case symbol_kind::S_DEC_OP: // DEC_OP
+      case symbol_kind::S_LEFT_OP: // LEFT_OP
+      case symbol_kind::S_RIGHT_OP: // RIGHT_OP
+      case symbol_kind::S_LE_OP: // LE_OP
+      case symbol_kind::S_GE_OP: // GE_OP
+      case symbol_kind::S_EQ_OP: // EQ_OP
+      case symbol_kind::S_NE_OP: // NE_OP
+      case symbol_kind::S_AND_OP: // AND_OP
+      case symbol_kind::S_OR_OP: // OR_OP
+      case symbol_kind::S_MUL_ASSIGN: // MUL_ASSIGN
+      case symbol_kind::S_DIV_ASSIGN: // DIV_ASSIGN
+      case symbol_kind::S_MOD_ASSIGN: // MOD_ASSIGN
+      case symbol_kind::S_ADD_ASSIGN: // ADD_ASSIGN
+      case symbol_kind::S_SUB_ASSIGN: // SUB_ASSIGN
+      case symbol_kind::S_LEFT_ASSIGN: // LEFT_ASSIGN
+      case symbol_kind::S_RIGHT_ASSIGN: // RIGHT_ASSIGN
+      case symbol_kind::S_AND_ASSIGN: // AND_ASSIGN
+      case symbol_kind::S_XOR_ASSIGN: // XOR_ASSIGN
+      case symbol_kind::S_OR_ASSIGN: // OR_ASSIGN
+      case symbol_kind::S_TYPE_NAME: // TYPE_NAME
+      case symbol_kind::S_SEMICOLON: // SEMICOLON
+      case symbol_kind::S_LBRACE: // LBRACE
+      case symbol_kind::S_RBRACE: // RBRACE
+      case symbol_kind::S_COMMA: // COMMA
+      case symbol_kind::S_COLON: // COLON
+      case symbol_kind::S_ASSIGN: // ASSIGN
+      case symbol_kind::S_LPAREN: // LPAREN
+      case symbol_kind::S_RPAREN: // RPAREN
+      case symbol_kind::S_LBRACKET: // LBRACKET
+      case symbol_kind::S_RBRACKET: // RBRACKET
+      case symbol_kind::S_PERIOD: // PERIOD
+      case symbol_kind::S_AMPERSAND: // AMPERSAND
+      case symbol_kind::S_EXCLAMATION: // EXCLAMATION
+      case symbol_kind::S_TILDE: // TILDE
+      case symbol_kind::S_MINUS_OP: // MINUS_OP
+      case symbol_kind::S_ADD_OP: // ADD_OP
+      case symbol_kind::S_MULT_OP: // MULT_OP
+      case symbol_kind::S_DIV_OP: // DIV_OP
+      case symbol_kind::S_MOD_OP: // MOD_OP
+      case symbol_kind::S_LT_OP: // LT_OP
+      case symbol_kind::S_GT_OP: // GT_OP
+      case symbol_kind::S_EXP_OP: // EXP_OP
+      case symbol_kind::S_PIPE: // PIPE
+      case symbol_kind::S_QUESTION: // QUESTION
+      case symbol_kind::S_TYPEDEF: // TYPEDEF
+      case symbol_kind::S_EXTERN: // EXTERN
+      case symbol_kind::S_STATIC: // STATIC
+      case symbol_kind::S_AUTO: // AUTO
+      case symbol_kind::S_REGISTER: // REGISTER
+      case symbol_kind::S_INLINE: // INLINE
+      case symbol_kind::S_RESTRICT: // RESTRICT
+      case symbol_kind::S_CHAR: // CHAR
+      case symbol_kind::S_SHORT: // SHORT
+      case symbol_kind::S_INT: // INT
+      case symbol_kind::S_LONG: // LONG
+      case symbol_kind::S_SIGNED: // SIGNED
+      case symbol_kind::S_UNSIGNED: // UNSIGNED
+      case symbol_kind::S_FLOAT: // FLOAT
+      case symbol_kind::S_DOUBLE: // DOUBLE
+      case symbol_kind::S_CONST: // CONST
+      case symbol_kind::S_VOLATILE: // VOLATILE
+      case symbol_kind::S_VOID: // VOID
+      case symbol_kind::S_BOOL: // BOOL
+      case symbol_kind::S_COMPLEX: // COMPLEX
+      case symbol_kind::S_IMAGINARY: // IMAGINARY
+      case symbol_kind::S_STRUCT: // STRUCT
+      case symbol_kind::S_UNION: // UNION
+      case symbol_kind::S_ENUM: // ENUM
+      case symbol_kind::S_ELLIPSIS: // ELLIPSIS
+      case symbol_kind::S_CASE: // CASE
+      case symbol_kind::S_DEFAULT: // DEFAULT
+      case symbol_kind::S_IF: // IF
+      case symbol_kind::S_ELSE: // ELSE
+      case symbol_kind::S_SWITCH: // SWITCH
+      case symbol_kind::S_WHILE: // WHILE
+      case symbol_kind::S_DO: // DO
+      case symbol_kind::S_FOR: // FOR
+      case symbol_kind::S_GOTO: // GOTO
+      case symbol_kind::S_CONTINUE: // CONTINUE
+      case symbol_kind::S_BREAK: // BREAK
+      case symbol_kind::S_RETURN: // RETURN
+        value.move< std::string > (that.value);
+        break;
+
+      default:
+        break;
+    }
+
     location = that.location;
     // that is emptied.
     that.state = empty_state;
@@ -346,9 +646,6 @@ namespace adios2 { namespace detail {
   {
     if (yymsg)
       YY_SYMBOL_PRINT (yymsg, yysym);
-
-    // User destructor.
-    YY_USE (yysym.kind ());
   }
 
 #if YYDEBUG
@@ -521,7 +818,8 @@ namespace adios2 { namespace detail {
         try
 #endif // YY_EXCEPTIONS
           {
-            yyla.kind_ = yytranslate_ (yylex (&yyla.value, &yyla.location, drv));
+            symbol_type yylookahead (yylex (drv));
+            yyla.move (yylookahead);
           }
 #if YY_EXCEPTIONS
         catch (const syntax_error& yyexc)
@@ -595,16 +893,109 @@ namespace adios2 { namespace detail {
     {
       stack_symbol_type yylhs;
       yylhs.state = yy_lr_goto_state_ (yystack_[yylen].state, yyr1_[yyn]);
-      /* If YYLEN is nonzero, implement the default value of the
-         action: '$$ = $1'.  Otherwise, use the top of the stack.
+      /* Variants are always initialized to an empty instance of the
+         correct type. The default '$$ = $1' action is NOT applied
+         when using variants.  */
+      switch (yyr1_[yyn])
+    {
+      case symbol_kind::S_argument_expression_list: // argument_expression_list
+        yylhs.value.emplace< int > ();
+        break;
 
-         Otherwise, the following line sets YYLHS.VALUE to garbage.
-         This behavior is undocumented and Bison users should not rely
-         upon it.  */
-      if (yylen)
-        yylhs.value = yystack_[yylen - 1].value;
-      else
-        yylhs.value = yystack_[0].value;
+      case symbol_kind::S_IDENTIFIER: // IDENTIFIER
+      case symbol_kind::S_CONSTANT: // CONSTANT
+      case symbol_kind::S_STRING_LITERAL: // STRING_LITERAL
+      case symbol_kind::S_SIZEOF: // SIZEOF
+      case symbol_kind::S_PTR_OP: // PTR_OP
+      case symbol_kind::S_INC_OP: // INC_OP
+      case symbol_kind::S_DEC_OP: // DEC_OP
+      case symbol_kind::S_LEFT_OP: // LEFT_OP
+      case symbol_kind::S_RIGHT_OP: // RIGHT_OP
+      case symbol_kind::S_LE_OP: // LE_OP
+      case symbol_kind::S_GE_OP: // GE_OP
+      case symbol_kind::S_EQ_OP: // EQ_OP
+      case symbol_kind::S_NE_OP: // NE_OP
+      case symbol_kind::S_AND_OP: // AND_OP
+      case symbol_kind::S_OR_OP: // OR_OP
+      case symbol_kind::S_MUL_ASSIGN: // MUL_ASSIGN
+      case symbol_kind::S_DIV_ASSIGN: // DIV_ASSIGN
+      case symbol_kind::S_MOD_ASSIGN: // MOD_ASSIGN
+      case symbol_kind::S_ADD_ASSIGN: // ADD_ASSIGN
+      case symbol_kind::S_SUB_ASSIGN: // SUB_ASSIGN
+      case symbol_kind::S_LEFT_ASSIGN: // LEFT_ASSIGN
+      case symbol_kind::S_RIGHT_ASSIGN: // RIGHT_ASSIGN
+      case symbol_kind::S_AND_ASSIGN: // AND_ASSIGN
+      case symbol_kind::S_XOR_ASSIGN: // XOR_ASSIGN
+      case symbol_kind::S_OR_ASSIGN: // OR_ASSIGN
+      case symbol_kind::S_TYPE_NAME: // TYPE_NAME
+      case symbol_kind::S_SEMICOLON: // SEMICOLON
+      case symbol_kind::S_LBRACE: // LBRACE
+      case symbol_kind::S_RBRACE: // RBRACE
+      case symbol_kind::S_COMMA: // COMMA
+      case symbol_kind::S_COLON: // COLON
+      case symbol_kind::S_ASSIGN: // ASSIGN
+      case symbol_kind::S_LPAREN: // LPAREN
+      case symbol_kind::S_RPAREN: // RPAREN
+      case symbol_kind::S_LBRACKET: // LBRACKET
+      case symbol_kind::S_RBRACKET: // RBRACKET
+      case symbol_kind::S_PERIOD: // PERIOD
+      case symbol_kind::S_AMPERSAND: // AMPERSAND
+      case symbol_kind::S_EXCLAMATION: // EXCLAMATION
+      case symbol_kind::S_TILDE: // TILDE
+      case symbol_kind::S_MINUS_OP: // MINUS_OP
+      case symbol_kind::S_ADD_OP: // ADD_OP
+      case symbol_kind::S_MULT_OP: // MULT_OP
+      case symbol_kind::S_DIV_OP: // DIV_OP
+      case symbol_kind::S_MOD_OP: // MOD_OP
+      case symbol_kind::S_LT_OP: // LT_OP
+      case symbol_kind::S_GT_OP: // GT_OP
+      case symbol_kind::S_EXP_OP: // EXP_OP
+      case symbol_kind::S_PIPE: // PIPE
+      case symbol_kind::S_QUESTION: // QUESTION
+      case symbol_kind::S_TYPEDEF: // TYPEDEF
+      case symbol_kind::S_EXTERN: // EXTERN
+      case symbol_kind::S_STATIC: // STATIC
+      case symbol_kind::S_AUTO: // AUTO
+      case symbol_kind::S_REGISTER: // REGISTER
+      case symbol_kind::S_INLINE: // INLINE
+      case symbol_kind::S_RESTRICT: // RESTRICT
+      case symbol_kind::S_CHAR: // CHAR
+      case symbol_kind::S_SHORT: // SHORT
+      case symbol_kind::S_INT: // INT
+      case symbol_kind::S_LONG: // LONG
+      case symbol_kind::S_SIGNED: // SIGNED
+      case symbol_kind::S_UNSIGNED: // UNSIGNED
+      case symbol_kind::S_FLOAT: // FLOAT
+      case symbol_kind::S_DOUBLE: // DOUBLE
+      case symbol_kind::S_CONST: // CONST
+      case symbol_kind::S_VOLATILE: // VOLATILE
+      case symbol_kind::S_VOID: // VOID
+      case symbol_kind::S_BOOL: // BOOL
+      case symbol_kind::S_COMPLEX: // COMPLEX
+      case symbol_kind::S_IMAGINARY: // IMAGINARY
+      case symbol_kind::S_STRUCT: // STRUCT
+      case symbol_kind::S_UNION: // UNION
+      case symbol_kind::S_ENUM: // ENUM
+      case symbol_kind::S_ELLIPSIS: // ELLIPSIS
+      case symbol_kind::S_CASE: // CASE
+      case symbol_kind::S_DEFAULT: // DEFAULT
+      case symbol_kind::S_IF: // IF
+      case symbol_kind::S_ELSE: // ELSE
+      case symbol_kind::S_SWITCH: // SWITCH
+      case symbol_kind::S_WHILE: // WHILE
+      case symbol_kind::S_DO: // DO
+      case symbol_kind::S_FOR: // FOR
+      case symbol_kind::S_GOTO: // GOTO
+      case symbol_kind::S_CONTINUE: // CONTINUE
+      case symbol_kind::S_BREAK: // BREAK
+      case symbol_kind::S_RETURN: // RETURN
+        yylhs.value.emplace< std::string > ();
+        break;
+
+      default:
+        break;
+    }
+
 
       // Default location.
       {
@@ -622,109 +1013,127 @@ namespace adios2 { namespace detail {
           switch (yyn)
             {
   case 2: // primary_expression: IDENTIFIER
-#line 78 "../parser.y"
-                     { drv.createVariableNode(yystack_[0].value); }
-#line 628 "parser.cpp"
+#line 99 "../parser.y"
+                     { drv.createVariableNode(yystack_[0].value.as < std::string > ()); }
+#line 1019 "parser.cpp"
     break;
 
   case 4: // primary_expression: CONSTANT
-#line 80 "../parser.y"
-                   { drv.createNumberNode(yystack_[0].value); }
-#line 634 "parser.cpp"
+#line 101 "../parser.y"
+                   { drv.createNumberNode(yystack_[0].value.as < std::string > ()); }
+#line 1025 "parser.cpp"
     break;
 
-  case 7: // postfix_expression: IDENTIFIER '(' argument_expression_list ')'
-#line 90 "../parser.y"
-                                                      { drv.createOperatorNode(yystack_[3].value, yystack_[1].value); }
-#line 640 "parser.cpp"
+  case 8: // postfix_expression: IDENTIFIER LPAREN argument_expression_list RPAREN
+#line 111 "../parser.y"
+                                                            { drv.createOperatorNode(yystack_[3].value.as < std::string > (), yystack_[1].value.as < int > ()); }
+#line 1031 "parser.cpp"
     break;
 
-  case 15: // multiplicative_expression: multiplicative_expression '*' cast_expression
-#line 135 "../parser.y"
-                                                        { drv.createOperatorNode(yystack_[1].value, 2); }
-#line 646 "parser.cpp"
+  case 9: // argument_expression_list: assignment_expression
+#line 123 "../parser.y"
+                                { yylhs.value.as < int > () = 1; }
+#line 1037 "parser.cpp"
     break;
 
-  case 16: // multiplicative_expression: multiplicative_expression '/' cast_expression
-#line 136 "../parser.y"
-                                                        { drv.createOperatorNode(yystack_[1].value, 2); }
-#line 652 "parser.cpp"
+  case 10: // argument_expression_list: argument_expression_list "," assignment_expression
+#line 124 "../parser.y"
+                                                             { yylhs.value.as < int > () = yystack_[2].value.as < int > () + 1; }
+#line 1043 "parser.cpp"
     break;
 
-  case 18: // additive_expression: additive_expression '+' multiplicative_expression
-#line 142 "../parser.y"
-                                                            { drv.createOperatorNode(yystack_[1].value, 2); }
-#line 658 "parser.cpp"
+  case 12: // unary_expression: MINUS_OP cast_expression
+#line 129 "../parser.y"
+                                    { drv.createOperatorNode("negate", 1); }
+#line 1049 "parser.cpp"
     break;
 
-  case 19: // additive_expression: additive_expression '-' multiplicative_expression
-#line 143 "../parser.y"
-                                                            { drv.createOperatorNode(yystack_[1].value, 2); }
-#line 664 "parser.cpp"
+  case 15: // multiplicative_expression: multiplicative_expression MULT_OP cast_expression
+#line 155 "../parser.y"
+                                                            { drv.createOperatorNode(yystack_[1].value.as < std::string > (), 2); }
+#line 1055 "parser.cpp"
     break;
 
-  case 22: // relational_expression: relational_expression '<' shift_expression
+  case 16: // multiplicative_expression: multiplicative_expression DIV_OP cast_expression
 #line 156 "../parser.y"
-                                                       { drv.createConditionNode(yystack_[1].value); }
-#line 670 "parser.cpp"
+                                                           { drv.createOperatorNode(yystack_[1].value.as < std::string > (), 2); }
+#line 1061 "parser.cpp"
     break;
 
-  case 23: // relational_expression: relational_expression '>' shift_expression
-#line 157 "../parser.y"
-                                                       { drv.createConditionNode(yystack_[1].value); }
-#line 676 "parser.cpp"
+  case 18: // additive_expression: additive_expression ADD_OP multiplicative_expression
+#line 162 "../parser.y"
+                                                               { drv.createOperatorNode(yystack_[1].value.as < std::string > (), 2); }
+#line 1067 "parser.cpp"
+    break;
+
+  case 19: // additive_expression: additive_expression MINUS_OP multiplicative_expression
+#line 163 "../parser.y"
+                                                                 { drv.createOperatorNode(yystack_[1].value.as < std::string > (), 2); }
+#line 1073 "parser.cpp"
+    break;
+
+  case 22: // relational_expression: relational_expression LT_OP shift_expression
+#line 176 "../parser.y"
+                                                         { drv.createConditionNode(yystack_[1].value.as < std::string > ()); }
+#line 1079 "parser.cpp"
+    break;
+
+  case 23: // relational_expression: relational_expression GT_OP shift_expression
+#line 177 "../parser.y"
+                                                         { drv.createConditionNode(yystack_[1].value.as < std::string > ()); }
+#line 1085 "parser.cpp"
     break;
 
   case 24: // relational_expression: relational_expression LE_OP shift_expression
-#line 158 "../parser.y"
-                                                       { drv.createConditionNode(yystack_[1].value); }
-#line 682 "parser.cpp"
+#line 178 "../parser.y"
+                                                       { drv.createConditionNode(yystack_[1].value.as < std::string > ()); }
+#line 1091 "parser.cpp"
     break;
 
   case 25: // relational_expression: relational_expression GE_OP shift_expression
-#line 159 "../parser.y"
-                                                       { drv.createConditionNode(yystack_[1].value); }
-#line 688 "parser.cpp"
+#line 179 "../parser.y"
+                                                       { drv.createConditionNode(yystack_[1].value.as < std::string > ()); }
+#line 1097 "parser.cpp"
     break;
 
   case 27: // equality_expression: equality_expression EQ_OP relational_expression
-#line 164 "../parser.y"
-                                                          { drv.createConditionNode(yystack_[1].value); }
-#line 694 "parser.cpp"
+#line 184 "../parser.y"
+                                                          { drv.createConditionNode(yystack_[1].value.as < std::string > ()); }
+#line 1103 "parser.cpp"
     break;
 
   case 28: // equality_expression: equality_expression NE_OP relational_expression
-#line 165 "../parser.y"
-                                                          { drv.createConditionNode(yystack_[1].value); }
-#line 700 "parser.cpp"
+#line 185 "../parser.y"
+                                                          { drv.createConditionNode(yystack_[1].value.as < std::string > ()); }
+#line 1109 "parser.cpp"
     break;
 
   case 33: // logical_and_expression: logical_and_expression AND_OP inclusive_or_expression
-#line 188 "../parser.y"
-                                                                { drv.createRelationNode(yystack_[1].value); }
-#line 706 "parser.cpp"
+#line 208 "../parser.y"
+                                                                { drv.createRelationNode(yystack_[1].value.as < std::string > ()); }
+#line 1115 "parser.cpp"
     break;
 
   case 35: // logical_or_expression: logical_or_expression OR_OP logical_and_expression
-#line 193 "../parser.y"
-                                                             { drv.createRelationNode(yystack_[1].value); }
-#line 712 "parser.cpp"
+#line 213 "../parser.y"
+                                                             { drv.createRelationNode(yystack_[1].value.as < std::string > ()); }
+#line 1121 "parser.cpp"
     break;
 
-  case 39: // assignment: IDENTIFIER '=' STRING_LITERAL
-#line 228 "../parser.y"
-                                        { drv.add_lookup_entry(yystack_[2].value,  yystack_[0].value); }
-#line 718 "parser.cpp"
+  case 39: // assignment: IDENTIFIER ASSIGN STRING_LITERAL
+#line 248 "../parser.y"
+                                           { drv.add_lookup_entry(yystack_[2].value.as < std::string > (),  yystack_[0].value.as < std::string > ()); }
+#line 1127 "parser.cpp"
     break;
 
-  case 40: // assignment: IDENTIFIER '=' IDENTIFIER
-#line 229 "../parser.y"
-                                        { drv.add_lookup_entry(yystack_[2].value,  yystack_[0].value); }
-#line 724 "parser.cpp"
+  case 40: // assignment: IDENTIFIER ASSIGN IDENTIFIER
+#line 249 "../parser.y"
+                                           { drv.add_lookup_entry(yystack_[2].value.as < std::string > (),  yystack_[0].value.as < std::string > ()); }
+#line 1133 "parser.cpp"
     break;
 
 
-#line 728 "parser.cpp"
+#line 1137 "parser.cpp"
 
             default:
               break;
@@ -913,15 +1322,17 @@ namespace adios2 { namespace detail {
   "RIGHT_OP", "LE_OP", "GE_OP", "EQ_OP", "NE_OP", "AND_OP", "OR_OP",
   "MUL_ASSIGN", "DIV_ASSIGN", "MOD_ASSIGN", "ADD_ASSIGN", "SUB_ASSIGN",
   "LEFT_ASSIGN", "RIGHT_ASSIGN", "AND_ASSIGN", "XOR_ASSIGN", "OR_ASSIGN",
-  "TYPE_NAME", "TYPEDEF", "EXTERN", "STATIC", "AUTO", "REGISTER", "INLINE",
-  "RESTRICT", "CHAR", "SHORT", "INT", "LONG", "SIGNED", "UNSIGNED",
-  "FLOAT", "DOUBLE", "CONST", "VOLATILE", "VOID", "BOOL", "COMPLEX",
-  "IMAGINARY", "STRUCT", "UNION", "ENUM", "ELLIPSIS", "CASE", "DEFAULT",
-  "IF", "ELSE", "SWITCH", "WHILE", "DO", "FOR", "GOTO", "CONTINUE",
-  "BREAK", "RETURN", "@", "'('", "')'", "','", "'-'", "'*'", "'/'", "'+'",
-  "'<'", "'>'", "'='", "';'", "$accept", "primary_expression",
-  "postfix_expression", "argument_expression_list", "unary_expression",
-  "unary_operator", "cast_expression", "multiplicative_expression",
+  "TYPE_NAME", "SEMICOLON", "LBRACE", "RBRACE", "COMMA", "COLON", "ASSIGN",
+  "LPAREN", "RPAREN", "LBRACKET", "RBRACKET", "PERIOD", "AMPERSAND",
+  "EXCLAMATION", "TILDE", "MINUS_OP", "ADD_OP", "MULT_OP", "DIV_OP",
+  "MOD_OP", "LT_OP", "GT_OP", "EXP_OP", "PIPE", "QUESTION", "TYPEDEF",
+  "EXTERN", "STATIC", "AUTO", "REGISTER", "INLINE", "RESTRICT", "CHAR",
+  "SHORT", "INT", "LONG", "SIGNED", "UNSIGNED", "FLOAT", "DOUBLE", "CONST",
+  "VOLATILE", "VOID", "BOOL", "COMPLEX", "IMAGINARY", "STRUCT", "UNION",
+  "ENUM", "ELLIPSIS", "CASE", "DEFAULT", "IF", "ELSE", "SWITCH", "WHILE",
+  "DO", "FOR", "GOTO", "CONTINUE", "BREAK", "RETURN", "@", ",", "$accept",
+  "primary_expression", "postfix_expression", "argument_expression_list",
+  "unary_expression", "cast_expression", "multiplicative_expression",
   "additive_expression", "shift_expression", "relational_expression",
   "equality_expression", "and_expression", "exclusive_or_expression",
   "inclusive_or_expression", "logical_and_expression",
@@ -1195,106 +1606,110 @@ namespace adios2 { namespace detail {
   }
 
 
-  const signed char parser::yypact_ninf_ = -63;
+  const signed char parser::yypact_ninf_ = -29;
 
   const signed char parser::yytable_ninf_ = -1;
 
   const signed char
   parser::yypact_[] =
   {
-      -3,   -62,   -63,     2,   -52,   -63,   -63,   -63,   -63,    -1,
-     -63,   -51,   -55,   -63,    -4,     8,   -63,   -63,   -63,    16,
-      17,   -63,   -63,   -63,   -42,    33,    -1,    14,   -63,   -63,
-     -31,   -63,    -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,
-      -1,    -1,    -1,    -1,    -3,   -63,   -44,   -63,   -63,   -63,
-     -63,   -63,   -51,   -51,   -63,   -63,   -63,   -63,    -4,    -4,
-     -63,    16,   -63,   -63,    -1,   -63
+       1,   -18,   -29,    -3,     3,    31,   -29,   -29,   -29,   -29,
+     -21,   -14,   -29,     2,    12,   -29,   -29,   -29,    -4,    20,
+     -29,   -29,   -29,    -1,    39,     8,     3,     6,   -29,     7,
+     -29,   -29,     3,     3,     3,     3,     3,     3,     3,     3,
+       3,     3,     3,     3,     1,   -29,   -29,   -29,   -29,   -28,
+     -29,   -29,   -29,   -29,   -21,   -21,   -29,   -29,   -29,   -29,
+       2,     2,   -29,    -4,   -29,   -29,     3,   -29
   };
 
   const signed char
   parser::yydefact_[] =
   {
-       0,     2,     4,     0,     0,    12,     6,    10,    13,     0,
-      14,    17,    20,    21,    26,    29,    30,    31,    32,    34,
-      36,    37,    38,    42,     0,     0,     0,     0,     3,     5,
-       2,    11,     0,     0,     0,     0,     0,     0,     0,     0,
-       0,     0,     0,     0,     0,     1,     0,     8,    40,    39,
-      15,    16,    19,    18,    24,    25,    22,    23,    27,    28,
-      33,    35,    41,     7,     0,     9
+       0,     2,     4,     0,     0,     0,     7,    11,    13,    14,
+      17,    20,    21,    26,    29,    30,    31,    32,    34,    36,
+      37,    38,    43,     0,     0,     0,     0,     2,     6,     0,
+      12,     3,     0,     0,     0,     0,     0,     0,     0,     0,
+       0,     0,     0,     0,     0,    41,     1,    40,    39,     0,
+       9,     5,    15,    16,    19,    18,    24,    25,    22,    23,
+      27,    28,    33,    35,    42,     8,     0,    10
   };
 
   const signed char
   parser::yypgoto_[] =
   {
-     -63,   -63,   -63,   -63,   -63,   -63,    -2,    -8,   -63,   -26,
-     -12,   -63,   -63,   -63,    -5,     0,   -63,   -63,   -22,   -63,
-     -63,    -6
+     -29,   -29,   -29,   -29,   -29,    15,    18,   -29,   -16,    14,
+     -29,   -29,   -29,   -24,    13,   -29,   -29,   -17,    42,   -29,
+     -13
   };
 
   const signed char
   parser::yydefgoto_[] =
   {
-       0,     6,     7,    46,     8,     9,    10,    11,    12,    13,
+       0,     6,     7,    49,     8,     9,    10,    11,    12,    13,
       14,    15,    16,    17,    18,    19,    20,    21,    22,    23,
-      24,    25
+      24
   };
 
   const signed char
   parser::yytable_[] =
   {
-       1,     2,    30,     2,    47,    26,    28,    31,    36,    37,
-      54,    55,    56,    57,    27,    34,    29,    48,    35,    49,
-      32,    33,    40,    41,    63,    64,    52,    53,    58,    59,
-      50,    51,    42,    45,    43,    44,    26,    60,    62,     0,
-       0,     0,    65,    61,     0,     0,     0,     0,     0,     0,
+      27,     2,     1,     2,     1,     2,    27,     2,    65,    50,
+      45,    47,    42,    48,    36,    37,    25,    26,    62,    30,
+      56,    57,    58,    59,    32,    33,    40,    41,    44,    34,
+      35,    64,     3,    28,     3,    31,     3,    43,     3,    46,
+       4,    26,     4,    51,     4,    29,     4,    52,    53,    67,
+      38,    39,    54,    55,    60,    61,    63,     0,     0,     0,
+       0,     0,     0,    66,     0,     0,     0,     0,     0,     0,
        0,     0,     0,     0,     0,     0,     0,     0,     0,     0,
-       0,     0,     0,     3,     4,     3,     4,     5,     0,     5,
-      38,    39
+       0,     0,     0,     0,     0,     0,     0,     5,     0,     5,
+       0,     5,     0,     5
   };
 
   const signed char
   parser::yycheck_[] =
   {
-       3,     4,     3,     4,    26,    67,     4,     9,    12,    13,
-      36,    37,    38,    39,    76,    70,    68,     3,    73,     5,
-      71,    72,    14,    15,    68,    69,    34,    35,    40,    41,
-      32,    33,    16,     0,    17,    77,    67,    42,    44,    -1,
-      -1,    -1,    64,    43,    -1,    -1,    -1,    -1,    -1,    -1,
+       3,     4,     3,     4,     3,     4,     3,     4,    36,    26,
+      23,     3,    16,     5,    12,    13,    34,    35,    42,     4,
+      36,    37,    38,    39,    45,    46,    14,    15,    29,    43,
+      44,    44,    35,    36,    35,     4,    35,    17,    35,     0,
+      43,    35,    43,    36,    43,     3,    43,    32,    33,    66,
+      48,    49,    34,    35,    40,    41,    43,    -1,    -1,    -1,
+      -1,    -1,    -1,    91,    -1,    -1,    -1,    -1,    -1,    -1,
       -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,
-      -1,    -1,    -1,    66,    67,    66,    67,    70,    -1,    70,
-      74,    75
+      -1,    -1,    -1,    -1,    -1,    -1,    -1,    90,    -1,    90,
+      -1,    90,    -1,    90
   };
 
   const signed char
   parser::yystos_[] =
   {
-       0,     3,     4,    66,    67,    70,    79,    80,    82,    83,
-      84,    85,    86,    87,    88,    89,    90,    91,    92,    93,
-      94,    95,    96,    97,    98,    99,    67,    76,     4,    68,
-       3,    84,    71,    72,    70,    73,    12,    13,    74,    75,
-      14,    15,    16,    17,    77,     0,    81,    96,     3,     5,
-      84,    84,    85,    85,    87,    87,    87,    87,    88,    88,
-      92,    93,    99,    68,    69,    96
+       0,     3,     4,    35,    43,    90,    93,    94,    96,    97,
+      98,    99,   100,   101,   102,   103,   104,   105,   106,   107,
+     108,   109,   110,   111,   112,    34,    35,     3,    36,   110,
+      97,     4,    45,    46,    43,    44,    12,    13,    48,    49,
+      14,    15,    16,    17,    29,   112,     0,     3,     5,    95,
+     109,    36,    97,    97,    98,    98,   100,   100,   100,   100,
+     101,   101,   105,   106,   112,    36,    91,   109
   };
 
   const signed char
   parser::yyr1_[] =
   {
-       0,    78,    79,    79,    79,    79,    80,    80,    81,    81,
-      82,    82,    83,    84,    85,    85,    85,    86,    86,    86,
-      87,    88,    88,    88,    88,    88,    89,    89,    89,    90,
-      91,    92,    93,    93,    94,    94,    95,    96,    97,    98,
-      98,    99,    99
+       0,    92,    93,    93,    93,    93,    93,    94,    94,    95,
+      95,    96,    96,    97,    98,    98,    98,    99,    99,    99,
+     100,   101,   101,   101,   101,   101,   102,   102,   102,   103,
+     104,   105,   106,   106,   107,   107,   108,   109,   110,   111,
+     111,   112,   112,   112
   };
 
   const signed char
   parser::yyr2_[] =
   {
-       0,     2,     1,     2,     1,     2,     1,     4,     1,     3,
-       1,     2,     1,     1,     1,     3,     3,     1,     3,     3,
+       0,     2,     1,     2,     1,     3,     2,     1,     4,     1,
+       3,     1,     2,     1,     1,     3,     3,     1,     3,     3,
        1,     1,     3,     3,     3,     3,     1,     3,     3,     1,
        1,     1,     1,     3,     1,     3,     1,     1,     1,     3,
-       3,     3,     1
+       3,     2,     3,     1
   };
 
 
@@ -1304,11 +1719,11 @@ namespace adios2 { namespace detail {
   const unsigned char
   parser::yyrline_[] =
   {
-       0,    78,    78,    79,    80,    83,    87,    90,   102,   103,
-     107,   110,   116,   129,   134,   135,   136,   141,   142,   143,
-     148,   155,   156,   157,   158,   159,   163,   164,   165,   170,
-     176,   182,   187,   188,   192,   193,   197,   202,   223,   228,
-     229,   233,   234
+       0,    99,    99,   100,   101,   103,   104,   108,   111,   123,
+     124,   128,   129,   149,   154,   155,   156,   161,   162,   163,
+     168,   175,   176,   177,   178,   179,   183,   184,   185,   190,
+     196,   202,   207,   208,   212,   213,   217,   222,   243,   248,
+     249,   253,   254,   255
   };
 
   void
@@ -1338,65 +1753,12 @@ namespace adios2 { namespace detail {
   }
 #endif // YYDEBUG
 
-  parser::symbol_kind_type
-  parser::yytranslate_ (int t) YY_NOEXCEPT
-  {
-    // YYTRANSLATE[TOKEN-NUM] -- Symbol number corresponding to
-    // TOKEN-NUM as returned by yylex.
-    static
-    const signed char
-    translate_table[] =
-    {
-       0,     2,     2,     2,     2,     2,     2,     2,     2,     2,
-       2,     2,     2,     2,     2,     2,     2,     2,     2,     2,
-       2,     2,     2,     2,     2,     2,     2,     2,     2,     2,
-       2,     2,     2,     2,     2,     2,     2,     2,     2,     2,
-      67,    68,    71,    73,    69,    70,     2,    72,     2,     2,
-       2,     2,     2,     2,     2,     2,     2,     2,     2,    77,
-      74,    76,    75,     2,     2,     2,     2,     2,     2,     2,
-       2,     2,     2,     2,     2,     2,     2,     2,     2,     2,
-       2,     2,     2,     2,     2,     2,     2,     2,     2,     2,
-       2,     2,     2,     2,     2,     2,     2,     2,     2,     2,
-       2,     2,     2,     2,     2,     2,     2,     2,     2,     2,
-       2,     2,     2,     2,     2,     2,     2,     2,     2,     2,
-       2,     2,     2,     2,     2,     2,     2,     2,     2,     2,
-       2,     2,     2,     2,     2,     2,     2,     2,     2,     2,
-       2,     2,     2,     2,     2,     2,     2,     2,     2,     2,
-       2,     2,     2,     2,     2,     2,     2,     2,     2,     2,
-       2,     2,     2,     2,     2,     2,     2,     2,     2,     2,
-       2,     2,     2,     2,     2,     2,     2,     2,     2,     2,
-       2,     2,     2,     2,     2,     2,     2,     2,     2,     2,
-       2,     2,     2,     2,     2,     2,     2,     2,     2,     2,
-       2,     2,     2,     2,     2,     2,     2,     2,     2,     2,
-       2,     2,     2,     2,     2,     2,     2,     2,     2,     2,
-       2,     2,     2,     2,     2,     2,     2,     2,     2,     2,
-       2,     2,     2,     2,     2,     2,     2,     2,     2,     2,
-       2,     2,     2,     2,     2,     2,     2,     2,     2,     2,
-       2,     2,     2,     2,     2,     2,     1,     2,     3,     4,
-       5,     6,     7,     8,     9,    10,    11,    12,    13,    14,
-      15,    16,    17,    18,    19,    20,    21,    22,    23,    24,
-      25,    26,    27,    28,    29,    30,    31,    32,    33,    34,
-      35,    36,    37,    38,    39,    40,    41,    42,    43,    44,
-      45,    46,    47,    48,    49,    50,    51,    52,    53,    54,
-      55,    56,    57,    58,    59,    60,    61,    62,    63,    64,
-      65,    66
-    };
-    // Last valid token kind.
-    const int code_max = 321;
-
-    if (t <= 0)
-      return symbol_kind::S_YYEOF;
-    else if (t <= code_max)
-      return static_cast <symbol_kind_type> (translate_table[t]);
-    else
-      return symbol_kind::S_YYUNDEF;
-  }
 
 #line 6 "../parser.y"
 } } // adios2::detail
-#line 1398 "parser.cpp"
+#line 1760 "parser.cpp"
 
-#line 285 "../parser.y"
+#line 306 "../parser.y"
 
 #include <stdio.h>
 
@@ -1412,5 +1774,5 @@ void yyerror(char const *s)
 void
 adios2::detail::parser::error (const location_type& l, const std::string& m)
 {
-  std::cerr << l << ": " << m << '\n';
+  std::cerr << l << ": " << m << "\n";
 }

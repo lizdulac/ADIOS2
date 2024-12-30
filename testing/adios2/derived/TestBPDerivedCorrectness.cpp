@@ -34,11 +34,19 @@ TEST_P(DerivedCorrectnessP, ParserTest)
     const size_t N = 10;
     auto U = bpOut.DefineVariable<float>("var1", {N}, {0}, {N});
     auto V = bpOut.DefineVariable<float>("var2", {N}, {0}, {N});
-    bpOut.DefineDerivedVariable("constAdd", "x= var1 \n x + 1", mode);
-    bpOut.DefineDerivedVariable("constMult", "x= var1 \n y= var2 \n 2 * x * y * 5", mode);
+    bpOut.DefineDerivedVariable("constAdd", "x = var1 \n x + 1", mode);
+    bpOut.DefineDerivedVariable("constMult", "x= var1 ;\n y= var2; 2 * x * y * 5", mode);
+
+    // Queries - result in error - cannot translate to ExpressionTree
+    bpOut.DefineDerivedVariable("queryComplex", "x = var1; y =var2;\n (x> 0 && (-1.5 < y < 1.5)) || y <20 &&y >2", mode);
+    bpOut.DefineDerivedVariable("queryRelation", "x = var1; y =var2;\n (x>=0) && (-1.5 < y < 1.5)", mode);
+    bpOut.DefineDerivedVariable("querySimple", "x = var1 x <0", mode);
+    
     //bpOut.DefineDerivedVariable("Index", "x= var1 \n y= var2 \n x[1:5:2]", mode);
     //bpOut.DefineDerivedVariable("SubexprConst", "x= var1 \n y= var2 \n ((x + 5.9) * (-7.8 - y))/2", mode);
-    bpOut.DefineDerivedVariable("SubexprConst", "x= var1 \n y= var2 \n ((x + 5) * (-7 - y)) * 2", mode);
+    
+    // error - negate not implemented operation
+    bpOut.DefineDerivedVariable("SubexprConst2", "x= var1;y= var2 \n ((x + 5) * (-7 - y)) * 2", mode);
 }
 
 /*

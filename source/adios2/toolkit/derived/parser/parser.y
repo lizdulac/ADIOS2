@@ -2,10 +2,10 @@
 %require "3.8.2"
 %header
 
- //%define api.token.raw
+%define api.token.raw
 %define api.namespace {adios2::detail}
-//%define api.token.constructor
-%define api.value.type {std::string}
+%define api.token.constructor
+%define api.value.type variant
 %define parse.assert
 
 %code requires {
@@ -37,6 +37,26 @@
 
 %define api.token.prefix {TOK_}
 
+%token <std::string> IDENTIFIER CONSTANT STRING_LITERAL SIZEOF
+%token <std::string> PTR_OP INC_OP DEC_OP LEFT_OP RIGHT_OP LE_OP GE_OP EQ_OP NE_OP
+%token <std::string> AND_OP OR_OP MUL_ASSIGN DIV_ASSIGN MOD_ASSIGN ADD_ASSIGN
+%token <std::string> SUB_ASSIGN LEFT_ASSIGN RIGHT_ASSIGN AND_ASSIGN
+%token <std::string> XOR_ASSIGN OR_ASSIGN TYPE_NAME
+%token <std::string> SEMICOLON LBRACE RBRACE COMMA COLON ASSIGN LPAREN RPAREN LBRACKET RBRACKET
+%token <std::string> PERIOD AMPERSAND EXCLAMATION TILDE
+%token <std::string> MINUS_OP ADD_OP MULT_OP DIV_OP MOD_OP
+%token <std::string> LT_OP GT_OP EXP_OP PIPE QUESTION
+
+%token <std::string> TYPEDEF EXTERN STATIC AUTO REGISTER INLINE RESTRICT
+%token <std::string> CHAR SHORT INT LONG SIGNED UNSIGNED FLOAT DOUBLE CONST VOLATILE VOID
+%token <std::string> BOOL COMPLEX IMAGINARY
+%token <std::string> STRUCT UNION ENUM ELLIPSIS
+
+%token <std::string> CASE DEFAULT IF ELSE SWITCH WHILE DO FOR GOTO CONTINUE BREAK RETURN
+
+%nterm <int> argument_expression_list
+ /*primary_expression postfix_expression argument_expression_list unary_expression unary_operator cast_expression multiplicative_expression additive_expression shift_expression relational_expression equality_expression and_expression exclusive_or_expression inclusive_or_expression logical_and_expression logical_or_expression conditional_expression assignment_expression expression
+   
 %token IDENTIFIER CONSTANT STRING_LITERAL SIZEOF
 %token PTR_OP INC_OP DEC_OP LEFT_OP RIGHT_OP LE_OP GE_OP EQ_OP NE_OP
 %token AND_OP OR_OP MUL_ASSIGN DIV_ASSIGN MOD_ASSIGN ADD_ASSIGN
@@ -49,6 +69,7 @@
 %token STRUCT UNION ENUM ELLIPSIS
 
 %token CASE DEFAULT IF ELSE SWITCH WHILE DO FOR GOTO CONTINUE BREAK RETURN
+*/
 
 /*
 %token
@@ -79,68 +100,67 @@ primary_expression
 	| "@" CONSTANT // throw error if not int
 	| CONSTANT { drv.createNumberNode($1); }
  //	| STRING_LITERAL
- //	| '(' expression ')'
-	| '('  ')'
+ 	| LPAREN expression RPAREN
+	| LPAREN  RPAREN
 	;
 
 postfix_expression
 	: primary_expression
-//  ?	| postfix_expression '[' expression ']'
-//	| IDENTIFIER '(' ')'
-	| IDENTIFIER '(' argument_expression_list ')' { drv.createOperatorNode($1, $3); }
-	  /*	| postfix_expression '(' ')'
-	| postfix_expression '(' argument_expression_list ')'
-     	| postfix_expression '.' IDENTIFIER
+//  ?	| postfix_expression "[" expression "]"
+//	| IDENTIFIER "(" ")"
+	| IDENTIFIER LPAREN argument_expression_list RPAREN { drv.createOperatorNode($1, $3); }
+	  /*	| postfix_expression "(" ")"
+	| postfix_expression "(" argument_expression_list ")"
+     	| postfix_expression "." IDENTIFIER
 	| postfix_expression PTR_OP IDENTIFIER
 	| postfix_expression INC_OP
 	| postfix_expression DEC_OP
-	| '(' type_name ')' '{' initializer_list '}'
-	| '(' type_name ')' '{' initializer_list ',' '}'*/
+	| "(" type_name ")" "{" initializer_list "}"
+	| "(" type_name ")" "{" initializer_list "," "}"*/
 	;
 
 argument_expression_list
-	: assignment_expression
-	| argument_expression_list ',' assignment_expression
+        : assignment_expression { $$ = 1; }
+        | argument_expression_list "," assignment_expression { $$ = $1 + 1; }
 	;
 
 unary_expression
 	: postfix_expression
+	| MINUS_OP cast_expression  { drv.createOperatorNode("negate", 1); }
 	  /*	| INC_OP unary_expression
-		| DEC_OP unary_expression */
+		| DEC_OP unary_expression
 	| unary_operator cast_expression
-	  /*	| SIZEOF unary_expression
-		| SIZEOF '(' type_name ')'*/
+	 	| SIZEOF unary_expression
+		| SIZEOF "(" type_name ")"*/
 	;
 
+/*
 unary_operator
-	: '-'
-	;
-	  /*
-	: '&'
-	| '*'
-	| '+'
-	| '-'
-	| '~'
-	| '!'
+	: "&"
+	| "*"
+	| "+"
+	| "-"
+	| "~"
+	| "!"
 	;
 	  */
 // not used
 cast_expression
 	: unary_expression
-	  //	| '(' type_name ')' cast_expression
+	  //	| "(" type_name ")" cast_expression
 	;
 
 multiplicative_expression
 	: cast_expression
-	| multiplicative_expression '*' cast_expression { drv.createOperatorNode($2, 2); }
-	| multiplicative_expression '/' cast_expression { drv.createOperatorNode($2, 2); }
-//	| multiplicative_expression '%' cast_expression
+	| multiplicative_expression MULT_OP cast_expression { drv.createOperatorNode($2, 2); }
+	| multiplicative_expression DIV_OP cast_expression { drv.createOperatorNode($2, 2); }
+//	| multiplicative_expression "%" cast_expression
 	;
 
 additive_expression
 	: multiplicative_expression
-	| additive_expression '+' multiplicative_expression { drv.createOperatorNode($2, 2); }
-	| additive_expression '-' multiplicative_expression { drv.createOperatorNode($2, 2); }
+	| additive_expression ADD_OP multiplicative_expression { drv.createOperatorNode($2, 2); }
+        | additive_expression MINUS_OP multiplicative_expression { drv.createOperatorNode($2, 2); }
 	;
 
 // not used
@@ -153,8 +173,8 @@ shift_expression
 
 relational_expression
 	: shift_expression
-	| relational_expression '<' shift_expression   { drv.createConditionNode($2); }
-	| relational_expression '>' shift_expression   { drv.createConditionNode($2); }
+	| relational_expression LT_OP shift_expression   { drv.createConditionNode($2); }
+	| relational_expression GT_OP shift_expression   { drv.createConditionNode($2); }
 	| relational_expression LE_OP shift_expression { drv.createConditionNode($2); }
 	| relational_expression GE_OP shift_expression { drv.createConditionNode($2); }
 	;
@@ -168,19 +188,19 @@ equality_expression
 // not used
 and_expression
 	: equality_expression
-//	| and_expression '&' equality_expression
+//	| and_expression "&" equality_expression
 	;
 
 // not used
 exclusive_or_expression
 	: and_expression
-//	| exclusive_or_expression '^' and_expression
+//	| exclusive_or_expression "^" and_expression
 	;
 
 // not used
 inclusive_or_expression
 	: exclusive_or_expression
-//	| inclusive_or_expression '|' exclusive_or_expression
+//	| inclusive_or_expression "|" exclusive_or_expression
 	;
 
 logical_and_expression
@@ -195,7 +215,7 @@ logical_or_expression
 
 conditional_expression
 	: logical_or_expression
-	  //	| logical_or_expression '?' expression ':' conditional_expression
+	  //	| logical_or_expression "?" expression ":" conditional_expression
 	;
 
 assignment_expression
@@ -205,7 +225,7 @@ assignment_expression
 
 /*
 assignment_operator
-	: '='
+	: "="
 	| MUL_ASSIGN
 	| DIV_ASSIGN
 	| MOD_ASSIGN
@@ -221,16 +241,17 @@ assignment_operator
 
 expression
 	: assignment_expression
-	  //	| expression ',' assignment_expression
+	  //	| expression "," assignment_expression
 	;
 
 assignment
-	: IDENTIFIER '=' STRING_LITERAL { drv.add_lookup_entry($1,  $3); }
-	| IDENTIFIER '=' IDENTIFIER     { drv.add_lookup_entry($1,  $3); }
+	: IDENTIFIER ASSIGN STRING_LITERAL { drv.add_lookup_entry($1,  $3); }
+	| IDENTIFIER ASSIGN IDENTIFIER     { drv.add_lookup_entry($1,  $3); }
 	;
 
 start_node
-	: assignment ';' start_node
+	: assignment start_node
+	| assignment SEMICOLON start_node
 	| expression
 	;
 
@@ -297,5 +318,5 @@ void yyerror(char const *s)
 void
 adios2::detail::parser::error (const location_type& l, const std::string& m)
 {
-  std::cerr << l << ": " << m << '\n';
+  std::cerr << l << ": " << m << "\n";
 }

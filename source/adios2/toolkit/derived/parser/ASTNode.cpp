@@ -1,5 +1,7 @@
 #include "ASTNode.h"
 
+#include <iostream>
+
 namespace adios2
 {
 namespace detail
@@ -147,8 +149,8 @@ std::string ConditionNode::printpretty(std::string indent)
 {
     std::string result = indent + "Conditional Node: " + condition + "\n";
 
-    subexpr1->printpretty(indent + "    ");
-    subexpr2->printpretty(indent + "    ");
+    result += subexpr1->printpretty(indent + "    ");
+    result += subexpr2->printpretty(indent + "    ");
 
     return result;
 }

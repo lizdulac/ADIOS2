@@ -591,7 +591,7 @@ int yy_flex_debug = 0;
 #define YY_RESTORE_YY_MORE_OFFSET
 char *yytext;
 #line 1 "../lexer.l"
-#line 10 "../lexer.l"
+#line 2 "../lexer.l"
 #include <cerrno>
 #include <cstdlib>
 #include <limits.h>
@@ -614,7 +614,7 @@ char *yytext;
 
 void count(void);
 #line 616 "lexer.cpp"
-#line 34 "../lexer.l"
+#line 26 "../lexer.l"
 #if defined __clang__
 # define CLANG_VERSION (__clang_major__ * 100 + __clang_minor__)
 #endif
@@ -685,12 +685,12 @@ void count(void);
 #endif
 #line 686 "lexer.cpp"
 #define YY_NO_INPUT 1
-#line 107 "../lexer.l"
+#line 99 "../lexer.l"
   // A number symbol corresponding to the value in S.
   adios2::detail::parser::symbol_type
   make_INT (const std::string &s, const adios2::detail::parser::location_type& loc);
 #line 692 "lexer.cpp"
-#line 119 "../lexer.l"
+#line 113 "../lexer.l"
   // Code run each time a pattern is matched.
   # define YY_USER_ACTION  loc.columns (yyleng);
 #line 696 "lexer.cpp"
@@ -909,10 +909,10 @@ YY_DECL
 		}
 
 	{
-#line 122 "../lexer.l"
+#line 116 "../lexer.l"
 
 
-#line 125 "../lexer.l"
+#line 119 "../lexer.l"
   // A handy shortcut to the location held by the adios2::detail::ASTDriver.
   adios2::detail::location& loc = drv.location;
   // Code run each time yylex is called.
@@ -974,323 +974,325 @@ do_action:	/* This label is used only to access EOF actions. */
 
 case 1:
 YY_RULE_SETUP
-#line 131 "../lexer.l"
-{ comment(); }
+#line 125 "../lexer.l"
+{ /*comment();*/ }
 	YY_BREAK
 case 2:
 YY_RULE_SETUP
-#line 132 "../lexer.l"
+#line 126 "../lexer.l"
 { /* consume //-comment */ }
 	YY_BREAK
 case 3:
 YY_RULE_SETUP
-#line 135 "../lexer.l"
-{ count(); return(check_type()); }
+#line 129 "../lexer.l"
+{ count(); return adios2::detail::parser::make_IDENTIFIER(yytext, loc); }
 	YY_BREAK
 case 4:
 YY_RULE_SETUP
-#line 137 "../lexer.l"
-{ count(); return(CONSTANT); }
+#line 131 "../lexer.l"
+{ count(); return adios2::detail::parser::make_CONSTANT(yytext, loc); }
 	YY_BREAK
 case 5:
 YY_RULE_SETUP
-#line 138 "../lexer.l"
-{ count(); return(CONSTANT); }
+#line 132 "../lexer.l"
+{ count(); return adios2::detail::parser::make_CONSTANT(yytext, loc); }
 	YY_BREAK
 case 6:
 YY_RULE_SETUP
-#line 139 "../lexer.l"
-{ count(); return(CONSTANT); }
+#line 133 "../lexer.l"
+{ count(); return adios2::detail::parser::make_CONSTANT(yytext, loc); }
 	YY_BREAK
 case 7:
 YY_RULE_SETUP
-#line 140 "../lexer.l"
-{ count(); return(CONSTANT); }
+#line 134 "../lexer.l"
+{ count(); return adios2::detail::parser::make_CONSTANT(yytext, loc); }
 	YY_BREAK
 case 8:
 YY_RULE_SETUP
-#line 142 "../lexer.l"
-{ count(); return(CONSTANT); }
+#line 136 "../lexer.l"
+{ count(); return adios2::detail::parser::make_CONSTANT(yytext, loc); }
 	YY_BREAK
 case 9:
 YY_RULE_SETUP
-#line 143 "../lexer.l"
-{ count(); return(CONSTANT); }
+#line 137 "../lexer.l"
+{ count(); return adios2::detail::parser::make_CONSTANT(yytext, loc); }
 	YY_BREAK
 case 10:
 YY_RULE_SETUP
-#line 144 "../lexer.l"
-{ count(); return(CONSTANT); }
+#line 138 "../lexer.l"
+{ count(); return adios2::detail::parser::make_CONSTANT(yytext, loc); }
 	YY_BREAK
 case 11:
 YY_RULE_SETUP
-#line 145 "../lexer.l"
-{ count(); return(CONSTANT); }
+#line 139 "../lexer.l"
+{ count(); return adios2::detail::parser::make_CONSTANT(yytext, loc); }
 	YY_BREAK
 case 12:
 YY_RULE_SETUP
-#line 146 "../lexer.l"
-{ count(); return(CONSTANT); }
+#line 140 "../lexer.l"
+{ count(); return adios2::detail::parser::make_CONSTANT(yytext, loc); }
 	YY_BREAK
 case 13:
 YY_RULE_SETUP
-#line 147 "../lexer.l"
-{ count(); return(CONSTANT); }
+#line 141 "../lexer.l"
+{ count(); return adios2::detail::parser::make_CONSTANT(yytext, loc); }
 	YY_BREAK
 case 14:
 YY_RULE_SETUP
-#line 150 "../lexer.l"
-{ count(); return(STRING_LITERAL); }
+#line 144 "../lexer.l"
+{ count(); return adios2::detail::parser::make_STRING_LITERAL(yytext, loc); }
 	YY_BREAK
 case 15:
 YY_RULE_SETUP
-#line 152 "../lexer.l"
-{ count(); return(ELLIPSIS); }
+#line 146 "../lexer.l"
+{ count(); return adios2::detail::parser::make_ELLIPSIS(yytext, loc); }
 	YY_BREAK
 case 16:
 YY_RULE_SETUP
-#line 153 "../lexer.l"
-{ count(); return(RIGHT_ASSIGN); }
+#line 147 "../lexer.l"
+{ count(); return adios2::detail::parser::make_RIGHT_ASSIGN(yytext, loc); }
 	YY_BREAK
 case 17:
 YY_RULE_SETUP
-#line 154 "../lexer.l"
-{ count(); return(LEFT_ASSIGN); }
+#line 148 "../lexer.l"
+{ count(); return adios2::detail::parser::make_LEFT_ASSIGN(yytext, loc); }
 	YY_BREAK
 case 18:
 YY_RULE_SETUP
-#line 155 "../lexer.l"
-{ count(); return(ADD_ASSIGN); }
+#line 149 "../lexer.l"
+{ count(); return adios2::detail::parser::make_ADD_ASSIGN(yytext, loc); }
 	YY_BREAK
 case 19:
 YY_RULE_SETUP
-#line 156 "../lexer.l"
-{ count(); return(SUB_ASSIGN); }
+#line 150 "../lexer.l"
+{ count(); return adios2::detail::parser::make_SUB_ASSIGN(yytext, loc); }
 	YY_BREAK
 case 20:
 YY_RULE_SETUP
-#line 157 "../lexer.l"
-{ count(); return(MUL_ASSIGN); }
+#line 151 "../lexer.l"
+{ count(); return adios2::detail::parser::make_MUL_ASSIGN(yytext, loc); }
 	YY_BREAK
 case 21:
 YY_RULE_SETUP
-#line 158 "../lexer.l"
-{ count(); return(DIV_ASSIGN); }
+#line 152 "../lexer.l"
+{ count(); return adios2::detail::parser::make_DIV_ASSIGN(yytext, loc); }
 	YY_BREAK
 case 22:
 YY_RULE_SETUP
-#line 159 "../lexer.l"
-{ count(); return(MOD_ASSIGN); }
+#line 153 "../lexer.l"
+{ count(); return adios2::detail::parser::make_MOD_ASSIGN(yytext, loc); }
 	YY_BREAK
 case 23:
 YY_RULE_SETUP
-#line 160 "../lexer.l"
-{ count(); return(AND_ASSIGN); }
+#line 154 "../lexer.l"
+{ count(); return adios2::detail::parser::make_AND_ASSIGN(yytext, loc); }
 	YY_BREAK
 case 24:
 YY_RULE_SETUP
-#line 161 "../lexer.l"
-{ count(); return(XOR_ASSIGN); }
+#line 155 "../lexer.l"
+{ count(); return adios2::detail::parser::make_XOR_ASSIGN(yytext, loc); }
 	YY_BREAK
 case 25:
 YY_RULE_SETUP
-#line 162 "../lexer.l"
-{ count(); return(OR_ASSIGN); }
+#line 156 "../lexer.l"
+{ count(); return adios2::detail::parser::make_OR_ASSIGN(yytext, loc); }
 	YY_BREAK
 case 26:
 YY_RULE_SETUP
-#line 163 "../lexer.l"
-{ count(); return(RIGHT_OP); }
+#line 157 "../lexer.l"
+{ count(); return adios2::detail::parser::make_RIGHT_OP(yytext, loc); }
 	YY_BREAK
 case 27:
 YY_RULE_SETUP
-#line 164 "../lexer.l"
-{ count(); return(LEFT_OP); }
+#line 158 "../lexer.l"
+{ count(); return adios2::detail::parser::make_LEFT_OP(yytext, loc); }
 	YY_BREAK
 case 28:
 YY_RULE_SETUP
-#line 165 "../lexer.l"
-{ count(); return(INC_OP); }
+#line 159 "../lexer.l"
+{ count(); return adios2::detail::parser::make_INC_OP(yytext, loc); }
 	YY_BREAK
 case 29:
 YY_RULE_SETUP
-#line 166 "../lexer.l"
-{ count(); return(DEC_OP); }
+#line 160 "../lexer.l"
+{ count(); return adios2::detail::parser::make_DEC_OP(yytext, loc); }
 	YY_BREAK
 case 30:
 YY_RULE_SETUP
-#line 167 "../lexer.l"
-{ count(); return(PTR_OP); }
+#line 161 "../lexer.l"
+{ count(); return adios2::detail::parser::make_PTR_OP(yytext, loc); }
 	YY_BREAK
 case 31:
 YY_RULE_SETUP
-#line 168 "../lexer.l"
-{ count(); return(AND_OP); }
+#line 162 "../lexer.l"
+{ count(); return adios2::detail::parser::make_AND_OP(yytext, loc); }
 	YY_BREAK
 case 32:
 YY_RULE_SETUP
-#line 169 "../lexer.l"
-{ count(); return(OR_OP); }
+#line 163 "../lexer.l"
+{ count(); return adios2::detail::parser::make_OR_OP(yytext, loc); }
 	YY_BREAK
 case 33:
 YY_RULE_SETUP
-#line 170 "../lexer.l"
-{ count(); return(LE_OP); }
+#line 164 "../lexer.l"
+{ count(); return adios2::detail::parser::make_LE_OP(yytext, loc); }
 	YY_BREAK
 case 34:
 YY_RULE_SETUP
-#line 171 "../lexer.l"
-{ count(); return(GE_OP); }
+#line 165 "../lexer.l"
+{ count(); return adios2::detail::parser::make_GE_OP(yytext, loc); }
 	YY_BREAK
 case 35:
 YY_RULE_SETUP
-#line 172 "../lexer.l"
-{ count(); return(EQ_OP); }
+#line 166 "../lexer.l"
+{ count(); return adios2::detail::parser::make_EQ_OP(yytext, loc); }
 	YY_BREAK
 case 36:
 YY_RULE_SETUP
-#line 173 "../lexer.l"
-{ count(); return(NE_OP); }
+#line 167 "../lexer.l"
+{ count(); return adios2::detail::parser::make_NE_OP(yytext, loc); }
 	YY_BREAK
 case 37:
 YY_RULE_SETUP
-#line 174 "../lexer.l"
-{ count(); return(';'); }
+#line 168 "../lexer.l"
+{ count(); return adios2::detail::parser::make_SEMICOLON(yytext, loc); }
 	YY_BREAK
 case 38:
 YY_RULE_SETUP
-#line 175 "../lexer.l"
-{ count(); return('{'); }
+#line 169 "../lexer.l"
+{ count(); return adios2::detail::parser::make_LBRACE(yytext, loc); }
 	YY_BREAK
 case 39:
 YY_RULE_SETUP
-#line 176 "../lexer.l"
-{ count(); return('}'); }
+#line 170 "../lexer.l"
+{ count(); return adios2::detail::parser::make_RBRACE(yytext, loc); }
 	YY_BREAK
 case 40:
 YY_RULE_SETUP
-#line 177 "../lexer.l"
-{ count(); return(','); }
+#line 171 "../lexer.l"
+{ count(); return adios2::detail::parser::make_COMMA(yytext, loc); }
 	YY_BREAK
 case 41:
 YY_RULE_SETUP
-#line 178 "../lexer.l"
-{ count(); return(':'); }
+#line 172 "../lexer.l"
+{ count(); return adios2::detail::parser::make_COLON(yytext, loc); }
 	YY_BREAK
 case 42:
 YY_RULE_SETUP
-#line 179 "../lexer.l"
-{ count(); return('='); }
+#line 173 "../lexer.l"
+{ count(); return adios2::detail::parser::make_ASSIGN(yytext, loc); }
 	YY_BREAK
 case 43:
 YY_RULE_SETUP
-#line 180 "../lexer.l"
-{ count(); return('('); }
+#line 174 "../lexer.l"
+{ count(); return adios2::detail::parser::make_LPAREN(yytext, loc); }
 	YY_BREAK
 case 44:
 YY_RULE_SETUP
-#line 181 "../lexer.l"
-{ count(); return(')'); }
+#line 175 "../lexer.l"
+{ count(); return adios2::detail::parser::make_RPAREN(yytext, loc); }
 	YY_BREAK
 case 45:
 YY_RULE_SETUP
-#line 182 "../lexer.l"
-{ count(); return('['); }
+#line 176 "../lexer.l"
+{ count(); return adios2::detail::parser::make_LBRACKET(yytext, loc); }
 	YY_BREAK
 case 46:
 YY_RULE_SETUP
-#line 183 "../lexer.l"
-{ count(); return(']'); }
+#line 177 "../lexer.l"
+{ count(); return adios2::detail::parser::make_RBRACKET(yytext, loc); }
 	YY_BREAK
 case 47:
 YY_RULE_SETUP
-#line 184 "../lexer.l"
-{ count(); return('.'); }
+#line 178 "../lexer.l"
+{ count(); return adios2::detail::parser::make_PERIOD(yytext, loc); }
 	YY_BREAK
 case 48:
 YY_RULE_SETUP
-#line 185 "../lexer.l"
-{ count(); return('&'); }
+#line 179 "../lexer.l"
+{ count(); return adios2::detail::parser::make_AMPERSAND(yytext, loc); }
 	YY_BREAK
 case 49:
 YY_RULE_SETUP
-#line 186 "../lexer.l"
-{ count(); return('!'); }
+#line 180 "../lexer.l"
+{ count(); return adios2::detail::parser::make_EXCLAMATION(yytext, loc); }
 	YY_BREAK
 case 50:
 YY_RULE_SETUP
-#line 187 "../lexer.l"
-{ count(); return('~'); }
+#line 181 "../lexer.l"
+{ count(); return adios2::detail::parser::make_TILDE(yytext, loc); }
 	YY_BREAK
 case 51:
 YY_RULE_SETUP
-#line 188 "../lexer.l"
-{ count(); return('-'); }
+#line 182 "../lexer.l"
+{ count(); return adios2::detail::parser::make_MINUS_OP(yytext, loc); }
 	YY_BREAK
 case 52:
 YY_RULE_SETUP
-#line 189 "../lexer.l"
-{ count(); return('+'); }
+#line 183 "../lexer.l"
+{ count(); return adios2::detail::parser::make_ADD_OP(yytext, loc); }
 	YY_BREAK
 case 53:
 YY_RULE_SETUP
-#line 190 "../lexer.l"
-{ count(); return('*'); }
+#line 184 "../lexer.l"
+{ count(); return adios2::detail::parser::make_MULT_OP(yytext, loc); }
 	YY_BREAK
 case 54:
 YY_RULE_SETUP
-#line 191 "../lexer.l"
-{ count(); return('/'); }
+#line 185 "../lexer.l"
+{ count(); return adios2::detail::parser::make_DIV_OP(yytext, loc); }
 	YY_BREAK
 case 55:
 YY_RULE_SETUP
-#line 192 "../lexer.l"
-{ count(); return('%'); }
+#line 186 "../lexer.l"
+{ count(); return adios2::detail::parser::make_MOD_OP(yytext, loc); }
 	YY_BREAK
 case 56:
 YY_RULE_SETUP
-#line 193 "../lexer.l"
-{ count(); return('<'); }
+#line 187 "../lexer.l"
+{ count(); return adios2::detail::parser::make_LT_OP(yytext, loc); }
 	YY_BREAK
 case 57:
 YY_RULE_SETUP
-#line 194 "../lexer.l"
-{ count(); return('>'); }
+#line 188 "../lexer.l"
+{ count(); return adios2::detail::parser::make_GT_OP(yytext, loc); }
 	YY_BREAK
 case 58:
 YY_RULE_SETUP
-#line 195 "../lexer.l"
-{ count(); return('^'); }
+#line 189 "../lexer.l"
+{ count(); return adios2::detail::parser::make_EXP_OP(yytext, loc); }
 	YY_BREAK
 case 59:
 YY_RULE_SETUP
-#line 196 "../lexer.l"
-{ count(); return('|'); }
+#line 190 "../lexer.l"
+{ count(); return adios2::detail::parser::make_PIPE(yytext, loc); }
 	YY_BREAK
 case 60:
 YY_RULE_SETUP
-#line 197 "../lexer.l"
-{ count(); return('?'); }
+#line 191 "../lexer.l"
+{ count(); return adios2::detail::parser::make_QUESTION(yytext, loc); }
 	YY_BREAK
 case 61:
 /* rule 61 can match eol */
 YY_RULE_SETUP
-#line 199 "../lexer.l"
+#line 193 "../lexer.l"
 { count(); }
+	YY_BREAK
+case YY_STATE_EOF(INITIAL):
+#line 194 "../lexer.l"
+{ count(); return adios2::detail::parser::make_YYEOF (loc); }
 	YY_BREAK
 case 62:
 YY_RULE_SETUP
-#line 200 "../lexer.l"
+#line 195 "../lexer.l"
 { /* Add code to complain about unmatched characters */ }
 	YY_BREAK
 case 63:
 YY_RULE_SETUP
-#line 202 "../lexer.l"
+#line 197 "../lexer.l"
 ECHO;
 	YY_BREAK
-#line 1291 "lexer.cpp"
-case YY_STATE_EOF(INITIAL):
-	yyterminate();
+#line 1295 "lexer.cpp"
 
 	case YY_END_OF_BUFFER:
 		{
@@ -2257,20 +2259,24 @@ void yyfree (void * ptr )
 
 #define YYTABLES_NAME "yytables"
 
-#line 202 "../lexer.l"
+#line 197 "../lexer.l"
 
 
-int yywrap(void)
+/*
+int
+yywrap()
 {
 	return 1;
 }
+*/
 
-
-void comment(void)
+/*
+void
+comment()
 {
 	char c, prev = 0;
   
-	while ((c = input()) != 0)      /* (EOF maps to 0) */
+	while ((c = input()) != 0)      // (EOF maps to 0)
 	{
 		if (c == '/' && prev == '*')
 			return;
@@ -2278,11 +2284,12 @@ void comment(void)
 	}
 	error("unterminated comment");
 }
-
+*/
 
 int column = 0;
 
-void count(void)
+void
+count()
 {
 	int i;
 
@@ -2297,24 +2304,24 @@ void count(void)
 	ECHO;
 }
 
-
-int check_type(void)
+/*
+int
+check_type(void)
 {
-/*
-* pseudo code --- this is what it should check
-*
-*	if (yytext == type_name)
-*		return TYPE_NAME;
-*
-*	return IDENTIFIER;
-*/
 
-/*
-*	it actually will only return IDENTIFIER
-*/
+// pseudo code --- this is what it should check
+
+//	if (yytext == type_name)
+//		return TYPE_NAME;
+
+//	return IDENTIFIER;
+
+
+//	it actually will only return IDENTIFIER
 
 	return IDENTIFIER;
-}
+	}
+	*/
 
 void
 adios2::detail::ASTDriver::parse (const std::string input)

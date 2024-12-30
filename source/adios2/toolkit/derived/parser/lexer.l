@@ -1,11 +1,3 @@
-D			[0-9]
-L			[a-zA-Z_]
-H			[a-fA-F0-9]
-E			([Ee][+-]?{D}+)
-P                       ([Pp][+-]?{D}+)
-FS			(f|F|l|L)
-IS                      ((u|U)|(u|U)?(l|L|ll|LL)|(l|L|ll|LL)(u|U))
-
 %{
 #include <cerrno>
 #include <cstdlib>
@@ -109,11 +101,13 @@ void count(void);
   make_INT (const std::string &s, const adios2::detail::parser::location_type& loc);
 %}
 
-op    [-+*^]
-id    [a-zA-Z][a-zA-Z_0-9_]*
-path  [a-zA-Z][a-zA-Z0-9._\/]*
-num   -?[0-9]*.?[0-9]+
-blank [ \t\r]
+D			[0-9]
+L			[a-zA-Z_]
+H			[a-fA-F0-9]
+E			([Ee][+-]?{D}+)
+P                       ([Pp][+-]?{D}+)
+FS			(f|F|l|L)
+IS                      ((u|U)|(u|U)?(l|L|ll|LL)|(l|L|ll|LL)(u|U))
 
 %{
   // Code run each time a pattern is matched.
@@ -127,90 +121,95 @@ blank [ \t\r]
   loc.step ();
 %}
 
-"/*"			{ comment(); }
+"/*"			{ /*comment();*/ }
 "//"[^\n]*              { /* consume //-comment */ }
 
 
-{L}({L}|{D})*		{ count(); return(check_type()); }
+{L}({L}|{D})*		{ count(); return adios2::detail::parser::make_IDENTIFIER(yytext, loc); }
 
-0[xX]{H}+{IS}?		{ count(); return(CONSTANT); }
-0[0-7]*{IS}?		{ count(); return(CONSTANT); }
-[1-9]{D}*{IS}?		{ count(); return(CONSTANT); }
-L?'(\\.|[^\\'\n])+'	{ count(); return(CONSTANT); }
+0[xX]{H}+{IS}?		{ count(); return adios2::detail::parser::make_CONSTANT(yytext, loc); }
+0[0-7]*{IS}?		{ count(); return adios2::detail::parser::make_CONSTANT(yytext, loc); }
+[1-9]{D}*{IS}?		{ count(); return adios2::detail::parser::make_CONSTANT(yytext, loc); }
+L?'(\\.|[^\\'\n])+'	{ count(); return adios2::detail::parser::make_CONSTANT(yytext, loc); }
 
-{D}+{E}{FS}?		{ count(); return(CONSTANT); }
-{D}*"."{D}+{E}?{FS}?	{ count(); return(CONSTANT); }
-{D}+"."{D}*{E}?{FS}?	{ count(); return(CONSTANT); }
-0[xX]{H}+{P}{FS}?	{ count(); return(CONSTANT); }
-0[xX]{H}*"."{H}+{P}?{FS}?     { count(); return(CONSTANT); }
-0[xX]{H}+"."{H}*{P}?{FS}?     { count(); return(CONSTANT); }
+{D}+{E}{FS}?		{ count(); return adios2::detail::parser::make_CONSTANT(yytext, loc); }
+{D}*"."{D}+{E}?{FS}?	{ count(); return adios2::detail::parser::make_CONSTANT(yytext, loc); }
+{D}+"."{D}*{E}?{FS}?	{ count(); return adios2::detail::parser::make_CONSTANT(yytext, loc); }
+0[xX]{H}+{P}{FS}?	{ count(); return adios2::detail::parser::make_CONSTANT(yytext, loc); }
+0[xX]{H}*"."{H}+{P}?{FS}?     { count(); return adios2::detail::parser::make_CONSTANT(yytext, loc); }
+0[xX]{H}+"."{H}*{P}?{FS}?     { count(); return adios2::detail::parser::make_CONSTANT(yytext, loc); }
 
 
-L?\"(\\.|[^\\"\n])*\"	{ count(); return(STRING_LITERAL); }
+L?\"(\\.|[^\\"\n])*\"	{ count(); return adios2::detail::parser::make_STRING_LITERAL(yytext, loc); }
 
-"..."			{ count(); return(ELLIPSIS); }
-">>="			{ count(); return(RIGHT_ASSIGN); }
-"<<="			{ count(); return(LEFT_ASSIGN); }
-"+="			{ count(); return(ADD_ASSIGN); }
-"-="			{ count(); return(SUB_ASSIGN); }
-"*="			{ count(); return(MUL_ASSIGN); }
-"/="			{ count(); return(DIV_ASSIGN); }
-"%="			{ count(); return(MOD_ASSIGN); }
-"&="			{ count(); return(AND_ASSIGN); }
-"^="			{ count(); return(XOR_ASSIGN); }
-"|="			{ count(); return(OR_ASSIGN); }
-">>"			{ count(); return(RIGHT_OP); }
-"<<"			{ count(); return(LEFT_OP); }
-"++"			{ count(); return(INC_OP); }
-"--"			{ count(); return(DEC_OP); }
-"->"			{ count(); return(PTR_OP); }
-"&&"			{ count(); return(AND_OP); }
-"||"			{ count(); return(OR_OP); }
-"<="			{ count(); return(LE_OP); }
-">="			{ count(); return(GE_OP); }
-"=="			{ count(); return(EQ_OP); }
-"!="			{ count(); return(NE_OP); }
-";"			{ count(); return(';'); }
-("{"|"<%")		{ count(); return('{'); }
-("}"|"%>")		{ count(); return('}'); }
-","			{ count(); return(','); }
-":"			{ count(); return(':'); }
-"="			{ count(); return('='); }
-"("			{ count(); return('('); }
-")"			{ count(); return(')'); }
-("["|"<:")		{ count(); return('['); }
-("]"|":>")		{ count(); return(']'); }
-"."			{ count(); return('.'); }
-"&"			{ count(); return('&'); }
-"!"			{ count(); return('!'); }
-"~"			{ count(); return('~'); }
-"-"			{ count(); return('-'); }
-"+"			{ count(); return('+'); }
-"*"			{ count(); return('*'); }
-"/"			{ count(); return('/'); }
-"%"			{ count(); return('%'); }
-"<"			{ count(); return('<'); }
-">"			{ count(); return('>'); }
-"^"			{ count(); return('^'); }
-"|"			{ count(); return('|'); }
-"?"			{ count(); return('?'); }
+"..."			{ count(); return adios2::detail::parser::make_ELLIPSIS(yytext, loc); }
+">>="			{ count(); return adios2::detail::parser::make_RIGHT_ASSIGN(yytext, loc); }
+"<<="			{ count(); return adios2::detail::parser::make_LEFT_ASSIGN(yytext, loc); }
+"+="			{ count(); return adios2::detail::parser::make_ADD_ASSIGN(yytext, loc); }
+"-="			{ count(); return adios2::detail::parser::make_SUB_ASSIGN(yytext, loc); }
+"*="			{ count(); return adios2::detail::parser::make_MUL_ASSIGN(yytext, loc); }
+"/="			{ count(); return adios2::detail::parser::make_DIV_ASSIGN(yytext, loc); }
+"%="			{ count(); return adios2::detail::parser::make_MOD_ASSIGN(yytext, loc); }
+"&="			{ count(); return adios2::detail::parser::make_AND_ASSIGN(yytext, loc); }
+"^="			{ count(); return adios2::detail::parser::make_XOR_ASSIGN(yytext, loc); }
+"|="			{ count(); return adios2::detail::parser::make_OR_ASSIGN(yytext, loc); }
+">>"			{ count(); return adios2::detail::parser::make_RIGHT_OP(yytext, loc); }
+"<<"			{ count(); return adios2::detail::parser::make_LEFT_OP(yytext, loc); }
+"++"			{ count(); return adios2::detail::parser::make_INC_OP(yytext, loc); }
+"--"			{ count(); return adios2::detail::parser::make_DEC_OP(yytext, loc); }
+"->"			{ count(); return adios2::detail::parser::make_PTR_OP(yytext, loc); }
+"&&"			{ count(); return adios2::detail::parser::make_AND_OP(yytext, loc); }
+"||"			{ count(); return adios2::detail::parser::make_OR_OP(yytext, loc); }
+"<="			{ count(); return adios2::detail::parser::make_LE_OP(yytext, loc); }
+">="			{ count(); return adios2::detail::parser::make_GE_OP(yytext, loc); }
+"=="			{ count(); return adios2::detail::parser::make_EQ_OP(yytext, loc); }
+"!="			{ count(); return adios2::detail::parser::make_NE_OP(yytext, loc); }
+";"			{ count(); return adios2::detail::parser::make_SEMICOLON(yytext, loc); }
+("{"|"<%")		{ count(); return adios2::detail::parser::make_LBRACE(yytext, loc); }
+("}"|"%>")		{ count(); return adios2::detail::parser::make_RBRACE(yytext, loc); }
+","			{ count(); return adios2::detail::parser::make_COMMA(yytext, loc); }
+":"			{ count(); return adios2::detail::parser::make_COLON(yytext, loc); }
+"="			{ count(); return adios2::detail::parser::make_ASSIGN(yytext, loc); }
+"("			{ count(); return adios2::detail::parser::make_LPAREN(yytext, loc); }
+")"			{ count(); return adios2::detail::parser::make_RPAREN(yytext, loc); }
+("["|"<:")		{ count(); return adios2::detail::parser::make_LBRACKET(yytext, loc); }
+("]"|":>")		{ count(); return adios2::detail::parser::make_RBRACKET(yytext, loc); }
+"."			{ count(); return adios2::detail::parser::make_PERIOD(yytext, loc); }
+"&"			{ count(); return adios2::detail::parser::make_AMPERSAND(yytext, loc); }
+"!"			{ count(); return adios2::detail::parser::make_EXCLAMATION(yytext, loc); }
+"~"			{ count(); return adios2::detail::parser::make_TILDE(yytext, loc); }
+"-"			{ count(); return adios2::detail::parser::make_MINUS_OP(yytext, loc); }
+"+"			{ count(); return adios2::detail::parser::make_ADD_OP(yytext, loc); }
+"*"			{ count(); return adios2::detail::parser::make_MULT_OP(yytext, loc); }
+"/"			{ count(); return adios2::detail::parser::make_DIV_OP(yytext, loc); }
+"%"			{ count(); return adios2::detail::parser::make_MOD_OP(yytext, loc); }
+"<"			{ count(); return adios2::detail::parser::make_LT_OP(yytext, loc); }
+">"			{ count(); return adios2::detail::parser::make_GT_OP(yytext, loc); }
+"^"			{ count(); return adios2::detail::parser::make_EXP_OP(yytext, loc); }
+"|"			{ count(); return adios2::detail::parser::make_PIPE(yytext, loc); }
+"?"			{ count(); return adios2::detail::parser::make_QUESTION(yytext, loc); }
 
 [ \t\v\n\f]		{ count(); }
+<<EOF>>                 { count(); return adios2::detail::parser::make_YYEOF (loc); }
 .			{ /* Add code to complain about unmatched characters */ }
 
 %%
 
-int yywrap(void)
+/*
+int
+yywrap()
 {
 	return 1;
 }
+*/
 
-
-void comment(void)
+/*
+void
+comment()
 {
 	char c, prev = 0;
   
-	while ((c = input()) != 0)      /* (EOF maps to 0) */
+	while ((c = input()) != 0)      // (EOF maps to 0)
 	{
 		if (c == '/' && prev == '*')
 			return;
@@ -218,11 +217,12 @@ void comment(void)
 	}
 	error("unterminated comment");
 }
-
+*/
 
 int column = 0;
 
-void count(void)
+void
+count()
 {
 	int i;
 
@@ -237,24 +237,24 @@ void count(void)
 	ECHO;
 }
 
-
-int check_type(void)
+/*
+int
+check_type(void)
 {
-/*
-* pseudo code --- this is what it should check
-*
-*	if (yytext == type_name)
-*		return TYPE_NAME;
-*
-*	return IDENTIFIER;
-*/
 
-/*
-*	it actually will only return IDENTIFIER
-*/
+// pseudo code --- this is what it should check
+
+//	if (yytext == type_name)
+//		return TYPE_NAME;
+
+//	return IDENTIFIER;
+
+
+//	it actually will only return IDENTIFIER
 
 	return IDENTIFIER;
-}
+	}
+	*/
 
 void
 adios2::detail::ASTDriver::parse (const std::string input)
