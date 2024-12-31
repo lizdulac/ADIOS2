@@ -471,6 +471,7 @@ namespace adios2 { namespace detail {
       // EXP_OP
       // PIPE
       // QUESTION
+      // ALIAS_OP
       // TYPEDEF
       // EXTERN
       // STATIC
@@ -611,43 +612,44 @@ namespace adios2 { namespace detail {
     TOK_EXP_OP = 50,               // EXP_OP
     TOK_PIPE = 51,                 // PIPE
     TOK_QUESTION = 52,             // QUESTION
-    TOK_TYPEDEF = 53,              // TYPEDEF
-    TOK_EXTERN = 54,               // EXTERN
-    TOK_STATIC = 55,               // STATIC
-    TOK_AUTO = 56,                 // AUTO
-    TOK_REGISTER = 57,             // REGISTER
-    TOK_INLINE = 58,               // INLINE
-    TOK_RESTRICT = 59,             // RESTRICT
-    TOK_CHAR = 60,                 // CHAR
-    TOK_SHORT = 61,                // SHORT
-    TOK_INT = 62,                  // INT
-    TOK_LONG = 63,                 // LONG
-    TOK_SIGNED = 64,               // SIGNED
-    TOK_UNSIGNED = 65,             // UNSIGNED
-    TOK_FLOAT = 66,                // FLOAT
-    TOK_DOUBLE = 67,               // DOUBLE
-    TOK_CONST = 68,                // CONST
-    TOK_VOLATILE = 69,             // VOLATILE
-    TOK_VOID = 70,                 // VOID
-    TOK_BOOL = 71,                 // BOOL
-    TOK_COMPLEX = 72,              // COMPLEX
-    TOK_IMAGINARY = 73,            // IMAGINARY
-    TOK_STRUCT = 74,               // STRUCT
-    TOK_UNION = 75,                // UNION
-    TOK_ENUM = 76,                 // ENUM
-    TOK_ELLIPSIS = 77,             // ELLIPSIS
-    TOK_CASE = 78,                 // CASE
-    TOK_DEFAULT = 79,              // DEFAULT
-    TOK_IF = 80,                   // IF
-    TOK_ELSE = 81,                 // ELSE
-    TOK_SWITCH = 82,               // SWITCH
-    TOK_WHILE = 83,                // WHILE
-    TOK_DO = 84,                   // DO
-    TOK_FOR = 85,                  // FOR
-    TOK_GOTO = 86,                 // GOTO
-    TOK_CONTINUE = 87,             // CONTINUE
-    TOK_BREAK = 88,                // BREAK
-    TOK_RETURN = 89                // RETURN
+    TOK_ALIAS_OP = 53,             // ALIAS_OP
+    TOK_TYPEDEF = 54,              // TYPEDEF
+    TOK_EXTERN = 55,               // EXTERN
+    TOK_STATIC = 56,               // STATIC
+    TOK_AUTO = 57,                 // AUTO
+    TOK_REGISTER = 58,             // REGISTER
+    TOK_INLINE = 59,               // INLINE
+    TOK_RESTRICT = 60,             // RESTRICT
+    TOK_CHAR = 61,                 // CHAR
+    TOK_SHORT = 62,                // SHORT
+    TOK_INT = 63,                  // INT
+    TOK_LONG = 64,                 // LONG
+    TOK_SIGNED = 65,               // SIGNED
+    TOK_UNSIGNED = 66,             // UNSIGNED
+    TOK_FLOAT = 67,                // FLOAT
+    TOK_DOUBLE = 68,               // DOUBLE
+    TOK_CONST = 69,                // CONST
+    TOK_VOLATILE = 70,             // VOLATILE
+    TOK_VOID = 71,                 // VOID
+    TOK_BOOL = 72,                 // BOOL
+    TOK_COMPLEX = 73,              // COMPLEX
+    TOK_IMAGINARY = 74,            // IMAGINARY
+    TOK_STRUCT = 75,               // STRUCT
+    TOK_UNION = 76,                // UNION
+    TOK_ENUM = 77,                 // ENUM
+    TOK_ELLIPSIS = 78,             // ELLIPSIS
+    TOK_CASE = 79,                 // CASE
+    TOK_DEFAULT = 80,              // DEFAULT
+    TOK_IF = 81,                   // IF
+    TOK_ELSE = 82,                 // ELSE
+    TOK_SWITCH = 83,               // SWITCH
+    TOK_WHILE = 84,                // WHILE
+    TOK_DO = 85,                   // DO
+    TOK_FOR = 86,                  // FOR
+    TOK_GOTO = 87,                 // GOTO
+    TOK_CONTINUE = 88,             // CONTINUE
+    TOK_BREAK = 89,                // BREAK
+    TOK_RETURN = 90                // RETURN
       };
       /// Backward compatibility alias (Bison 3.6).
       typedef token_kind_type yytokentype;
@@ -719,44 +721,44 @@ namespace adios2 { namespace detail {
         S_EXP_OP = 50,                           // EXP_OP
         S_PIPE = 51,                             // PIPE
         S_QUESTION = 52,                         // QUESTION
-        S_TYPEDEF = 53,                          // TYPEDEF
-        S_EXTERN = 54,                           // EXTERN
-        S_STATIC = 55,                           // STATIC
-        S_AUTO = 56,                             // AUTO
-        S_REGISTER = 57,                         // REGISTER
-        S_INLINE = 58,                           // INLINE
-        S_RESTRICT = 59,                         // RESTRICT
-        S_CHAR = 60,                             // CHAR
-        S_SHORT = 61,                            // SHORT
-        S_INT = 62,                              // INT
-        S_LONG = 63,                             // LONG
-        S_SIGNED = 64,                           // SIGNED
-        S_UNSIGNED = 65,                         // UNSIGNED
-        S_FLOAT = 66,                            // FLOAT
-        S_DOUBLE = 67,                           // DOUBLE
-        S_CONST = 68,                            // CONST
-        S_VOLATILE = 69,                         // VOLATILE
-        S_VOID = 70,                             // VOID
-        S_BOOL = 71,                             // BOOL
-        S_COMPLEX = 72,                          // COMPLEX
-        S_IMAGINARY = 73,                        // IMAGINARY
-        S_STRUCT = 74,                           // STRUCT
-        S_UNION = 75,                            // UNION
-        S_ENUM = 76,                             // ENUM
-        S_ELLIPSIS = 77,                         // ELLIPSIS
-        S_CASE = 78,                             // CASE
-        S_DEFAULT = 79,                          // DEFAULT
-        S_IF = 80,                               // IF
-        S_ELSE = 81,                             // ELSE
-        S_SWITCH = 82,                           // SWITCH
-        S_WHILE = 83,                            // WHILE
-        S_DO = 84,                               // DO
-        S_FOR = 85,                              // FOR
-        S_GOTO = 86,                             // GOTO
-        S_CONTINUE = 87,                         // CONTINUE
-        S_BREAK = 88,                            // BREAK
-        S_RETURN = 89,                           // RETURN
-        S_90_ = 90,                              // "@"
+        S_ALIAS_OP = 53,                         // ALIAS_OP
+        S_TYPEDEF = 54,                          // TYPEDEF
+        S_EXTERN = 55,                           // EXTERN
+        S_STATIC = 56,                           // STATIC
+        S_AUTO = 57,                             // AUTO
+        S_REGISTER = 58,                         // REGISTER
+        S_INLINE = 59,                           // INLINE
+        S_RESTRICT = 60,                         // RESTRICT
+        S_CHAR = 61,                             // CHAR
+        S_SHORT = 62,                            // SHORT
+        S_INT = 63,                              // INT
+        S_LONG = 64,                             // LONG
+        S_SIGNED = 65,                           // SIGNED
+        S_UNSIGNED = 66,                         // UNSIGNED
+        S_FLOAT = 67,                            // FLOAT
+        S_DOUBLE = 68,                           // DOUBLE
+        S_CONST = 69,                            // CONST
+        S_VOLATILE = 70,                         // VOLATILE
+        S_VOID = 71,                             // VOID
+        S_BOOL = 72,                             // BOOL
+        S_COMPLEX = 73,                          // COMPLEX
+        S_IMAGINARY = 74,                        // IMAGINARY
+        S_STRUCT = 75,                           // STRUCT
+        S_UNION = 76,                            // UNION
+        S_ENUM = 77,                             // ENUM
+        S_ELLIPSIS = 78,                         // ELLIPSIS
+        S_CASE = 79,                             // CASE
+        S_DEFAULT = 80,                          // DEFAULT
+        S_IF = 81,                               // IF
+        S_ELSE = 82,                             // ELSE
+        S_SWITCH = 83,                           // SWITCH
+        S_WHILE = 84,                            // WHILE
+        S_DO = 85,                               // DO
+        S_FOR = 86,                              // FOR
+        S_GOTO = 87,                             // GOTO
+        S_CONTINUE = 88,                         // CONTINUE
+        S_BREAK = 89,                            // BREAK
+        S_RETURN = 90,                           // RETURN
         S_91_ = 91,                              // ","
         S_YYACCEPT = 92,                         // $accept
         S_primary_expression = 93,               // primary_expression
@@ -869,6 +871,7 @@ namespace adios2 { namespace detail {
       case symbol_kind::S_EXP_OP: // EXP_OP
       case symbol_kind::S_PIPE: // PIPE
       case symbol_kind::S_QUESTION: // QUESTION
+      case symbol_kind::S_ALIAS_OP: // ALIAS_OP
       case symbol_kind::S_TYPEDEF: // TYPEDEF
       case symbol_kind::S_EXTERN: // EXTERN
       case symbol_kind::S_STATIC: // STATIC
@@ -1038,6 +1041,7 @@ switch (yykind)
       case symbol_kind::S_EXP_OP: // EXP_OP
       case symbol_kind::S_PIPE: // PIPE
       case symbol_kind::S_QUESTION: // QUESTION
+      case symbol_kind::S_ALIAS_OP: // ALIAS_OP
       case symbol_kind::S_TYPEDEF: // TYPEDEF
       case symbol_kind::S_EXTERN: // EXTERN
       case symbol_kind::S_STATIC: // STATIC
@@ -1177,7 +1181,7 @@ switch (yykind)
 #if !defined _MSC_VER || defined __clang__
         YY_ASSERT (tok == token::TOK_YYEOF
                    || (token::TOK_YYerror <= tok && tok <= token::TOK_YYUNDEF)
-                   || (345 <= tok && tok <= 346));
+                   || tok == 346);
 #endif
       }
 #if 201103L <= YY_CPLUSPLUS
@@ -2038,6 +2042,21 @@ switch (yykind)
 #if 201103L <= YY_CPLUSPLUS
       static
       symbol_type
+      make_ALIAS_OP (std::string v, location_type l)
+      {
+        return symbol_type (token::TOK_ALIAS_OP, std::move (v), std::move (l));
+      }
+#else
+      static
+      symbol_type
+      make_ALIAS_OP (const std::string& v, const location_type& l)
+      {
+        return symbol_type (token::TOK_ALIAS_OP, v, l);
+      }
+#endif
+#if 201103L <= YY_CPLUSPLUS
+      static
+      symbol_type
       make_TYPEDEF (std::string v, location_type l)
       {
         return symbol_type (token::TOK_TYPEDEF, std::move (v), std::move (l));
@@ -2698,7 +2717,7 @@ switch (yykind)
 
 #if YYDEBUG
     // YYRLINE[YYN] -- Source line where rule number YYN was defined.
-    static const unsigned char yyrline_[];
+    static const short yyrline_[];
     /// Report on the debug stream that the rule \a r is going to be reduced.
     virtual void yy_reduce_print_ (int r) const;
     /// Print the state stack on the debug stream.
@@ -2934,7 +2953,7 @@ switch (yykind)
     /// Constants.
     enum
     {
-      yylast_ = 93,     ///< Last index in yytable_.
+      yylast_ = 63,     ///< Last index in yytable_.
       yynnts_ = 21,  ///< Number of nonterminal symbols.
       yyfinal_ = 46 ///< Termination state number.
     };
@@ -3015,6 +3034,7 @@ switch (yykind)
       case symbol_kind::S_EXP_OP: // EXP_OP
       case symbol_kind::S_PIPE: // PIPE
       case symbol_kind::S_QUESTION: // QUESTION
+      case symbol_kind::S_ALIAS_OP: // ALIAS_OP
       case symbol_kind::S_TYPEDEF: // TYPEDEF
       case symbol_kind::S_EXTERN: // EXTERN
       case symbol_kind::S_STATIC: // STATIC
@@ -3140,6 +3160,7 @@ switch (yykind)
       case symbol_kind::S_EXP_OP: // EXP_OP
       case symbol_kind::S_PIPE: // PIPE
       case symbol_kind::S_QUESTION: // QUESTION
+      case symbol_kind::S_ALIAS_OP: // ALIAS_OP
       case symbol_kind::S_TYPEDEF: // TYPEDEF
       case symbol_kind::S_EXTERN: // EXTERN
       case symbol_kind::S_STATIC: // STATIC
@@ -3247,7 +3268,7 @@ switch (yykind)
 
 #line 6 "../parser.y"
 } } // adios2::detail
-#line 3251 "parser.h"
+#line 3272 "parser.h"
 
 
 

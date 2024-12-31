@@ -45,7 +45,7 @@
 %token <std::string> SEMICOLON LBRACE RBRACE COMMA COLON ASSIGN LPAREN RPAREN LBRACKET RBRACKET
 %token <std::string> PERIOD AMPERSAND EXCLAMATION TILDE
 %token <std::string> MINUS_OP ADD_OP MULT_OP DIV_OP MOD_OP
-%token <std::string> LT_OP GT_OP EXP_OP PIPE QUESTION
+%token <std::string> LT_OP GT_OP EXP_OP PIPE QUESTION ALIAS_OP
 
 %token <std::string> TYPEDEF EXTERN STATIC AUTO REGISTER INLINE RESTRICT
 %token <std::string> CHAR SHORT INT LONG SIGNED UNSIGNED FLOAT DOUBLE CONST VOLATILE VOID
@@ -97,7 +97,7 @@
 
 primary_expression
 	: IDENTIFIER { drv.createVariableNode($1); }
-	| "@" CONSTANT // throw error if not int
+        | ALIAS_OP CONSTANT { drv.createLookupVariableNode($2); }
 	| CONSTANT { drv.createNumberNode($1); }
  //	| STRING_LITERAL
  	| LPAREN expression RPAREN
@@ -247,6 +247,7 @@ expression
 assignment
 	: IDENTIFIER ASSIGN STRING_LITERAL { drv.add_lookup_entry($1,  $3); }
 	| IDENTIFIER ASSIGN IDENTIFIER     { drv.add_lookup_entry($1,  $3); }
+	| IDENTIFIER ASSIGN ALIAS_OP IDENTIFIER     { drv.add_lookup_entry($1,  $4); }
 	;
 
 start_node

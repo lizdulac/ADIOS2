@@ -21,7 +21,7 @@ public:
 class VariableNode : public ASTNode
 {
 public:
-    VariableNode(std::string alias);
+    VariableNode(std::string alias, bool index = false);
     ~VariableNode();
 
     std::string printpretty(std::string = "");
@@ -34,6 +34,7 @@ public:
 private:
     std::string alias;
     std::string varname;
+    bool alias_is_index;
 };
 
 class IndexNode : public ASTNode

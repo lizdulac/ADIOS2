@@ -128,6 +128,12 @@ void ASTDriver::createVariableNode(std::string alias)
     holding.push(node);
 }
 
+void ASTDriver::createLookupVariableNode(std::string index)
+{
+    VariableNode *node = new VariableNode(index, true);
+    holding.push(node);
+}
+
 void ASTDriver::createIndexNode(std::string alias, indx_type indices)
 {
     VariableNode *var = new VariableNode(alias);

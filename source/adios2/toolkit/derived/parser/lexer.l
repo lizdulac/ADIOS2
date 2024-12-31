@@ -140,7 +140,7 @@ L?'(\\.|[^\\'\n])+'	{ count(); return adios2::detail::parser::make_CONSTANT(yyte
 0[xX]{H}+"."{H}*{P}?{FS}?     { count(); return adios2::detail::parser::make_CONSTANT(yytext, loc); }
 
 
-L?\"(\\.|[^\\"\n])*\"	{ count(); return adios2::detail::parser::make_STRING_LITERAL(yytext, loc); }
+\"(\\.|[^\\"\n])*\"	{ count(); std::string ret(yytext + 1, strlen(yytext) - 2); return adios2::detail::parser::make_STRING_LITERAL(ret, loc); }
 
 "..."			{ count(); return adios2::detail::parser::make_ELLIPSIS(yytext, loc); }
 ">>="			{ count(); return adios2::detail::parser::make_RIGHT_ASSIGN(yytext, loc); }
@@ -188,6 +188,7 @@ L?\"(\\.|[^\\"\n])*\"	{ count(); return adios2::detail::parser::make_STRING_LITE
 "^"			{ count(); return adios2::detail::parser::make_EXP_OP(yytext, loc); }
 "|"			{ count(); return adios2::detail::parser::make_PIPE(yytext, loc); }
 "?"			{ count(); return adios2::detail::parser::make_QUESTION(yytext, loc); }
+"@"			{ count(); return adios2::detail::parser::make_ALIAS_OP(yytext, loc); }
 
 [ \t\v\n\f]		{ count(); }
 <<EOF>>                 { count(); return adios2::detail::parser::make_YYEOF (loc); }

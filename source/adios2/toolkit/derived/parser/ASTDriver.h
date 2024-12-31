@@ -44,13 +44,14 @@ public:
     void createRelationNode(std::string relation);
     void createConditionNode(std::string condition);
     void createVariableNode(std::string alias);
+    void createLookupVariableNode(std::string index);
     void createIndexNode(std::string alias, indx_type indices);
     void createNumberNode(std::string value);
 
     // Whether to generate parser debug traces.
-    bool trace_parsing = true;
+    bool trace_parsing = false;
     // Whether to generate scanner debug traces.
-    bool trace_scanning = true;
+    bool trace_scanning = false;
     // The token's location used by the scanner.
     adios2::detail::location location;
 

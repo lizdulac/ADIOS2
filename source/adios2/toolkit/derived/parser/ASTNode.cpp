@@ -7,8 +7,8 @@ namespace adios2
 namespace detail
 {
 
-VariableNode::VariableNode(std::string a)
-  :alias(a)
+VariableNode::VariableNode(std::string a, bool index)
+  :alias(a), alias_is_index(index)
 {
 }
 

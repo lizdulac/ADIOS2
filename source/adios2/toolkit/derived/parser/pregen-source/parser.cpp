@@ -263,6 +263,7 @@ namespace adios2 { namespace detail {
       case symbol_kind::S_EXP_OP: // EXP_OP
       case symbol_kind::S_PIPE: // PIPE
       case symbol_kind::S_QUESTION: // QUESTION
+      case symbol_kind::S_ALIAS_OP: // ALIAS_OP
       case symbol_kind::S_TYPEDEF: // TYPEDEF
       case symbol_kind::S_EXTERN: // EXTERN
       case symbol_kind::S_STATIC: // STATIC
@@ -372,6 +373,7 @@ namespace adios2 { namespace detail {
       case symbol_kind::S_EXP_OP: // EXP_OP
       case symbol_kind::S_PIPE: // PIPE
       case symbol_kind::S_QUESTION: // QUESTION
+      case symbol_kind::S_ALIAS_OP: // ALIAS_OP
       case symbol_kind::S_TYPEDEF: // TYPEDEF
       case symbol_kind::S_EXTERN: // EXTERN
       case symbol_kind::S_STATIC: // STATIC
@@ -481,6 +483,7 @@ namespace adios2 { namespace detail {
       case symbol_kind::S_EXP_OP: // EXP_OP
       case symbol_kind::S_PIPE: // PIPE
       case symbol_kind::S_QUESTION: // QUESTION
+      case symbol_kind::S_ALIAS_OP: // ALIAS_OP
       case symbol_kind::S_TYPEDEF: // TYPEDEF
       case symbol_kind::S_EXTERN: // EXTERN
       case symbol_kind::S_STATIC: // STATIC
@@ -589,6 +592,7 @@ namespace adios2 { namespace detail {
       case symbol_kind::S_EXP_OP: // EXP_OP
       case symbol_kind::S_PIPE: // PIPE
       case symbol_kind::S_QUESTION: // QUESTION
+      case symbol_kind::S_ALIAS_OP: // ALIAS_OP
       case symbol_kind::S_TYPEDEF: // TYPEDEF
       case symbol_kind::S_EXTERN: // EXTERN
       case symbol_kind::S_STATIC: // STATIC
@@ -952,6 +956,7 @@ namespace adios2 { namespace detail {
       case symbol_kind::S_EXP_OP: // EXP_OP
       case symbol_kind::S_PIPE: // PIPE
       case symbol_kind::S_QUESTION: // QUESTION
+      case symbol_kind::S_ALIAS_OP: // ALIAS_OP
       case symbol_kind::S_TYPEDEF: // TYPEDEF
       case symbol_kind::S_EXTERN: // EXTERN
       case symbol_kind::S_STATIC: // STATIC
@@ -1015,125 +1020,137 @@ namespace adios2 { namespace detail {
   case 2: // primary_expression: IDENTIFIER
 #line 99 "../parser.y"
                      { drv.createVariableNode(yystack_[0].value.as < std::string > ()); }
-#line 1019 "parser.cpp"
+#line 1024 "parser.cpp"
+    break;
+
+  case 3: // primary_expression: ALIAS_OP CONSTANT
+#line 100 "../parser.y"
+                            { drv.createLookupVariableNode(yystack_[0].value.as < std::string > ()); }
+#line 1030 "parser.cpp"
     break;
 
   case 4: // primary_expression: CONSTANT
 #line 101 "../parser.y"
                    { drv.createNumberNode(yystack_[0].value.as < std::string > ()); }
-#line 1025 "parser.cpp"
+#line 1036 "parser.cpp"
     break;
 
   case 8: // postfix_expression: IDENTIFIER LPAREN argument_expression_list RPAREN
 #line 111 "../parser.y"
                                                             { drv.createOperatorNode(yystack_[3].value.as < std::string > (), yystack_[1].value.as < int > ()); }
-#line 1031 "parser.cpp"
+#line 1042 "parser.cpp"
     break;
 
   case 9: // argument_expression_list: assignment_expression
 #line 123 "../parser.y"
                                 { yylhs.value.as < int > () = 1; }
-#line 1037 "parser.cpp"
+#line 1048 "parser.cpp"
     break;
 
   case 10: // argument_expression_list: argument_expression_list "," assignment_expression
 #line 124 "../parser.y"
                                                              { yylhs.value.as < int > () = yystack_[2].value.as < int > () + 1; }
-#line 1043 "parser.cpp"
+#line 1054 "parser.cpp"
     break;
 
   case 12: // unary_expression: MINUS_OP cast_expression
 #line 129 "../parser.y"
                                     { drv.createOperatorNode("negate", 1); }
-#line 1049 "parser.cpp"
+#line 1060 "parser.cpp"
     break;
 
   case 15: // multiplicative_expression: multiplicative_expression MULT_OP cast_expression
 #line 155 "../parser.y"
                                                             { drv.createOperatorNode(yystack_[1].value.as < std::string > (), 2); }
-#line 1055 "parser.cpp"
+#line 1066 "parser.cpp"
     break;
 
   case 16: // multiplicative_expression: multiplicative_expression DIV_OP cast_expression
 #line 156 "../parser.y"
                                                            { drv.createOperatorNode(yystack_[1].value.as < std::string > (), 2); }
-#line 1061 "parser.cpp"
+#line 1072 "parser.cpp"
     break;
 
   case 18: // additive_expression: additive_expression ADD_OP multiplicative_expression
 #line 162 "../parser.y"
                                                                { drv.createOperatorNode(yystack_[1].value.as < std::string > (), 2); }
-#line 1067 "parser.cpp"
+#line 1078 "parser.cpp"
     break;
 
   case 19: // additive_expression: additive_expression MINUS_OP multiplicative_expression
 #line 163 "../parser.y"
                                                                  { drv.createOperatorNode(yystack_[1].value.as < std::string > (), 2); }
-#line 1073 "parser.cpp"
+#line 1084 "parser.cpp"
     break;
 
   case 22: // relational_expression: relational_expression LT_OP shift_expression
 #line 176 "../parser.y"
                                                          { drv.createConditionNode(yystack_[1].value.as < std::string > ()); }
-#line 1079 "parser.cpp"
+#line 1090 "parser.cpp"
     break;
 
   case 23: // relational_expression: relational_expression GT_OP shift_expression
 #line 177 "../parser.y"
                                                          { drv.createConditionNode(yystack_[1].value.as < std::string > ()); }
-#line 1085 "parser.cpp"
+#line 1096 "parser.cpp"
     break;
 
   case 24: // relational_expression: relational_expression LE_OP shift_expression
 #line 178 "../parser.y"
                                                        { drv.createConditionNode(yystack_[1].value.as < std::string > ()); }
-#line 1091 "parser.cpp"
+#line 1102 "parser.cpp"
     break;
 
   case 25: // relational_expression: relational_expression GE_OP shift_expression
 #line 179 "../parser.y"
                                                        { drv.createConditionNode(yystack_[1].value.as < std::string > ()); }
-#line 1097 "parser.cpp"
+#line 1108 "parser.cpp"
     break;
 
   case 27: // equality_expression: equality_expression EQ_OP relational_expression
 #line 184 "../parser.y"
                                                           { drv.createConditionNode(yystack_[1].value.as < std::string > ()); }
-#line 1103 "parser.cpp"
+#line 1114 "parser.cpp"
     break;
 
   case 28: // equality_expression: equality_expression NE_OP relational_expression
 #line 185 "../parser.y"
                                                           { drv.createConditionNode(yystack_[1].value.as < std::string > ()); }
-#line 1109 "parser.cpp"
+#line 1120 "parser.cpp"
     break;
 
   case 33: // logical_and_expression: logical_and_expression AND_OP inclusive_or_expression
 #line 208 "../parser.y"
                                                                 { drv.createRelationNode(yystack_[1].value.as < std::string > ()); }
-#line 1115 "parser.cpp"
+#line 1126 "parser.cpp"
     break;
 
   case 35: // logical_or_expression: logical_or_expression OR_OP logical_and_expression
 #line 213 "../parser.y"
                                                              { drv.createRelationNode(yystack_[1].value.as < std::string > ()); }
-#line 1121 "parser.cpp"
+#line 1132 "parser.cpp"
     break;
 
   case 39: // assignment: IDENTIFIER ASSIGN STRING_LITERAL
 #line 248 "../parser.y"
                                            { drv.add_lookup_entry(yystack_[2].value.as < std::string > (),  yystack_[0].value.as < std::string > ()); }
-#line 1127 "parser.cpp"
+#line 1138 "parser.cpp"
     break;
 
   case 40: // assignment: IDENTIFIER ASSIGN IDENTIFIER
 #line 249 "../parser.y"
                                            { drv.add_lookup_entry(yystack_[2].value.as < std::string > (),  yystack_[0].value.as < std::string > ()); }
-#line 1133 "parser.cpp"
+#line 1144 "parser.cpp"
+    break;
+
+  case 41: // assignment: IDENTIFIER ASSIGN ALIAS_OP IDENTIFIER
+#line 250 "../parser.y"
+                                                    { drv.add_lookup_entry(yystack_[3].value.as < std::string > (),  yystack_[0].value.as < std::string > ()); }
+#line 1150 "parser.cpp"
     break;
 
 
-#line 1137 "parser.cpp"
+#line 1154 "parser.cpp"
 
             default:
               break;
@@ -1325,19 +1342,20 @@ namespace adios2 { namespace detail {
   "TYPE_NAME", "SEMICOLON", "LBRACE", "RBRACE", "COMMA", "COLON", "ASSIGN",
   "LPAREN", "RPAREN", "LBRACKET", "RBRACKET", "PERIOD", "AMPERSAND",
   "EXCLAMATION", "TILDE", "MINUS_OP", "ADD_OP", "MULT_OP", "DIV_OP",
-  "MOD_OP", "LT_OP", "GT_OP", "EXP_OP", "PIPE", "QUESTION", "TYPEDEF",
-  "EXTERN", "STATIC", "AUTO", "REGISTER", "INLINE", "RESTRICT", "CHAR",
-  "SHORT", "INT", "LONG", "SIGNED", "UNSIGNED", "FLOAT", "DOUBLE", "CONST",
-  "VOLATILE", "VOID", "BOOL", "COMPLEX", "IMAGINARY", "STRUCT", "UNION",
-  "ENUM", "ELLIPSIS", "CASE", "DEFAULT", "IF", "ELSE", "SWITCH", "WHILE",
-  "DO", "FOR", "GOTO", "CONTINUE", "BREAK", "RETURN", "@", ",", "$accept",
-  "primary_expression", "postfix_expression", "argument_expression_list",
-  "unary_expression", "cast_expression", "multiplicative_expression",
-  "additive_expression", "shift_expression", "relational_expression",
-  "equality_expression", "and_expression", "exclusive_or_expression",
-  "inclusive_or_expression", "logical_and_expression",
-  "logical_or_expression", "conditional_expression",
-  "assignment_expression", "expression", "assignment", "start_node", YY_NULLPTR
+  "MOD_OP", "LT_OP", "GT_OP", "EXP_OP", "PIPE", "QUESTION", "ALIAS_OP",
+  "TYPEDEF", "EXTERN", "STATIC", "AUTO", "REGISTER", "INLINE", "RESTRICT",
+  "CHAR", "SHORT", "INT", "LONG", "SIGNED", "UNSIGNED", "FLOAT", "DOUBLE",
+  "CONST", "VOLATILE", "VOID", "BOOL", "COMPLEX", "IMAGINARY", "STRUCT",
+  "UNION", "ENUM", "ELLIPSIS", "CASE", "DEFAULT", "IF", "ELSE", "SWITCH",
+  "WHILE", "DO", "FOR", "GOTO", "CONTINUE", "BREAK", "RETURN", ",",
+  "$accept", "primary_expression", "postfix_expression",
+  "argument_expression_list", "unary_expression", "cast_expression",
+  "multiplicative_expression", "additive_expression", "shift_expression",
+  "relational_expression", "equality_expression", "and_expression",
+  "exclusive_or_expression", "inclusive_or_expression",
+  "logical_and_expression", "logical_or_expression",
+  "conditional_expression", "assignment_expression", "expression",
+  "assignment", "start_node", YY_NULLPTR
     };
     return yy_sname[yysymbol];
   }
@@ -1606,20 +1624,20 @@ namespace adios2 { namespace detail {
   }
 
 
-  const signed char parser::yypact_ninf_ = -29;
+  const signed char parser::yypact_ninf_ = -37;
 
   const signed char parser::yytable_ninf_ = -1;
 
   const signed char
   parser::yypact_[] =
   {
-       1,   -18,   -29,    -3,     3,    31,   -29,   -29,   -29,   -29,
-     -21,   -14,   -29,     2,    12,   -29,   -29,   -29,    -4,    20,
-     -29,   -29,   -29,    -1,    39,     8,     3,     6,   -29,     7,
-     -29,   -29,     3,     3,     3,     3,     3,     3,     3,     3,
-       3,     3,     3,     3,     1,   -29,   -29,   -29,   -29,   -28,
-     -29,   -29,   -29,   -29,   -21,   -21,   -29,   -29,   -29,   -29,
-       2,     2,   -29,    -4,   -29,   -29,     3,   -29
+       3,   -13,   -37,    -2,     5,    11,   -37,   -37,   -37,   -37,
+     -22,   -18,   -37,     1,    13,   -37,   -37,   -37,    20,    22,
+     -37,   -37,   -37,     0,    37,     7,     5,    17,   -37,     6,
+     -37,   -37,     5,     5,     5,     5,     5,     5,     5,     5,
+       5,     5,     5,     5,     3,   -37,   -37,   -37,   -37,    51,
+     -36,   -37,   -37,   -37,   -37,   -22,   -22,   -37,   -37,   -37,
+     -37,     1,     1,   -37,    20,   -37,   -37,   -37,     5,   -37
   };
 
   const signed char
@@ -1627,25 +1645,25 @@ namespace adios2 { namespace detail {
   {
        0,     2,     4,     0,     0,     0,     7,    11,    13,    14,
       17,    20,    21,    26,    29,    30,    31,    32,    34,    36,
-      37,    38,    43,     0,     0,     0,     0,     2,     6,     0,
+      37,    38,    44,     0,     0,     0,     0,     2,     6,     0,
       12,     3,     0,     0,     0,     0,     0,     0,     0,     0,
-       0,     0,     0,     0,     0,    41,     1,    40,    39,     0,
-       9,     5,    15,    16,    19,    18,    24,    25,    22,    23,
-      27,    28,    33,    35,    42,     8,     0,    10
+       0,     0,     0,     0,     0,    42,     1,    40,    39,     0,
+       0,     9,     5,    15,    16,    19,    18,    24,    25,    22,
+      23,    27,    28,    33,    35,    43,    41,     8,     0,    10
   };
 
   const signed char
   parser::yypgoto_[] =
   {
-     -29,   -29,   -29,   -29,   -29,    15,    18,   -29,   -16,    14,
-     -29,   -29,   -29,   -24,    13,   -29,   -29,   -17,    42,   -29,
-     -13
+     -37,   -37,   -37,   -37,   -37,    12,    -4,   -37,   -19,    21,
+     -37,   -37,   -37,    15,    16,   -37,   -37,   -21,    60,   -37,
+     -12
   };
 
   const signed char
   parser::yydefgoto_[] =
   {
-       0,     6,     7,    49,     8,     9,    10,    11,    12,    13,
+       0,     6,     7,    50,     8,     9,    10,    11,    12,    13,
       14,    15,    16,    17,    18,    19,    20,    21,    22,    23,
       24
   };
@@ -1653,43 +1671,37 @@ namespace adios2 { namespace detail {
   const signed char
   parser::yytable_[] =
   {
-      27,     2,     1,     2,     1,     2,    27,     2,    65,    50,
-      45,    47,    42,    48,    36,    37,    25,    26,    62,    30,
-      56,    57,    58,    59,    32,    33,    40,    41,    44,    34,
-      35,    64,     3,    28,     3,    31,     3,    43,     3,    46,
-       4,    26,     4,    51,     4,    29,     4,    52,    53,    67,
-      38,    39,    54,    55,    60,    61,    63,     0,     0,     0,
-       0,     0,     0,    66,     0,     0,     0,     0,     0,     0,
-       0,     0,     0,     0,     0,     0,     0,     0,     0,     0,
-       0,     0,     0,     0,     0,     0,     0,     5,     0,     5,
-       0,     5,     0,     5
+      67,    27,     2,     1,     2,    51,     1,     2,    27,     2,
+      47,    45,    48,    36,    37,    31,    30,    57,    58,    59,
+      60,    25,    26,    32,    33,    34,    35,    40,    41,    44,
+      55,    56,    65,     3,    28,     3,    42,    46,     3,    43,
+       3,     4,    52,     4,    53,    54,     4,    69,     4,    38,
+      39,     5,    26,     5,    66,    68,     5,    63,     5,    64,
+      49,    61,    62,    29
   };
 
   const signed char
   parser::yycheck_[] =
   {
-       3,     4,     3,     4,     3,     4,     3,     4,    36,    26,
-      23,     3,    16,     5,    12,    13,    34,    35,    42,     4,
-      36,    37,    38,    39,    45,    46,    14,    15,    29,    43,
-      44,    44,    35,    36,    35,     4,    35,    17,    35,     0,
-      43,    35,    43,    36,    43,     3,    43,    32,    33,    66,
-      48,    49,    34,    35,    40,    41,    43,    -1,    -1,    -1,
-      -1,    -1,    -1,    91,    -1,    -1,    -1,    -1,    -1,    -1,
-      -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,
-      -1,    -1,    -1,    -1,    -1,    -1,    -1,    90,    -1,    90,
-      -1,    90,    -1,    90
+      36,     3,     4,     3,     4,    26,     3,     4,     3,     4,
+       3,    23,     5,    12,    13,     4,     4,    36,    37,    38,
+      39,    34,    35,    45,    46,    43,    44,    14,    15,    29,
+      34,    35,    44,    35,    36,    35,    16,     0,    35,    17,
+      35,    43,    36,    43,    32,    33,    43,    68,    43,    48,
+      49,    53,    35,    53,     3,    91,    53,    42,    53,    43,
+      53,    40,    41,     3
   };
 
   const signed char
   parser::yystos_[] =
   {
-       0,     3,     4,    35,    43,    90,    93,    94,    96,    97,
+       0,     3,     4,    35,    43,    53,    93,    94,    96,    97,
       98,    99,   100,   101,   102,   103,   104,   105,   106,   107,
      108,   109,   110,   111,   112,    34,    35,     3,    36,   110,
       97,     4,    45,    46,    43,    44,    12,    13,    48,    49,
-      14,    15,    16,    17,    29,   112,     0,     3,     5,    95,
-     109,    36,    97,    97,    98,    98,   100,   100,   100,   100,
-     101,   101,   105,   106,   112,    36,    91,   109
+      14,    15,    16,    17,    29,   112,     0,     3,     5,    53,
+      95,   109,    36,    97,    97,    98,    98,   100,   100,   100,
+     100,   101,   101,   105,   106,   112,     3,    36,    91,   109
   };
 
   const signed char
@@ -1699,7 +1711,7 @@ namespace adios2 { namespace detail {
       95,    96,    96,    97,    98,    98,    98,    99,    99,    99,
      100,   101,   101,   101,   101,   101,   102,   102,   102,   103,
      104,   105,   106,   106,   107,   107,   108,   109,   110,   111,
-     111,   112,   112,   112
+     111,   111,   112,   112,   112
   };
 
   const signed char
@@ -1709,21 +1721,21 @@ namespace adios2 { namespace detail {
        3,     1,     2,     1,     1,     3,     3,     1,     3,     3,
        1,     1,     3,     3,     3,     3,     1,     3,     3,     1,
        1,     1,     1,     3,     1,     3,     1,     1,     1,     3,
-       3,     2,     3,     1
+       3,     4,     2,     3,     1
   };
 
 
 
 
 #if YYDEBUG
-  const unsigned char
+  const short
   parser::yyrline_[] =
   {
        0,    99,    99,   100,   101,   103,   104,   108,   111,   123,
      124,   128,   129,   149,   154,   155,   156,   161,   162,   163,
      168,   175,   176,   177,   178,   179,   183,   184,   185,   190,
      196,   202,   207,   208,   212,   213,   217,   222,   243,   248,
-     249,   253,   254,   255
+     249,   250,   254,   255,   256
   };
 
   void
@@ -1756,9 +1768,9 @@ namespace adios2 { namespace detail {
 
 #line 6 "../parser.y"
 } } // adios2::detail
-#line 1760 "parser.cpp"
+#line 1772 "parser.cpp"
 
-#line 306 "../parser.y"
+#line 307 "../parser.y"
 
 #include <stdio.h>
 
