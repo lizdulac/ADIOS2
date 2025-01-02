@@ -55,6 +55,16 @@ void ASTDriver::resolve(ASTNode *node)
             resolve(subexpr);
         }
     }
+    else if (ConditionNode *condnode = dynamic_cast<ConditionNode*>(node))
+    {
+        resolve(condnode->get_subexpr1());
+        resolve(condnode->get_subexpr2());
+    }
+    else if (RelationNode *relnode = dynamic_cast<RelationNode*>(node))
+    {
+        resolve(relnode->get_condition1());
+        resolve(relnode->get_condition2());
+    }
     else if (IndexNode *idxnode = dynamic_cast<IndexNode*>(node))
     {
         resolve(idxnode->get_varnode());
