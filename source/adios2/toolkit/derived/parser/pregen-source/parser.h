@@ -666,7 +666,7 @@ namespace adios2 { namespace detail {
     {
       enum symbol_kind_type
       {
-        YYNTOKENS = 92, ///< Number of tokens.
+        YYNTOKENS = 91, ///< Number of tokens.
         S_YYEMPTY = -2,
         S_YYEOF = 0,                             // "end of file"
         S_YYerror = 1,                           // error
@@ -759,28 +759,27 @@ namespace adios2 { namespace detail {
         S_CONTINUE = 88,                         // CONTINUE
         S_BREAK = 89,                            // BREAK
         S_RETURN = 90,                           // RETURN
-        S_91_ = 91,                              // ","
-        S_YYACCEPT = 92,                         // $accept
-        S_primary_expression = 93,               // primary_expression
-        S_postfix_expression = 94,               // postfix_expression
-        S_argument_expression_list = 95,         // argument_expression_list
-        S_unary_expression = 96,                 // unary_expression
-        S_cast_expression = 97,                  // cast_expression
-        S_multiplicative_expression = 98,        // multiplicative_expression
-        S_additive_expression = 99,              // additive_expression
-        S_shift_expression = 100,                // shift_expression
-        S_relational_expression = 101,           // relational_expression
-        S_equality_expression = 102,             // equality_expression
-        S_and_expression = 103,                  // and_expression
-        S_exclusive_or_expression = 104,         // exclusive_or_expression
-        S_inclusive_or_expression = 105,         // inclusive_or_expression
-        S_logical_and_expression = 106,          // logical_and_expression
-        S_logical_or_expression = 107,           // logical_or_expression
-        S_conditional_expression = 108,          // conditional_expression
-        S_assignment_expression = 109,           // assignment_expression
-        S_expression = 110,                      // expression
-        S_assignment = 111,                      // assignment
-        S_start_node = 112                       // start_node
+        S_YYACCEPT = 91,                         // $accept
+        S_primary_expression = 92,               // primary_expression
+        S_postfix_expression = 93,               // postfix_expression
+        S_argument_expression_list = 94,         // argument_expression_list
+        S_unary_expression = 95,                 // unary_expression
+        S_cast_expression = 96,                  // cast_expression
+        S_multiplicative_expression = 97,        // multiplicative_expression
+        S_additive_expression = 98,              // additive_expression
+        S_shift_expression = 99,                 // shift_expression
+        S_relational_expression = 100,           // relational_expression
+        S_equality_expression = 101,             // equality_expression
+        S_and_expression = 102,                  // and_expression
+        S_exclusive_or_expression = 103,         // exclusive_or_expression
+        S_inclusive_or_expression = 104,         // inclusive_or_expression
+        S_logical_and_expression = 105,          // logical_and_expression
+        S_logical_or_expression = 106,           // logical_or_expression
+        S_conditional_expression = 107,          // conditional_expression
+        S_assignment_expression = 108,           // assignment_expression
+        S_expression = 109,                      // expression
+        S_assignment = 110,                      // assignment
+        S_start_node = 111                       // start_node
       };
     };
 
@@ -1180,8 +1179,7 @@ switch (yykind)
       {
 #if !defined _MSC_VER || defined __clang__
         YY_ASSERT (tok == token::TOK_YYEOF
-                   || (token::TOK_YYerror <= tok && tok <= token::TOK_YYUNDEF)
-                   || tok == 346);
+                   || (token::TOK_YYerror <= tok && tok <= token::TOK_YYUNDEF));
 #endif
       }
 #if 201103L <= YY_CPLUSPLUS
@@ -2953,7 +2951,7 @@ switch (yykind)
     /// Constants.
     enum
     {
-      yylast_ = 63,     ///< Last index in yytable_.
+      yylast_ = 66,     ///< Last index in yytable_.
       yynnts_ = 21,  ///< Number of nonterminal symbols.
       yyfinal_ = 46 ///< Termination state number.
     };
@@ -3268,7 +3266,7 @@ switch (yykind)
 
 #line 6 "../parser.y"
 } } // adios2::detail
-#line 3272 "parser.h"
+#line 3270 "parser.h"
 
 
 

@@ -1047,9 +1047,9 @@ namespace adios2 { namespace detail {
 #line 1048 "parser.cpp"
     break;
 
-  case 10: // argument_expression_list: argument_expression_list "," assignment_expression
+  case 10: // argument_expression_list: argument_expression_list COMMA assignment_expression
 #line 124 "../parser.y"
-                                                             { yylhs.value.as < int > () = yystack_[2].value.as < int > () + 1; }
+                                                               { yylhs.value.as < int > () = yystack_[2].value.as < int > () + 1; }
 #line 1054 "parser.cpp"
     break;
 
@@ -1347,15 +1347,14 @@ namespace adios2 { namespace detail {
   "CHAR", "SHORT", "INT", "LONG", "SIGNED", "UNSIGNED", "FLOAT", "DOUBLE",
   "CONST", "VOLATILE", "VOID", "BOOL", "COMPLEX", "IMAGINARY", "STRUCT",
   "UNION", "ENUM", "ELLIPSIS", "CASE", "DEFAULT", "IF", "ELSE", "SWITCH",
-  "WHILE", "DO", "FOR", "GOTO", "CONTINUE", "BREAK", "RETURN", ",",
-  "$accept", "primary_expression", "postfix_expression",
-  "argument_expression_list", "unary_expression", "cast_expression",
-  "multiplicative_expression", "additive_expression", "shift_expression",
-  "relational_expression", "equality_expression", "and_expression",
-  "exclusive_or_expression", "inclusive_or_expression",
-  "logical_and_expression", "logical_or_expression",
-  "conditional_expression", "assignment_expression", "expression",
-  "assignment", "start_node", YY_NULLPTR
+  "WHILE", "DO", "FOR", "GOTO", "CONTINUE", "BREAK", "RETURN", "$accept",
+  "primary_expression", "postfix_expression", "argument_expression_list",
+  "unary_expression", "cast_expression", "multiplicative_expression",
+  "additive_expression", "shift_expression", "relational_expression",
+  "equality_expression", "and_expression", "exclusive_or_expression",
+  "inclusive_or_expression", "logical_and_expression",
+  "logical_or_expression", "conditional_expression",
+  "assignment_expression", "expression", "assignment", "start_node", YY_NULLPTR
     };
     return yy_sname[yysymbol];
   }
@@ -1624,20 +1623,20 @@ namespace adios2 { namespace detail {
   }
 
 
-  const signed char parser::yypact_ninf_ = -37;
+  const signed char parser::yypact_ninf_ = -24;
 
   const signed char parser::yytable_ninf_ = -1;
 
   const signed char
   parser::yypact_[] =
   {
-       3,   -13,   -37,    -2,     5,    11,   -37,   -37,   -37,   -37,
-     -22,   -18,   -37,     1,    13,   -37,   -37,   -37,    20,    22,
-     -37,   -37,   -37,     0,    37,     7,     5,    17,   -37,     6,
-     -37,   -37,     5,     5,     5,     5,     5,     5,     5,     5,
-       5,     5,     5,     5,     3,   -37,   -37,   -37,   -37,    51,
-     -36,   -37,   -37,   -37,   -37,   -22,   -22,   -37,   -37,   -37,
-     -37,     1,     1,   -37,    20,   -37,   -37,   -37,     5,   -37
+       1,   -13,   -24,    -3,     3,     7,   -24,   -24,   -24,   -24,
+     -20,    18,   -24,    11,    16,   -24,   -24,   -24,     4,    10,
+     -24,   -24,   -24,    -1,    37,     5,     3,    -6,   -24,     9,
+     -24,   -24,     3,     3,     3,     3,     3,     3,     3,     3,
+       3,     3,     3,     3,     1,   -24,   -24,   -24,   -24,    36,
+     -23,   -24,   -24,   -24,   -24,   -20,   -20,   -24,   -24,   -24,
+     -24,    11,    11,   -24,     4,   -24,   -24,     3,   -24,   -24
   };
 
   const signed char
@@ -1649,15 +1648,15 @@ namespace adios2 { namespace detail {
       12,     3,     0,     0,     0,     0,     0,     0,     0,     0,
        0,     0,     0,     0,     0,    42,     1,    40,    39,     0,
        0,     9,     5,    15,    16,    19,    18,    24,    25,    22,
-      23,    27,    28,    33,    35,    43,    41,     8,     0,    10
+      23,    27,    28,    33,    35,    43,    41,     0,     8,    10
   };
 
   const signed char
   parser::yypgoto_[] =
   {
-     -37,   -37,   -37,   -37,   -37,    12,    -4,   -37,   -19,    21,
-     -37,   -37,   -37,    15,    16,   -37,   -37,   -21,    60,   -37,
-     -12
+     -24,   -24,   -24,   -24,   -24,    15,    29,   -24,   -21,    25,
+     -24,   -24,   -24,    13,    -2,   -24,   -24,   -14,    40,   -24,
+      -9
   };
 
   const signed char
@@ -1671,47 +1670,47 @@ namespace adios2 { namespace detail {
   const signed char
   parser::yytable_[] =
   {
-      67,    27,     2,     1,     2,    51,     1,     2,    27,     2,
-      47,    45,    48,    36,    37,    31,    30,    57,    58,    59,
-      60,    25,    26,    32,    33,    34,    35,    40,    41,    44,
-      55,    56,    65,     3,    28,     3,    42,    46,     3,    43,
-       3,     4,    52,     4,    53,    54,     4,    69,     4,    38,
-      39,     5,    26,     5,    66,    68,     5,    63,     5,    64,
-      49,    61,    62,    29
+      27,     2,     1,     2,     1,     2,    27,     2,    47,    67,
+      48,    31,    51,    68,    45,    57,    58,    59,    60,    30,
+      42,    25,    26,    36,    37,    32,    33,    43,    44,    26,
+      40,    41,     3,    28,     3,    65,     3,    46,     3,    66,
+       4,    64,     4,    29,     4,    52,     4,    53,    54,     0,
+       5,     0,     5,    69,     5,    63,     5,     0,    49,    38,
+      39,    34,    35,    55,    56,    61,    62
   };
 
   const signed char
   parser::yycheck_[] =
   {
-      36,     3,     4,     3,     4,    26,     3,     4,     3,     4,
-       3,    23,     5,    12,    13,     4,     4,    36,    37,    38,
-      39,    34,    35,    45,    46,    43,    44,    14,    15,    29,
-      34,    35,    44,    35,    36,    35,    16,     0,    35,    17,
-      35,    43,    36,    43,    32,    33,    43,    68,    43,    48,
-      49,    53,    35,    53,     3,    91,    53,    42,    53,    43,
-      53,    40,    41,     3
+       3,     4,     3,     4,     3,     4,     3,     4,     3,    32,
+       5,     4,    26,    36,    23,    36,    37,    38,    39,     4,
+      16,    34,    35,    12,    13,    45,    46,    17,    29,    35,
+      14,    15,    35,    36,    35,    44,    35,     0,    35,     3,
+      43,    43,    43,     3,    43,    36,    43,    32,    33,    -1,
+      53,    -1,    53,    67,    53,    42,    53,    -1,    53,    48,
+      49,    43,    44,    34,    35,    40,    41
   };
 
   const signed char
   parser::yystos_[] =
   {
-       0,     3,     4,    35,    43,    53,    93,    94,    96,    97,
-      98,    99,   100,   101,   102,   103,   104,   105,   106,   107,
-     108,   109,   110,   111,   112,    34,    35,     3,    36,   110,
-      97,     4,    45,    46,    43,    44,    12,    13,    48,    49,
-      14,    15,    16,    17,    29,   112,     0,     3,     5,    53,
-      95,   109,    36,    97,    97,    98,    98,   100,   100,   100,
-     100,   101,   101,   105,   106,   112,     3,    36,    91,   109
+       0,     3,     4,    35,    43,    53,    92,    93,    95,    96,
+      97,    98,    99,   100,   101,   102,   103,   104,   105,   106,
+     107,   108,   109,   110,   111,    34,    35,     3,    36,   109,
+      96,     4,    45,    46,    43,    44,    12,    13,    48,    49,
+      14,    15,    16,    17,    29,   111,     0,     3,     5,    53,
+      94,   108,    36,    96,    96,    97,    97,    99,    99,    99,
+      99,   100,   100,   104,   105,   111,     3,    32,    36,   108
   };
 
   const signed char
   parser::yyr1_[] =
   {
-       0,    92,    93,    93,    93,    93,    93,    94,    94,    95,
-      95,    96,    96,    97,    98,    98,    98,    99,    99,    99,
-     100,   101,   101,   101,   101,   101,   102,   102,   102,   103,
-     104,   105,   106,   106,   107,   107,   108,   109,   110,   111,
-     111,   111,   112,   112,   112
+       0,    91,    92,    92,    92,    92,    92,    93,    93,    94,
+      94,    95,    95,    96,    97,    97,    97,    98,    98,    98,
+      99,   100,   100,   100,   100,   100,   101,   101,   101,   102,
+     103,   104,   105,   105,   106,   106,   107,   108,   109,   110,
+     110,   110,   111,   111,   111
   };
 
   const signed char
@@ -1768,7 +1767,7 @@ namespace adios2 { namespace detail {
 
 #line 6 "../parser.y"
 } } // adios2::detail
-#line 1772 "parser.cpp"
+#line 1771 "parser.cpp"
 
 #line 307 "../parser.y"
 

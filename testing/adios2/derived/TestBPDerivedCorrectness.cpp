@@ -50,7 +50,6 @@ TEST_P(DerivedCorrectnessP, ParserTest)
     bpOut.DefineDerivedVariable("SubexprConst2", "x= var1;y= var2 \n ((x + 5) * (-7 - y)) * 2", mode);
 }
 
-/*
 TEST_P(DerivedCorrectnessP, BasicCorrectnessTest)
 {
     adios2::DerivedVarType mode = GetParam();
@@ -127,18 +126,18 @@ TEST_P(DerivedCorrectnessP, VectorCorrectnessTest)
     auto Vz = bpOut.DefineVariable<float>(varname[5], {Nx, Ny, Nz}, {0, 0, 0}, {Nx, Ny, Nz});
     // clang-format off
     bpOut.DefineDerivedVariable(derMagName,
-                                "x =" + varname[0] + " \n"
-                                "y =" + varname[1] + " \n"
-                                "z =" + varname[2] + " \n"
+                                "x =\"" + varname[0] + "\" \n"
+                                "y =\"" + varname[1] + "\" \n"
+                                "z =\"" + varname[2] + "\" \n"
                                 "magnitude(x,y,z)",
                                 mode);
     bpOut.DefineDerivedVariable(derCrossName,
-                                "Ux =" + varname[0] + " \n"
-                                "Uy =" + varname[1] + " \n"
-                                "Uz =" + varname[2] + " \n"
-                                "Vx =" + varname[3] + " \n"
-                                "Vy =" + varname[4] + " \n"
-                                "Vz =" + varname[5] + " \n"
+                                "Ux =\"" + varname[0] + "\" \n"
+                                "Uy =\"" + varname[1] + "\" \n"
+                                "Uz =\"" + varname[2] + "\" \n"
+                                "Vx =\"" + varname[3] + "\" \n"
+                                "Vy =\"" + varname[4] + "\" \n"
+                                "Vz =\"" + varname[5] + "\" \n"
                                 "cross(Ux, Uy, Uz, Vx, Vy, Vz)",
                                 mode);
     // clang-format on
@@ -251,7 +250,6 @@ TEST_P(DerivedCorrectnessP, CurlCorrectnessTest)
                 simArray2[idx] = sqrtf(z + 1) * cosf(x);
                 simArray3[idx] = powf(x, 2) * sinf(y) + (6 * z);
                 */
-/*
             }
         }
     }
@@ -266,9 +264,9 @@ TEST_P(DerivedCorrectnessP, CurlCorrectnessTest)
     auto VZ = bpOut.DefineVariable<float>(varname[2], {Nx, Ny, Nz}, {0, 0, 0}, {Nx, Ny, Nz});
     // clang-format off
     bpOut.DefineDerivedVariable(derivedname,
-                                "Vx =" + varname[0] + " \n"
-                                "Vy =" + varname[1] + " \n"
-                                "Vz =" + varname[2] + " \n"
+                                "Vx =\"" + varname[0] + "\" \n"
+                                "Vy =\"" + varname[1] + "\" \n"
+                                "Vz =\"" + varname[2] + "\" \n"
                                 "curl(Vx,Vy,Vz)",
                                 mode);
     // clang-format on
@@ -332,7 +330,6 @@ TEST_P(DerivedCorrectnessP, CurlCorrectnessTest)
                 curl_y = -2 * x * sinf(y);
                 curl_z = -sqrtf(z + 1) * sinf(x) - (2 * expf(2 * y) * sinf(x));
                 */
-/*
                 if (fabs(curl_x) < 1)
                 {
                     err_x = fabs(curl_x - readCurl[3 * idx]) / (1 + fabs(curl_x));
@@ -407,9 +404,9 @@ TEST_P(DerivedCorrectnessP, MagCurlCorrectnessTest)
     auto Uz = bpOut.DefineVariable<float>(varname[2], {Nx, Ny, Nz}, {0, 0, 0}, {Nx, Ny, Nz});
     // clang-format off
     bpOut.DefineDerivedVariable(derivedname,
-                                "x =" + varname[0] + " \n"
-                                "y =" + varname[1] + " \n"
-                                "z =" + varname[2] + " \n"
+                                "x =\"" + varname[0] + "\" \n"
+                                "y =\"" + varname[1] + "\" \n"
+                                "z =\"" + varname[2] + "\" \n"
                                 "magnitude(curl(x,y,z))",
                                 mode);
     // clang-format on
@@ -462,7 +459,7 @@ TEST_P(DerivedCorrectnessP, MagCurlCorrectnessTest)
     bpFileReader.Close();
     EXPECT_LT(err / (Nx * Ny * Nz), error_limit);
 }
-*/
+
 INSTANTIATE_TEST_SUITE_P(DerivedCorrectness, DerivedCorrectnessP,
                          ::testing::Values(adios2::DerivedVarType::StatsOnly,
                                            adios2::DerivedVarType::ExpressionString,

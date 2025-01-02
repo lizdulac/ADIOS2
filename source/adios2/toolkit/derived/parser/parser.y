@@ -121,7 +121,7 @@ postfix_expression
 
 argument_expression_list
         : assignment_expression { $$ = 1; }
-        | argument_expression_list "," assignment_expression { $$ = $1 + 1; }
+        | argument_expression_list COMMA assignment_expression { $$ = $1 + 1; }
 	;
 
 unary_expression
