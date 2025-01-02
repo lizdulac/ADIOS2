@@ -118,7 +118,7 @@ void ASTDriver::createRelationNode(std::string relation)
     holding.pop();
     ASTNode *subexpr1 = holding.top();
     holding.pop();
-    ConditionNode *node = new ConditionNode(relation, subexpr1, subexpr2);
+    RelationNode *node = new RelationNode(relation, subexpr1, subexpr2);
     holding.push(node);
 }
 

@@ -176,8 +176,8 @@ std::string RelationNode::printpretty(std::string indent)
 {
     std::string result = indent + "Relation Node: " + relation + "\n";
 
-    condition1->printpretty(indent + "    ");
-    condition2->printpretty(indent + "    ");
+    result += condition1->printpretty(indent + "    ");
+    result += condition2->printpretty(indent + "    ");
 
     return result;
 }
