@@ -28,6 +28,7 @@ public:
 
     std::string get_alias();
     std::string get_varname();
+    bool get_alias_is_index();
 
     void set_varname(const std::string);
 

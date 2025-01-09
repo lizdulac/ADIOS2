@@ -37,6 +37,7 @@ TEST_P(DerivedCorrectnessP, ParserTest)
     auto W = bpOut.DefineVariable<float>("vars/var_#3", {N}, {0}, {N});
     bpOut.DefineDerivedVariable("constAdd", "x = var1 \n x + 1", mode);
     bpOut.DefineDerivedVariable("constMult", "x= var1 ;\n y= \"vars/var_#3\"; 2 * x * y * 5 * 1", mode);
+    bpOut.DefineDerivedVariable("Alias1", "x= var1 ;\n y= \"vars/var_#3\"; 5 - (@1 + y * @3 - 3.14159) + add(@4, x)", mode, {"unused","vars/var_#3","fakename","var1","var2"});
 
     // Queries - result in error - cannot translate to ExpressionTree
     bpOut.DefineDerivedVariable("queryComplex", "x = var1; y =var2;\n (x> 0 && (-1.5 < y < 1.5)) || y <20 &&y >2", mode);

@@ -39,6 +39,8 @@ std::string VariableNode::get_alias() { return alias; }
 
 std::string VariableNode::get_varname() { return varname; }
 
+bool VariableNode::get_alias_is_index() { return alias_is_index; }
+
 void VariableNode::set_varname(const std::string s) { varname = s; }
 
 IndexNode::IndexNode(ASTNode *var, std::vector<std::tuple<int, int, int>> idx)

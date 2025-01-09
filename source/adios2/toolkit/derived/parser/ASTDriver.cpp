@@ -15,6 +15,13 @@ ASTDriver::ASTDriver(const std::string input)
   ASTDriver::parse(input);
 }
 
+ASTDriver::ASTDriver(const std::string input, const std::vector<std::string> vars_in)
+  : varnames_input(vars_in)
+{
+  std::cout << "ASTDriver parsing input expression \"" << input << "\"" << std::endl;
+  ASTDriver::parse(input);
+}
+
 ASTDriver::~ASTDriver()
 {
     ASTDriver::destroy_lex_structures();
@@ -39,14 +46,31 @@ void ASTDriver::resolve(ASTNode *node)
 {
     if (VariableNode *varnode = dynamic_cast<VariableNode*>(node))
     {
-        std::tuple<std::string, indx_type> var_info;
-        var_info = lookup_var(varnode->get_alias());
-        varnode->set_varname(std::get<0>(var_info));
-	indx_type i = std::get<1>(var_info);
-	if (i.size() > 0)
+        if (varnode->get_alias_is_index())
+	{
+	  int var_index = stoi(varnode->get_alias());
+	  if (var_index < 0 || var_index >= varnames_input.size())
 	  {
-	    node = new IndexNode(varnode, i);
+	    // error
+	    std::cout << "ASTDriver trying to resolve alias \"" << varnode->get_alias();
+	    std::cout << ", but index " << var_index << " out of bounds." << std::endl;
 	  }
+	  else
+	  {
+	    varnode->set_varname(varnames_input[var_index]);
+	  }
+	}
+	else
+	{
+            std::tuple<std::string, indx_type> var_info;
+            var_info = lookup_var(varnode->get_alias());
+            varnode->set_varname(std::get<0>(var_info));
+	    indx_type i = std::get<1>(var_info);
+	    if (i.size() > 0)
+	    {
+	        node = new IndexNode(varnode, i);
+	    }
+	}
     }
     else if (OperatorNode *opnode = dynamic_cast<OperatorNode*>(node))
     {   

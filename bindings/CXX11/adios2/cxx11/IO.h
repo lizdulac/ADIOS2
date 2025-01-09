@@ -156,7 +156,8 @@ public:
                                const bool constantDims = false);
 #ifdef ADIOS2_HAVE_DERIVED_VARIABLE
     VariableDerived DefineDerivedVariable(const std::string &name, const std::string &expression,
-                                          const DerivedVarType varType = DerivedVarType::StatsOnly);
+                                          const DerivedVarType varType = DerivedVarType::StatsOnly,
+					  const std::vector<std::string> &varnames = {});
 #endif
     VariableNT DefineVariable(const DataType type, const std::string &name,
                               const Dims &shape = Dims(), const Dims &start = Dims(),

@@ -887,7 +887,8 @@ void IO::CheckTransportType(const std::string type) const
 
 #ifdef ADIOS2_HAVE_DERIVED_VARIABLE
 VariableDerived &IO::DefineDerivedVariable(const std::string &name, const std::string &exp_string,
-                                           const DerivedVarType varType)
+                                           const DerivedVarType varType,
+					   const std::vector<std::string> &varnames)
 {
     PERFSTUBS_SCOPED_TIMER("IO::DefineDerivedVariable");
 
@@ -912,7 +913,7 @@ VariableDerived &IO::DefineDerivedVariable(const std::string &name, const std::s
         }
     }
 
-    derived::Expression derived_exp(exp_string);
+    derived::Expression derived_exp(exp_string, varnames);
     std::vector<std::string> var_list = derived_exp.VariableNameList();
     bool isConstant = true;
     std::map<std::string, DataType> name_to_type;

@@ -94,7 +94,7 @@ class Expression
 
 public:
     Expression() = default;
-    Expression(std::string expression);
+    Expression(std::string expression, const std::vector<std::string> &varnames = {});
 
     std::string ExprString;
 

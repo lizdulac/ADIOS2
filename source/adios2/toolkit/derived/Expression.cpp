@@ -170,10 +170,10 @@ std::map<adios2::detail::ExpressionOperator, OperatorFunctions> OpFunctions = {
     {adios2::detail::ExpressionOperator::OP_CROSS, {Cross3DFunc, Cross3DDimsFunc, SameTypeFunc}},
     {adios2::detail::ExpressionOperator::OP_CURL, {Curl3DFunc, CurlDimsFunc, SameTypeFunc}}};
 
-Expression::Expression(std::string string_exp)
+Expression::Expression(std::string string_exp, const std::vector<std::string> &varnames)
 : m_Shape({0}), m_Start({0}), m_Count({0}), ExprString(string_exp)
 {
-    adios2::detail::ASTDriver drv(string_exp);
+    adios2::detail::ASTDriver drv(string_exp, varnames);
     m_Expr = adios2::detail::ASTNode_to_ExpressionTree(drv.getAST());
 }
 

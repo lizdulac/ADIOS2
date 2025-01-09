@@ -23,6 +23,7 @@ class ASTDriver
 public:
     ASTDriver();
     ASTDriver(const std::string input);
+    ASTDriver(const std::string input, const std::vector<std::string> vars_in);
     ~ASTDriver();
 
     // Defined in lexer.l
@@ -63,6 +64,8 @@ private:
     // Variable lookup table: maps alias names
     // to variable names and indices from alias definition
     std::map<std::string, std::tuple<std::string, indx_type>> aliases;
+
+    std::vector<std::string> varnames_input;
 };
 
 }
